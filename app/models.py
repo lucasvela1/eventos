@@ -197,7 +197,7 @@ class Ticket(models.Model):
     type = models.TextField(choices=Type.choices, default=Type.general)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
     event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False) #VER SI ES CLAVE FORANEA
-
+    #Agregar aquí para definir que sea única la relación de un ticket-usuario-evento
     def __str__(self):
         return self.ticket_code
 
