@@ -77,10 +77,10 @@ class Event(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     total_rating = models.IntegerField()
     categoria = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
-    venue = models.OneToOneField(Venue, on_delete=models.SET_NULL, null=True, blank=False)
-    suma_puntaje=models.BooleanField
-    cantidad_puntos=models.IntegerField
-    cancelado=models.BooleanField
+    venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=False)
+    suma_puntaje=models.BooleanField()
+    cantidad_puntos=models.IntegerField()
+    cancelado=models.BooleanField()
 
     def __str__(self):
         return self.title
@@ -138,7 +138,7 @@ class User(models.Model):
     username = models.CharField(max_length=50)
     email = models.TextField()
     notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
-    puntaje= models.IntegerField
+    puntaje= models.IntegerField()
 
     def __str__(self):
         return self.username
@@ -196,31 +196,41 @@ class Ticket(models.Model):
     quantity = models.IntegerField()
     type = models.TextField(choices=Type.choices, default=Type.general)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False) #VER SI ES CLAVE FORANEA
-    #Agregar aquí para definir que sea única la relación de un ticket-usuario-evento
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
+    
     def __str__(self):
         return self.ticket_code
+    
+    class Meta:
+        unique_together = ("user", "event")
 
 class Rating(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
 
     def __str__(self):
         return self.title
+    
+    class Meta():
+        unique_together = ("user", "event")
 
 class Comment(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False )  #Revisar si es ForeigngKey
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False )  #Revisar si es ForeigngKey
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
 
+    class Meta():
+        unique_together = ("user", "event")
 
 class Favorito(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
     event = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
-   
+    
+    class Meta():
+        unique_together = ("user", "event")
