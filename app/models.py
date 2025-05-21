@@ -80,6 +80,7 @@ class Event(models.Model):
     venue = models.OneToOneField(Venue, on_delete=models.SET_NULL, null=True, blank=False)
     suma_puntaje=models.BooleanField
     cantidad_puntos=models.IntegerField
+    cancelado=models.BooleanField
 
     def __str__(self):
         return self.title
