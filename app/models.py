@@ -95,8 +95,8 @@ class Ticket(models.Model):
     ticket_code = models.TextField(unique=True)
     quantity = models.IntegerField()
     type = models.TextField(choices=Type.choices, default=Type.general)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False )
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False )
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False )
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False )
 
 class Rating(models.Model):
     title = models.CharField(max_length=200)
