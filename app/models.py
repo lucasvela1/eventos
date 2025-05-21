@@ -102,7 +102,6 @@ class RefundRequest(models.Model):
     def __str__(self):
         return self.ticket_code
     
-    def 
 
 class Type(models.TextChoices):
     general = 'GENERAL'
@@ -114,7 +113,7 @@ class Ticket(models.Model):
     quantity = models.IntegerField()
     type = models.TextField(choices=Type.choices, default=Type.general)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False)
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False) #VER SI ES CLAVE FORANEA
 
     def __str__(self):
         return self.ticket_code
