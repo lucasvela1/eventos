@@ -7,6 +7,31 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @classmethod
+    def validate(cls, name):
+        errors = {}
+        if not name:
+            errors["name"] = "Por favor ingrese un nombre"
+        return errors
+
+    @classmethod
+    def new(cls, name, description="", is_active=True):
+        errors = cls.validate(name)
+        if errors:
+            return False, errors
+        cls.objects.create(name=name, description=description, is_active=is_active)
+        return True, None
+
+    def update(self, name=None, description=None, is_active=None):
+        if name is not None:
+            self.name = name
+        if description is not None:
+            self.description = description
+        if is_active is not None:
+            self.is_active = is_active
+        self.save()
+
 
 class Venue(models.Model):
     name = models.CharField(max_length=200)
@@ -17,6 +42,31 @@ class Venue(models.Model):
 
     def __str__(self):
         return self.name
+    
+    @classmethod
+    def validate(cls, name, address, city, capacity, contact):
+        errors = {}
+        if not name:
+            errors["name"] = "El nombre es requerido"
+        if capacity is not None and capacity < 0:
+            errors["capacity"] = "La capacidad no puede ser negativa"
+        return errors
+
+    @classmethod
+    def new(cls, name, address, city, capacity, contact):
+        errors = cls.validate(name, address, city, capacity, contact)
+        if errors:
+            return False, errors
+        cls.objects.create(name=name, address=address, city=city, capacity=capacity, contact=contact)
+        return True, None
+
+    def update(self, name=None, address=None, city=None, capacity=None, contact=None):
+        self.name = name or self.name
+        self.address = address or self.address
+        self.city = city or self.city
+        self.capacity = capacity if capacity is not None else self.capacity
+        self.contact = contact or self.contact
+        self.save()
 
 
 class Event(models.Model):
@@ -28,6 +78,8 @@ class Event(models.Model):
     total_rating = models.IntegerField()
     categoria = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     venue = models.OneToOneField(Venue, on_delete=models.SET_NULL, null=True, blank=False)
+    suma_puntaje=models.BooleanField
+    cantidad_puntos=models.IntegerField
 
     def __str__(self):
         return self.title
@@ -85,9 +137,39 @@ class User(models.Model):
     username = models.CharField(max_length=50)
     email = models.TextField()
     notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
+    puntaje= models.IntegerField
 
     def __str__(self):
         return self.username
+    
+    @classmethod
+    def validate(cls, username, email):
+        errors = {}
+        if not username or username.strip() == "":
+            errors["username"] = "Por favor ingrese un nombre de usuario"
+
+        if not email or email.strip() == "":
+            errors["email"] = "Por favor ingrese un correo electrónico"
+
+        return errors
+
+    @classmethod
+    def new(cls, username, email, notification=None):
+        errors = cls.validate(username, email)
+        if errors:
+            return False, errors
+
+        cls.objects.create(username=username, email=email, notification=notification)
+        return True, None
+
+    def update(self, username=None, email=None, notification=None):
+        if username is not None:
+            self.username = username
+        if email is not None:
+            self.email = email
+        if notification is not None:
+            self.notification = notification
+        self.save()
 
 
 
@@ -123,15 +205,21 @@ class Rating(models.Model):
     text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False )
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
 
     def __str__(self):
-        return self.ticket_title
+        return self.title
 
 class Comment(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False )
-    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False )
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False )  #Revisar si es ForeigngKey
+    event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+
+
+class Favorito(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
+    event = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
+   
