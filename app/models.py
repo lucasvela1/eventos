@@ -105,12 +105,3 @@ class Rating(models.Model):
     created_at = models.DateTimeField()
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=False )
     event = models.OneToOneField(Event, on_delete=models.CASCADE, null=True, blank=False )
-
-
-
-    
-
-
-
-
-    
