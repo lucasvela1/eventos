@@ -135,11 +135,17 @@ class Notification(models.Model):
     def __str__(self):
         return self.title
 
+class UserRole(models.TextChoices):
+    ADMIN = 'ADMIN', 'Administrador'
+    VENDEDOR = 'VENDEDOR', 'Vendedor'
+    CLIENTE = 'CLIENTE', 'Cliente'
+
 class CustomUser(AbstractUser):
     #username = models.CharField(max_length=50)
     #email = models.TextField()
     notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
-    puntaje= models.IntegerField()
+    puntaje= models.IntegerField(default=0)
+    rol = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.CLIENTE)
 
     def __str__(self):
         return self.username
