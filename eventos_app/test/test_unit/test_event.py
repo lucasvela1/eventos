@@ -3,7 +3,7 @@ import datetime
 from django.test import TestCase
 from django.utils import timezone
 
-from app.models import Event
+from eventos_app.models import Event
 
 
 class EventModelTest(TestCase):

@@ -4,7 +4,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 from django.utils import timezone
 
-from app.models import Event
+from eventos_app.models import Event
 
 
 class BaseEventTestCase(TestCase):

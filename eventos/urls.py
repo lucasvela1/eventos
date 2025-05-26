@@ -18,7 +18,6 @@ Including another URLconf
 from django.urls import include, path
 
 urlpatterns = [
-    path("", include("app.urls")),
+    path("", include("eventos_app.urls")),
 ]
 
-#comentario barby

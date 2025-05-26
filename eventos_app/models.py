@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import AbstractUser #para heredar el usuario definido en Django
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -134,9 +135,9 @@ class Notification(models.Model):
     def __str__(self):
         return self.title
 
-class User(models.Model):
-    username = models.CharField(max_length=50)
-    email = models.TextField()
+class CustomUser(AbstractUser):
+    #username = models.CharField(max_length=50)
+    #email = models.TextField()
     notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
     puntaje= models.IntegerField()
 
@@ -180,7 +181,7 @@ class RefundRequest(models.Model):
     ticket_code = models.TextField(unique=True)
     reason = models.TextField()
     created_at = models.DateField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False )
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )
 
     def __str__(self):
         return self.ticket_code
@@ -195,7 +196,7 @@ class Ticket(models.Model):
     ticket_code = models.TextField(unique=True)
     quantity = models.IntegerField()
     type = models.TextField(choices=Type.choices, default=Type.general)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
     
     def __str__(self):
@@ -209,7 +210,7 @@ class Rating(models.Model):
     text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
 
     def __str__(self):
@@ -222,15 +223,16 @@ class Comment(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False )  #Revisar si es ForeigngKey
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )  #Revisar si es ForeigngKey
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
 
     class Meta():
         unique_together = ("user", "event")
 
 class Favorito(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
-    event = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=False)
-    
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False, related_name="favoritos_usuario")
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False, related_name="favoritos_evento")
+    #related_name define cómo se accede desde el otro modelo hacia este. 
+
     class Meta():
         unique_together = ("user", "event")

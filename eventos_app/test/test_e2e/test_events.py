@@ -3,9 +3,9 @@ import datetime
 from django.utils import timezone
 from playwright.sync_api import expect
 
-from app.models import Event
+from eventos_app.models import Event
 
-from app.test.test_e2e.base import BaseE2ETest
+from eventos_app.test.test_e2e.base import BaseE2ETest
 
 
 class EventBaseTest(BaseE2ETest):

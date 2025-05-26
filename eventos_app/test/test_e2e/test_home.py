@@ -1,6 +1,6 @@
 from playwright.sync_api import expect
 
-from app.test.test_e2e.base import BaseE2ETest
+from eventos_app.test.test_e2e.base import BaseE2ETest
 
 
 # Tests para la página de inicio

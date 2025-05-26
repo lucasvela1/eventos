@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
-# de nuevo Beliii
+
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -31,15 +31,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    "app",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.staticfiles",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "app"
+    "eventos_app",
 ]
+
+AUTH_USER_MODEL = 'eventos_app.CustomUser' #usamos un user modificado
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
