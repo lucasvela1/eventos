@@ -114,10 +114,13 @@ class Event(models.Model):
         return True, None
 
     def update(self, title, description, date):
-        self.title = title or self.title
-        self.description = description or self.description
-        self.date = date or self.date
-
+        self.save()
+        if title is not None:
+            self.title = title
+        if description is not None:
+            self.description = description
+        if date is not None:
+            self.date = date
         self.save()
 
 class Priority(models.TextChoices):
@@ -127,7 +130,7 @@ class Priority(models.TextChoices):
 
 class Notification(models.Model):
     title = models.CharField(max_length=200)
-    messaje = models.TextField()
+    message = models.TextField()
     created_at = models.DateField(auto_now_add=True) 
     priority = models.TextField(choices=Priority.choices)
     read = models.BooleanField(default=False)
@@ -141,11 +144,11 @@ class UserRole(models.TextChoices):
     CLIENTE = 'CLIENTE', 'Cliente'
 
 class CustomUser(AbstractUser):
-    #username = models.CharField(max_length=50)
+    #username = models.CharField(max_length=50) Comentado porque el usuario ya tiene un campo username por heredar de AbstractUser
     #email = models.TextField()
     notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
     puntaje= models.IntegerField(default=0)
-    rol = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.CLIENTE)
+    rol = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.CLIENTE) #Solo se puede elegir entre los roles ya creados
 
     def __str__(self):
         return self.username
@@ -200,7 +203,7 @@ class Type(models.TextChoices):
 class Ticket(models.Model):
     buy_date = models.DateField(auto_now_add=True)
     ticket_code = models.TextField(unique=True)
-    quantity = models.IntegerField()
+    quantity = models.IntegerField() #Se puede hacer una compra, y en ella se pueden comprar varias entradas
     type = models.TextField(choices=Type.choices, default=Type.general)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
@@ -229,11 +232,11 @@ class Comment(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )  #Revisar si es ForeigngKey
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )  
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) 
 
     class Meta():
-        unique_together = ("user", "event")
+        unique_together = ("user", "event") #Solo se permite un comentario por usuario y evento
 
 class Favorito(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False, related_name="favoritos_usuario")
