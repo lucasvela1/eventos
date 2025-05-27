@@ -219,8 +219,8 @@ class Rating(models.Model):
     text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) #Revisar si es ForeignKey
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) 
 
     def __str__(self):
         return self.title
