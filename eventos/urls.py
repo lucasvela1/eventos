@@ -18,6 +18,7 @@ Including another URLconf
 from django.urls import include, path
 from django.contrib import admin
 
+
 urlpatterns = [
     path("", include("eventos_app.urls")),
     path('admin/', admin.site.urls),  # <--- Esta línea agrega el panel de administración

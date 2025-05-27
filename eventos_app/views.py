@@ -2,6 +2,7 @@ from django.views.generic import TemplateView, ListView, DetailView
 from .models import Event
 
 
+
 class HomeView(TemplateView):
     template_name = "home.html"
 
