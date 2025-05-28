@@ -74,7 +74,7 @@ class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
-    price=models.IntegerField()
+    price=models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     total_rating = models.IntegerField()
@@ -133,7 +133,7 @@ class Priority(models.TextChoices):
 class Notification(models.Model):
     title = models.CharField(max_length=200)
     message = models.TextField()
-    created_at = models.DateField(auto_now_add=True) 
+    created_at = models.DateTimeField(auto_now_add=True)  #Se pone como DateTimeFiel para también tener la hora
     priority = models.TextField(choices=Priority.choices)
     read = models.BooleanField(default=False)
 
