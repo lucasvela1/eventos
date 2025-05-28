@@ -7,16 +7,16 @@ class HomeView(TemplateView):
 
 
 class EventListView(ListView):
-    model = Event
-    template_name = "app/events.html"
+    model = Event #Clase que manipula la vista
+    template_name = "app/events.html" #Incluyo el template que controla la vista
     context_object_name = "events"
 
-    def get_queryset(self):
-        return Event.objects.all().order_by("date")
+    def get_queryset(self): #Pasarle una lista distinta al context
+        return Event.objects.all().order_by("date")  #Me ordena los eventos por fecha
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, **kwargs):  #Llamo al context data del padre, me traigo todos los objetos de event
         context = super().get_context_data(**kwargs)
-        return context
+        return context  
 
 
 class EventDetailView(DetailView):

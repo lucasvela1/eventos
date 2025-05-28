@@ -74,6 +74,7 @@ class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
+    price=models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     total_rating = models.IntegerField()
@@ -99,7 +100,7 @@ class Event(models.Model):
         return errors
 
     @classmethod
-    def new(cls, title, description, date):
+    def new(cls, title, description, date, price):
         errors = Event.validate(title, description, date)
 
         if len(errors.keys()) > 0:
@@ -109,6 +110,7 @@ class Event(models.Model):
             title=title,
             description=description,
             date=date,
+            price=price,
         )
 
         return True, None
