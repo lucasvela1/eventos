@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+
+{% block title %}Notificaciones{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Notificaciones</h1>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Mensaje</th>
+                <th>Fecha de creación</th>
+                <th>Prioridad</th>
+                <th>Leida?</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for notification in notifications%}
+                <tr>
+                    <td>{{ notification.title }}</td>
+                    <td>{{ notification.message }}</td>
+                    <td>{{ notification.created_at|date:"d b Y, H:i" }}</td>
+                    <td>
+                        {% if notification.priority == 'HIGH' %}
+                            <span class="badge bg-danger">Alta</span>
+                        {% elif notification.priority == 'MEDIUM' %}
+                            <span class="badge bg-warning">Media</span>
+                        {% else %}
+                            <span class="badge bg-info">Baja</span>
+                        {% endif %}
+                    <td>
+                        {% if notification.read %}
+                            <span class="badge bg-success">Sí</span>
+                        {% else %}
+                            <span class="badge bg-secondary">No</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No hay notificaciones</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

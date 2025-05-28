@@ -110,7 +110,7 @@ STATICFILES_DIRS = [BASE_DIR / "static"]
 
 LANGUAGE_CODE = "es-ar"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "America/Argentina/Ushuaia"
 
 USE_I18N = True
 

@@ -1,5 +1,6 @@
 from django.views.generic import TemplateView, ListView, DetailView
-from .models import Event
+from .models import Event, Notification
+from django.db.models import Case, When, Value, IntegerField
 
 
 class HomeView(TemplateView):
@@ -23,3 +24,22 @@ class EventDetailView(DetailView):
     model = Event
     template_name = "app/event_detail.html"
     context_object_name = "event"
+
+class NotificationListView(ListView):
+    model = Notification
+    template_name = "app/notification.html"
+    context_object_name = "notifications"
+
+    def get_queryset(self):
+        priority_order = Case(
+            When(priority='HIGH', then=Value(1)),
+            When(priority='MEDIUM', then=Value(2)),
+            When(priority='LOW', then=Value(3)),
+            default=Value(4), # Para cualquier otro valor o si es None
+            output_field=IntegerField(),
+        )
+        return Notification.objects.all().order_by(priority_order, "-created_at")  # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
