@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, ListView, DetailView
-from .models import Event, Notification
+from .models import Event, Notification, RefundRequest
 from django.db.models import Case, When, Value, IntegerField
 
 
@@ -39,6 +39,23 @@ class NotificationListView(ListView):
             output_field=IntegerField(),
         )
         return Notification.objects.all().order_by(priority_order, "-created_at")  # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+class RefundRequestListView(ListView):
+    model = RefundRequest
+    template_name = "app/refundRequest.html"
+    context_object_name = "refundRequests"
+
+    def get_queryset(self):
+        priority_order = Case(
+            When(approved=False, then=Value(1)),
+            When(approved=True, then=Value(2)),
+            output_field=IntegerField(),
+        )
+        return RefundRequest.objects.all().order_by(priority_order, "created_at")  # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

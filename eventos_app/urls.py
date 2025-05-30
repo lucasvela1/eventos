@@ -4,6 +4,7 @@ from .views import (
     EventListView,
     EventDetailView,
     NotificationListView,
+    RefundRequestListView,
 )
 
 urlpatterns = [
@@ -11,4 +12,5 @@ urlpatterns = [
     path("events/", EventListView.as_view(), name="events"),
     path("events/<int:pk>/", EventDetailView.as_view(), name="event_detail"),
     path("notifications/", NotificationListView.as_view(), name="notifications"),
+    path("refundRequests/", RefundRequestListView.as_view(), name="refundRequests"),
 ]
