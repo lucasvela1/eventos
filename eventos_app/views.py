@@ -1,6 +1,12 @@
-from django.views.generic import TemplateView, ListView, DetailView
-from .models import Event, Notification
-from django.db.models import Case, When, Value, IntegerField
+from django.views.generic import TemplateView, ListView, DetailView, FormView
+from django.db.models import Case, When, Value, IntegerField, Avg
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import get_object_or_404, redirect
+
+from .models import Event, Notification, Favorito, Rating
 
 
 class HomeView(TemplateView):
@@ -18,12 +24,13 @@ class EventListView(ListView):
     def get_context_data(self, **kwargs):  #Llamo al context data del padre, me traigo todos los objetos de event
         context = super().get_context_data(**kwargs)
         return context  
-
+    
 
 class EventDetailView(DetailView):
     model = Event
     template_name = "app/event_detail.html"
     context_object_name = "event"
+
 
 class NotificationListView(ListView):
     model = Notification
@@ -43,3 +50,49 @@ class NotificationListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+    
+
+class FavoritosListView(ListView):
+    model = Favorito
+    template_name = "app/favoritos.html"
+    context_object_name = "favoritos"
+    login_url = "/accounts/login/"
+
+    def get_queryset(self):
+        user = self.request.user
+        # Trae los favoritos del usuario, y anota el rating promedio del evento
+        return (
+            Favorito.objects
+            .filter(user=user)
+            .select_related("event")
+            .annotate(rating_promedio=Avg("event__rating__rating")) #calcula promedio del evento
+            .order_by("-rating_promedio") #ordena por rating
+        )  
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class RegisterView(FormView):
+    template_name = "accounts/register.html"
+    form_class = UserCreationForm
+    success_url = reverse_lazy("login")  # Redirige a login si el registro es exitoso
+
+    def form_valid(self, form):
+        form.save()  # Guarda el nuevo usuario
+        messages.success(self.request, "Usuario registrado correctamente. Ahora podés iniciar sesión.")
+        return super().form_valid(form)
+
+
+#para agregar o quitar favoritos
+@login_required
+def toggle_favorito(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    favorito, creado = Favorito.objects.get_or_create(user=request.user, event=event)
+
+    if not creado:
+        favorito.delete()  # Si ya existía, lo quitamos
+
+    # Redirigí a donde estabas antes (o a event list si querés algo fijo)
+    return redirect(request.META.get('HTTP_REFERER', 'event_list'))
