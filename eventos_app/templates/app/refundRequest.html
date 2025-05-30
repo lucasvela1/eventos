@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Reembolsos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Solicitudes de Reembolsos</h1>
+    </div>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Codigo de ticket</th>
+                <th>Razon</th>
+                <th>Fecha de solicitud</th>
+                <th>Estado</th>
+                <th>Fecha de aprobación</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for refundRequest in refundRequests%}
+                <tr>
+                    <td>{{ refundRequest.ticket_code}}</td>
+                    <td>{{ refundRequest.reason }}</td>
+                    <td>{{ refundRequest.created_at|date:"d b Y" }}</td>
+                    <td>
+                        {% if refundRequest.approved == True %}
+                            <span class="badge bg-success">Aprobado</span>
+                        {% else %}
+                            <span class="badge bg-secondary">Pendiente</span>
+                        {% endif %}
+                    <td>
+                        {% if refundRequest.approved == True %}
+                            {{ refundRequest.approval_date|date:"d b Y" }}
+                        {% else %}
+                            <span class="badge bg-secondary">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">No hay solicitud de reembolsos vigentes</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
