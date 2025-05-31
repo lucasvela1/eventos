@@ -6,7 +6,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
 
-from .models import Event, Notification, Favorito, Rating
+from .models import Event, Notification, Favorito, Rating, RefundRequest
 
 
 class HomeView(TemplateView):
@@ -96,3 +96,19 @@ def toggle_favorito(request, event_id):
 
     # Redirigí a donde estabas antes (o a event list si querés algo fijo)
     return redirect(request.META.get('HTTP_REFERER', 'event_list'))
+class RefundRequestListView(ListView):
+    model = RefundRequest
+    template_name = "app/refundRequest.html"
+    context_object_name = "refundRequests"
+
+    def get_queryset(self):
+        priority_order = Case(
+            When(approved=False, then=Value(1)),
+            When(approved=True, then=Value(2)),
+            output_field=IntegerField(),
+        )
+        return RefundRequest.objects.all().order_by(priority_order, "created_at")  # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
