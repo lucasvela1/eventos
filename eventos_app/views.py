@@ -1,11 +1,16 @@
+from django.contrib.auth.decorators import login_required
 from django.views.generic import TemplateView, ListView, DetailView, FormView
+from django.views.generic.edit import CreateView
 from django.db.models import Case, When, Value, IntegerField, Avg
 from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import get_object_or_404, redirect
-from .models import Event, Notification, Favorito, Rating, RefundRequest
+from django.shortcuts import get_object_or_404, redirect, render
+from .models import Event, Notification, Favorito, Rating, RefundRequest, Ticket
+from .forms import RatingForm
+
+
 
 
 class HomeView(TemplateView):
@@ -129,3 +134,30 @@ class RatingView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         return context
+    
+@login_required
+def crear_rating(request, event_id):
+    event= get_object_or_404(Event, pk=event_id)
+    user= request.user
+        
+    if Rating.objects.filter(user=user, event=event).exists():
+        messages.error(request, "Ya has calificado este evento.")
+        return redirect('event_detail', pk=event_id)
+        
+    if not Ticket.objects.filter(user=user, event=event).exists():
+        messages.error(request, "Debes comprar un ticket para calificar este evento.")
+        return redirect('event_detail', pk=event_id)
+        
+    if request.method == "POST":
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            rating = form.save(commit=False)
+            rating.user = user
+            rating.event = event
+            rating.save()
+            messages.success(request, "Calificación creada correctamente.")
+            return redirect('event_detail', pk=event_id)
+    else:
+        form = RatingForm()
+    return render(request, 'app/crear_rating.html', {'form': form, 'event': event}) 
+        
