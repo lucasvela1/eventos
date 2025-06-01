@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Rating de Eventos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">Rating de Eventos</h2>
+
+    <table class="table table-striped text-center">
+        <thead class="table-dark">
+            <tr>
+                <th>Puesto</th>
+                <th>Evento</th>
+                <th>Rating</th>
+                <th>Fecha</th>
+                <th>Estado</th> <!-- Nueva columna -->
+            </tr>
+        </thead>
+       <tbody>
+    {% for event in events %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td>{{ event.title }}</td>
+            <td>{{ event.total_rating|default:"Sin calificación" }}</td>
+            <td>{{ event.date|date:"d/m/Y" }}</td>
+            <td>
+                {% if event.cancelado %}
+                    <span class="badge bg-danger">Cancelado</span>
+                {% else %}
+                    <span class="badge bg-success">Activo</span>
+                {% endif %}
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="5">No hay eventos disponibles.</td>
+        </tr>
+    {% endfor %}
+</tbody>
+
+    </table>
+</div>
+{% endblock %}

@@ -114,9 +114,9 @@ class RefundRequestListView(ListView):
 
 
 
-class RankingView(ListView):
+class RatingView(ListView):
     model = Event
-    template_name = "app/ranking.html"
+    template_name = "app/rating.html"
     context_object_name = "events"
 
     def get_queryset(self):
