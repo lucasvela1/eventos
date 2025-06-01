@@ -6,6 +6,7 @@ from .views import (
     NotificationListView,
     FavoritosListView,
     RefundRequestListView,
+    RankingView,
 )
 from . import views
 
@@ -16,5 +17,7 @@ urlpatterns = [
     path("notifications/", NotificationListView.as_view(), name="notifications"),
     path("refundRequests/", RefundRequestListView.as_view(), name="refundRequests"),
     path("favoritos/", FavoritosListView.as_view(), name="favoritos"),
+    path("ranking/", RankingView.as_view(), name="ranking"),
+
     path('eventos/<int:event_id>/toggle_favorito/', views.toggle_favorito, name='toggle_favorito'),
 ]

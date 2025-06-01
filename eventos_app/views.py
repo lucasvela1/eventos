@@ -5,7 +5,6 @@ from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.shortcuts import get_object_or_404, redirect
-
 from .models import Event, Notification, Favorito, Rating, RefundRequest
 
 
@@ -108,6 +107,24 @@ class RefundRequestListView(ListView):
             output_field=IntegerField(),
         )
         return RefundRequest.objects.all().order_by(priority_order, "created_at")  # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+
+class RankingView(ListView):
+    model = Event
+    template_name = "app/ranking.html"
+    context_object_name = "events"
+
+    def get_queryset(self):
+        return (
+            Event.objects
+            .annotate(rating_promedio=Avg("rating__rating"))  # Calcula el promedio de ratings
+            .order_by("-rating_promedio")
+        )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
