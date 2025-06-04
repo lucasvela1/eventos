@@ -8,6 +8,14 @@
         comentarios y califica tus experiencias.</p>
     </div>
     <p>Hay {{ events|length }} eventos.</p>
+    <p>Eventos: {{ events.count }}</p>
+    {% for event in events %}
+        <p>{{ event.title }}</p>
+    {% empty %}
+        <p>No hay eventos disponibles.</p>
+    {% endfor %}
+
+
 
 </div>
 {% for event in events %}

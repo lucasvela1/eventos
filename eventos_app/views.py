@@ -16,6 +16,10 @@ from .forms import RatingForm
 class HomeView(TemplateView):
     template_name = "home.html"
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['events'] = Event.objects.all().order_by("date")  # Pasa la lista de eventos al contexto
+        return context
 
 class EventListView(ListView):
     model = Event #Clase que manipula la vista
