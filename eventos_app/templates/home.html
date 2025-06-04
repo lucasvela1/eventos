@@ -5,8 +5,36 @@
     <div class="p-5 bg-light rounded-3">
         <h1 class="display-5 fw-bold">Eventos y Entradas</h1>
         <p class="fs-4">Descubre, organiza y participa en los mejores eventos. Compra entradas, deja
-            comentarios y califica tus experiencias.</p>
-        <div>
+        comentarios y califica tus experiencias.</p>
     </div>
+    <p>Hay {{ events|length }} eventos.</p>
+    <p>Eventos: {{ events.count }}</p>
+    {% for event in events %}
+        <p>{{ event.title }}</p>
+    {% empty %}
+        <p>No hay eventos disponibles.</p>
+    {% endfor %}
+
+
+
 </div>
+{% for event in events %}
+    <div class="card" style="width: 18rem;">
+        <img src="{{ event.imagen_url_directa }}" class="card-img-top" alt="{{ event.title }}">
+        <div class="card-body">
+            <h5 class="card-title">{{ event.title }}</h5>
+            <p class="card-text">{{ event.description }}</p>
+            <a href="{% url 'event_detail' event.id %}" class="btn btn-primary">Ver detalles</a>
+        </div>
+    </div>
+{% endfor %}
+
+<div class="card" style="width: 18rem;">
+        <img src="..." class="card-img-top" alt="...">
+        <div class="card-body">
+            <h5 class="card-title">Hola mundo</h5>
+            <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card’s content.</p>
+            <a href="#" class="btn btn-primary">Go somewhere</a>
+        </div>
+    </div>
 {% endblock content %}
