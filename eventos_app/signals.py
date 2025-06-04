@@ -3,7 +3,7 @@ from django.dispatch import receiver
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
 from .models import CustomUser
-from eventos.models import Category, Venue, Event, RefundRequest, Comment, Ticket, Rating, Favorito, Notification   # Importá los modelos sobre los que van los permisos
+from eventos.models import Category, Venue, Event, RefundRequest, Comment, Ticket, Rating, Favorito, Notification, CustomUser   # Importá los modelos sobre los que van los permisos
 
 """
 Definís los permisos de acceso. Acá es donde decís:
@@ -21,7 +21,13 @@ def assign_user_permissions(sender, instance, created, **kwargs):
     content_type_comentario = ContentType.objects.get_for_model(Comment)
     content_type_reembolso = ContentType.objects.get_for_model(RefundRequest)
     content_type_notificacion = ContentType.objects.get_for_model(Notification)
-    # Agregar otros content_types para otros modelos
+    content_type_rating = ContentType.objects.get_for_model(Rating)
+    content_type_favorito = ContentType.objects.get_for_model(Favorito) 
+    content_type_venue = ContentType.objects.get_for_model(Venue)
+    content_type_category = ContentType.objects.get_for_model(Category)
+    content_type_ticket = ContentType.objects.get_for_model(Ticket)
+    content_type_user = ContentType.objects.get_for_model(CustomUser)
+
     
     # Permisos para Evento
     view_evento = Permission.objects.get(codename='view_evento', content_type=content_type_evento)
@@ -45,17 +51,45 @@ def assign_user_permissions(sender, instance, created, **kwargs):
     read_notif = Permission.objects.get(codename='read_notification', content_type=content_type_notificacion)
 
     # Permisos para Rating: calificar, editar y eliminar una calificacion a un evento
+    add_ratting = Permission.objects.get(codename='add_rating_rating', content_type=content_type_rating)
+    change_ratting = Permission.objects.get(codename='change_rating_rating', content_type=content_type_rating)
+    delete_ratting = Permission.objects.get(codename='delete_rating_rating', content_type=content_type_rating)
 
     # Permisos para Tickets: crear, editar, eliminar   
+    add_tickets = Permission.objects.get(codename='add_ticket', content_type=content_type_ticket)
+    change_tickets = Permission.objects.get(codename='change_ticket', content_type=content_type_ticket)
+    delete_tickets = Permission.objects.get(codename='delete_ticket', content_type=content_type_ticket)
 
-    # Ahora asignamos según rol
+    # Permisos para Favoritos: agregar, eliminar
+    add_favorito = Permission.objects.get(codename='add_favorito', content_type=content_type_favorito)
+    delete_favorito = Permission.objects.get(codename='delete_favorito', content_type=content_type_favorito)
+
+    # Permisos para Venue: crear, editar, eliminar
+    add_venue = Permission.objects.get(codename='add_venue', content_type=content_type_venue)
+    change_venue = Permission.objects.get(codename='change_venue', content_type=content_type_venue)
+    delete_venue = Permission.objects.get(codename='delete_venue', content_type=content_type_venue)
+
+    # Permisos para Category: crear, editar, eliminar
+    add_category = Permission.objects.get(codename='add_category', content_type=content_type_category)
+    change_category = Permission.objects.get(codename='change_category', content_type=content_type_category)
+    delete_category = Permission.objects.get(codename='delete_category', content_type=content_type_category)
+
+    # Permisos para User: crear, editar, eliminar
+    add_user = Permission.objects.get(codename='add_customuser', content_type=content_type_user)
+    change_user = Permission.objects.get(codename='change_customuser', content_type=content_type_user)
+    delete_user = Permission.objects.get(codename='delete_customuser', content_type=content_type_user)
+    view_user = Permission.objects.get(codename='view_customuser', content_type=content_type_user)
+
+    # Ahora asignamos los persmisos según rol
     if instance.rol == 'VENDEDOR':
         instance.user_permissions.add(
             view_evento, change_evento,
             change_comentario, delete_comentario, 
             change_reembolso, accept_reembolso, reject_reembolso,
             add_notif, change_notif, delete_notif,     
-            #AGREGAR PERMISOS FALTANTES       
+            add_ratting, change_ratting, delete_ratting,
+            change_tickets, delete_tickets,      
+            
         )
     
     elif instance.rol == 'CLIENTE':
