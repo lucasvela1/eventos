@@ -8,6 +8,7 @@ from .views import (
     RefundRequestListView,
     RatingView,
     crear_rating,
+    BuscarEventosView
 )
 from . import views
 
@@ -21,4 +22,5 @@ urlpatterns = [
     path("rating/", RatingView.as_view(), name="rating"),
     path("events/<int:event_id>/calificar/", crear_rating, name='crear_rating'),
     path('eventos/<int:event_id>/toggle_favorito/', views.toggle_favorito, name='toggle_favorito'),
+    path('buscar/', BuscarEventosView.as_view(), name='buscar_eventos'),
 ]

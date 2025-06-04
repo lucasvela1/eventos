@@ -1,9 +1,21 @@
-from django.db.models.signals import post_save
-from django.dispatch import receiver
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from .models import CustomUser
-from eventos.models import Category, Venue, Event, RefundRequest, Comment, Ticket, Rating, Favorito, Notification, CustomUser   # Importá los modelos sobre los que van los permisos
+from django.core.management import call_command
+from django.db.models.signals import post_migrate, post_save
+from django.dispatch import receiver
+
+from .models import (
+    CustomUser,
+    Category,
+    Venue,
+    Event,
+    RefundRequest,
+    Comment,
+    Ticket,
+    Rating,
+    Favorito,
+    Notification,
+)
 
 """
 Definís los permisos de acceso. Acá es donde decís:
@@ -87,9 +99,8 @@ def assign_user_permissions(sender, instance, created, **kwargs):
             change_comentario, delete_comentario, 
             change_reembolso, accept_reembolso, reject_reembolso,
             add_notif, change_notif, delete_notif,     
-            add_ratting, change_ratting, delete_ratting,
+            add_ratting, change_ratting,
             change_tickets, delete_tickets,      
-            
         )
     
     elif instance.rol == 'CLIENTE':
@@ -97,9 +108,20 @@ def assign_user_permissions(sender, instance, created, **kwargs):
             view_evento,
             add_comentario, change_comentario, delete_comentario,
             add_reembolso, read_notif,
+            add_ratting, change_ratting, delete_ratting,
+            add_favorito, delete_favorito,
         )
 
     elif instance.rol == 'ADMIN':
             instance.is_staff = True
             instance.is_superuser = True
             instance.save()
+'''
+receiver(post_migrate)
+def cargar_datos_iniciales(sender, **kwargs):
+    try:
+        call_command('pueblaDatos')
+        print("✅ Datos iniciales cargados correctamente (desde signals).")
+    except Exception as e:
+        print(f"⚠️ Error cargando datos iniciales desde signals: {e}")
+'''

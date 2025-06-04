@@ -1,14 +1,14 @@
-from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, ListView, DetailView, FormView
-from django.views.generic.edit import CreateView
-from django.db.models import Case, When, Value, IntegerField, Avg
-from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.forms import UserCreationForm
+from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Event, Notification, Favorito, Rating, RefundRequest, Ticket
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import CreateView, FormView
+
 from .forms import RatingForm
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
 
 
 
@@ -161,3 +161,20 @@ def crear_rating(request, event_id):
         form = RatingForm()
     return render(request, 'app/crear_rating.html', {'form': form, 'event': event}) 
         
+class BuscarEventosView(ListView):
+    model = Event
+    template_name = "app/resultados_busqueda.html"
+    context_object_name = "eventos"
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')
+        self.query = query  # Guardamos la query para usarla en el contexto
+        if query:
+            return Event.objects.filter(title__icontains=query)
+        return Event.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = getattr(self, 'query', '')
+        return context
+
