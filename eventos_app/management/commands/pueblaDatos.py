@@ -57,7 +57,8 @@ class Command(BaseCommand):
             venue=Venue.objects.get(name="Luna Park"),
             suma_puntaje=False,
             cantidad_puntos=0,
-            cancelado=False
+            cancelado=False,
+            id_img="18IJBal9GtJJDCs5pmYkCEcZ-LyVvO78i"
         )
 
         Event.objects.create(
@@ -70,7 +71,8 @@ class Command(BaseCommand):
             venue=Venue.objects.get(name="Teatro Colón"),
             suma_puntaje=False,
             cantidad_puntos=0,
-            cancelado=False
+            cancelado=False,
+            id_img="1ep9auYAfIXmRqNUWx1zRmLvhjmbjuqQH"
         )
 
         Event.objects.create(
@@ -83,7 +85,8 @@ class Command(BaseCommand):
             venue=Venue.objects.get(name="Teatro Colón"),
             suma_puntaje=False,
             cantidad_puntos=0,
-            cancelado=False
+            cancelado=False,
+            id_img="1FXlSy1jON88Wd2Pa3-uRbFVo9JzdaMXD"
         )
 
         self.stdout.write(self.style.SUCCESS("✅ Datos iniciales cargados correctamente."))
