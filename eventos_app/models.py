@@ -83,6 +83,7 @@ class Event(models.Model):
     suma_puntaje=models.BooleanField()
     cantidad_puntos=models.IntegerField()
     cancelado=models.BooleanField()
+    id_img = models.CharField(max_length=2083, default='sin_imagen') # Solamente id de la imagen
 
     def __str__(self):
         return self.title
@@ -124,6 +125,9 @@ class Event(models.Model):
         if date is not None:
             self.date = date
         self.save()
+    
+    def imagen_url_directa(self):
+        return f'https://drive.google.com/thumbnail?id={self.id_img}'
 
 class Priority(models.TextChoices):
     high = 'HIGH'
