@@ -7,6 +7,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Eventos</h1>
     </div>
+    {% include "app/search_form.html" %}
     <table class="table">
         <thead>
             <tr>
@@ -36,7 +37,14 @@
                                     class="btn btn-sm btn-outline-danger"
                                     aria-label="Marcar como favorito"
                                     title="Marcar como favorito">
-                                     <i class="bi bi-heart{% if event in user.favorite_events.all %}-fill{% endif %}" aria-hidden="true"></i>
+                                    <i class="bi bi-heart{% if event in user.favorite_events.all %}-fill{% endif %}" aria-hidden="true"></i>
+                                </a>
+                                <!-- Botón para añadir al carro TERMINAR REDIRECCIONAMIENTO-->
+                                <a href="#" 
+                                    class="btn btn-sm btn-outline-success"
+                                    aria-label="Añadir al carro"
+                                    title="Añadir al carro">
+                                    <i class="bi bi-cart-plus" aria-hidden="true"></i>
                                 </a>
                             {% endif %}
                         </div>

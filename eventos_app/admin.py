@@ -72,7 +72,6 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(Event, EventAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
-#admin.site.register(UserRole)
 admin.site.register(Category)
 admin.site.register(Venue)
 admin.site.register(RefundRequest)

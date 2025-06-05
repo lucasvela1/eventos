@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+  {% include 'app/search_form.html' %}
+
+  <div class="container mt-4">
+    <h4>Resultados para: "{{ query }}"</h4>
+
+    {% if eventos %}
+      <ul class="list-group">
+        {% for evento in eventos %}
+          <li class="list-group-item">
+            {{ evento.title }} – {{ evento.date }}
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No se encontraron eventos.</p>
+    {% endif %}
+  </div>
+{% endblock %}

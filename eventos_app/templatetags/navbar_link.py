@@ -14,6 +14,6 @@ def navbar_link(context, url_name, label):
     css_class = "nav-link active" if is_active else "nav-link"
     aria = 'aria-current="page"' if is_active else ""
 
-    html = f"<a href='{path}' class='{css_class}' {aria}>{label}</a>"
+    html = f'<a href="{path}" class="{css_class}" {aria}>{label}</a>'
 
     return format_html(html)
