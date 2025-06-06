@@ -1,14 +1,13 @@
-from django.contrib.auth.decorators import login_required
-from django.views.generic import TemplateView, ListView, DetailView, FormView
-from django.views.generic.edit import CreateView
-from django.db.models import Case, When, Value, IntegerField, Avg
-from django.contrib.auth.forms import UserCreationForm
-from django.urls import reverse_lazy
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
-from .models import Event, Notification, Favorito, Rating, RefundRequest, Ticket
-from .forms import RatingForm
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, ListView, TemplateView
+from django.views.generic.edit import CreateView, FormView
+
+from .forms import RatingForm, UsuarioRegisterForm
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
 
 
 
@@ -82,15 +81,28 @@ class FavoritosListView(ListView):
         return context
 
 
+
 class RegisterView(FormView):
     template_name = "accounts/register.html"
-    form_class = UserCreationForm
-    success_url = reverse_lazy("login")  # Redirige a login si el registro es exitoso
+    form_class = UsuarioRegisterForm  
+    success_url = reverse_lazy("login")
 
     def form_valid(self, form):
-        form.save()  # Guarda el nuevo usuario
-        messages.success(self.request, "Usuario registrado correctamente. Ahora podés iniciar sesión.")
+        form.save()
+        messages.success(self.request, "Usuario registrado correctamente.")
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        # Itera sobre todos los errores del formulario
+        for field in form:
+            for error in field.errors:
+                # Añade cada error como un mensaje de error
+                messages.error(self.request, error)
+        
+        for error in form.non_field_errors():
+            messages.error(self.request, error) #por ejemplo que la contra y su confirmarcion no coinciden
+            
+        return super().form_invalid(form)
 
 
 #para agregar o quitar favoritos
@@ -102,7 +114,6 @@ def toggle_favorito(request, event_id):
     if not creado:
         favorito.delete()  # Si ya existía, lo quitamos
 
-    # Redirigí a donde estabas antes (o a event list si querés algo fijo)
     return redirect(request.META.get('HTTP_REFERER', 'event_list'))
 class RefundRequestListView(ListView):
     model = RefundRequest
@@ -165,3 +176,20 @@ def crear_rating(request, event_id):
         form = RatingForm()
     return render(request, 'app/crear_rating.html', {'form': form, 'event': event}) 
         
+class BuscarEventosView(ListView):
+    model = Event
+    template_name = "app/resultados_busqueda.html"
+    context_object_name = "eventos"
+
+    def get_queryset(self):
+        query = self.request.GET.get('q', '')
+        self.query = query  # Guardamos la query para usarla en el contexto
+        if query:
+            return Event.objects.filter(title__icontains=query)
+        return Event.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = getattr(self, 'query', '')
+        return context
+
