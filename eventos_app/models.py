@@ -5,6 +5,7 @@ class Category(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
     is_active = models.BooleanField(default=True)
+    id_img = models.CharField(max_length=2083, default='sin_imagen')
 
     def __str__(self):
         return self.name
@@ -17,21 +18,26 @@ class Category(models.Model):
         return errors
 
     @classmethod
-    def new(cls, name, description="", is_active=True):
+    def new(cls, name, description="", is_active=True, id_img="sin_imagen"):
         errors = cls.validate(name)
         if errors:
             return False, errors
-        cls.objects.create(name=name, description=description, is_active=is_active)
+        cls.objects.create(name=name, description=description, is_active=is_active, id_img=id_img)
         return True, None
 
-    def update(self, name=None, description=None, is_active=None):
+    def update(self, name=None, description=None, is_active=None, id_img=None):
         if name is not None:
             self.name = name
         if description is not None:
             self.description = description
         if is_active is not None:
             self.is_active = is_active
+        if id_img is not None:
+            self.id_img = id_img
         self.save()
+    
+    def imagen_url_directa(self):
+        return f'https://drive.google.com/thumbnail?id={self.id_img}'
 
 
 class Venue(models.Model):
@@ -89,7 +95,7 @@ class Event(models.Model):
         return self.title
 
     @classmethod
-    def validate(cls, title, description, date):
+    def validate(cls, title, description, date, id_img):
         errors = {}
 
         if title == "":
@@ -101,7 +107,7 @@ class Event(models.Model):
         return errors
 
     @classmethod
-    def new(cls, title, description, date, price):
+    def new(cls, title, description, date, price, id_img):
         errors = Event.validate(title, description, date)
 
         if len(errors.keys()) > 0:
@@ -112,11 +118,12 @@ class Event(models.Model):
             description=description,
             date=date,
             price=price,
+            id_img=id_img
         )
 
         return True, None
 
-    def update(self, title, description, date):
+    def update(self, title, description, date, id_img):
         self.save()
         if title is not None:
             self.title = title
@@ -124,6 +131,8 @@ class Event(models.Model):
             self.description = description
         if date is not None:
             self.date = date
+        if id_img is not None:
+            self.id_img = id_img
         self.save()
     
     def imagen_url_directa(self):
