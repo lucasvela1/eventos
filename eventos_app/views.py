@@ -91,6 +91,18 @@ class RegisterView(FormView):
         form.save()
         messages.success(self.request, "Usuario registrado correctamente.")
         return super().form_valid(form)
+    
+    def form_invalid(self, form):
+        # Itera sobre todos los errores del formulario
+        for field in form:
+            for error in field.errors:
+                # Añade cada error como un mensaje de error
+                messages.error(self.request, error)
+        
+        for error in form.non_field_errors():
+            messages.error(self.request, error) #por ejemplo que la contra y su confirmarcion no coinciden
+            
+        return super().form_invalid(form)
 
 
 #para agregar o quitar favoritos
