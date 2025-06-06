@@ -2,6 +2,8 @@ from django import forms
 from .models import Rating
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
+from django.contrib.auth.forms import AuthenticationForm
+
 
 class RatingForm(forms.ModelForm):
     class Meta:
@@ -14,47 +16,20 @@ class RatingForm(forms.ModelForm):
         }
 
 
-class LoginForm(forms.Form):
-    usuario    = forms.CharField(
-        label="Usuario",
-        max_length=50,
-        widget=forms.TextInput(attrs={
-            "class": "form-control",
-            "placeholder": "Ingresa tu usuario"
-        })
-    )
-    contrasena = forms.CharField(
-        label="Contraseña",
-        max_length=128,
-        widget=forms.PasswordInput(attrs={
-            "class": "form-control",
-            "placeholder": "Ingresa tu contraseña"
-        })
-    )
+class LoginForm(AuthenticationForm):
+   def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    def clean_usuario(self):
-        valor = self.cleaned_data.get("usuario", "").strip()
-        if not valor:
-            raise forms.ValidationError("El campo Usuario es obligatorio.")
-        return valor
+        # Personalizamos los campos del formulario de autenticación por defecto
+        self.fields['username'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Usuario'}
+        )
+        self.fields['username'].label = "Usuario"
 
-    def clean_contrasena(self):
-        pwd = self.cleaned_data.get("contrasena", "")
-        if len(pwd) < 6:
-            raise forms.ValidationError("La contraseña debe tener al menos 6 caracteres.")
-        return pwd
-
-    def clean(self):
-        datos = super().clean()
-        u = datos.get("usuario")
-        p = datos.get("contrasena")
-
-
-        if self.errors:
-            return datos
-
-
-        return datos
+        self.fields['password'].widget.attrs.update(
+            {'class': 'form-control', 'placeholder': 'Contraseña'}
+        )
+        self.fields['password'].label = "Contraseña"
     
 
 class UsuarioRegisterForm(UserCreationForm):
@@ -92,7 +67,4 @@ class UsuarioRegisterForm(UserCreationForm):
         self.fields['password1'].error_messages['required'] = "El campo de contraseña es obligatorio."
         self.fields['password2'].error_messages['required'] = "El campo de confirmación de contraseña es obligatorio."
         self.fields['password1'].error_messages['min_length'] = "La contraseña debe tener al menos 8 caracteres."
-        self.fields['password2'].error_messages['password_mismatch'] = "Las contraseñas no coinciden. Por favor, inténtalo de nuevo."
-        self.fields['password1'].error_messages['password_common'] = ""
-        self.fields['password2'].error_messages['password_common'] = ""
-        
+

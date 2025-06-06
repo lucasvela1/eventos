@@ -13,6 +13,7 @@ from .views import (
     BuscarEventosView
 )
 from . import views
+from .forms import LoginForm, UsuarioRegisterForm
 
 urlpatterns = [
     path("", HomeView.as_view(), name="home"),
@@ -25,6 +26,6 @@ urlpatterns = [
     path("events/<int:event_id>/calificar/", crear_rating, name='crear_rating'),
     path('eventos/<int:event_id>/toggle_favorito/', views.toggle_favorito, name='toggle_favorito'),
     path('buscar/', BuscarEventosView.as_view(), name='buscar_eventos'),
-    path("accounts/login/", auth_views.LoginView.as_view(template_name="accounts/login.html"), name="login"),
+    path("accounts/login/", auth_views.LoginView.as_view(template_name="accounts/login.html",authentication_form=LoginForm), name="login"),
     path("accounts/register/", RegisterView.as_view(), name="register"),
 ]
