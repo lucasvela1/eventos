@@ -1,13 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
 from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, FormView
 
-from .forms import RatingForm
+from .forms import RatingForm, UsuarioRegisterForm
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
 
 
@@ -82,14 +81,15 @@ class FavoritosListView(ListView):
         return context
 
 
+
 class RegisterView(FormView):
     template_name = "accounts/register.html"
-    form_class = UserCreationForm
-    success_url = reverse_lazy("login")  # Redirige a login si el registro es exitoso
+    form_class = UsuarioRegisterForm  
+    success_url = reverse_lazy("login")
 
     def form_valid(self, form):
-        form.save()  # Guarda el nuevo usuario
-        messages.success(self.request, "Usuario registrado correctamente. Ahora podés iniciar sesión.")
+        form.save()
+        messages.success(self.request, "Usuario registrado correctamente.")
         return super().form_valid(form)
 
 
@@ -102,7 +102,6 @@ def toggle_favorito(request, event_id):
     if not creado:
         favorito.delete()  # Si ya existía, lo quitamos
 
-    # Redirigí a donde estabas antes (o a event list si querés algo fijo)
     return redirect(request.META.get('HTTP_REFERER', 'event_list'))
 class RefundRequestListView(ListView):
     model = RefundRequest
