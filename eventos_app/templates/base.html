@@ -21,6 +21,7 @@
         name="viewport"
         content="width=device-width, initial-scale=1"
     />
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
 
 </head>
 
@@ -101,5 +102,17 @@
     integrity="sha384-k6d4wzSIapyDyv1kpU366/PK5hCdSbCRGRCMv+eplOQJWyd1fbcAu9OCUj5zNLiq"
     crossorigin="anonymous"
 ></script>
+
+<script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        new Glide('.glide', {
+            type: 'carousel',
+            focusAT: 'center',
+            perView: 3
+        }).mount();
+    });
+</script>
+
 
 </html>
