@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Favoritos{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><span class="nav-link">Hola, {{ request.user.username }}</span></h1>
+    </div>
+    <h2>Mis tickets</h2>
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover">
+            <thead class="thead-light">
+                <tr>
+                    <th>#</th>
+                    <th>Evento</th>
+                    <th>Fecha</th>
+                    <th>Cantidad</th>
+                    <th>Precio total</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- AGREGAR LA LOGICA DE LOS TICKETS CUANDO ESTÉ -->
+                {% for ticket in tickets %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ ticket.evento.nombre }}</td>
+                    <td>{{ ticket.fecha }}</td>
+                    <td>{{ ticket.cantidad }}</td>
+                    <td>${{ ticket.total }}</td>
+                    <td>
+                        <!-- Ver evento. TERMINAR DE CONFIGURAR -->
+                        <a href="{% url 'evento_detail' ticket.evento.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
+                            <i class="bi bi-eye"></i>
+                        </a>
+
+                        <!-- Comprar más TERMINAR DE CONFIGURAR -->
+                        <a href="{% url 'comprar_ticket' ticket.evento.id %}" class="btn btn-sm btn-outline-success me-1" title="Comprar más">
+                            <i class="bi bi-cart-plus"></i>
+                        </a>
+
+                        <!-- Pedir reembolso. TERMINAR DE CONFIGURAR -->
+                        <a href="{% url 'pedir_reembolso' ticket.id %}" class="btn btn-sm btn-outline-danger" title="Pedir reembolso">
+                            <i class="bi bi-cash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Aún no has comprado tickets.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+</div>
+{% endblock %}
+
+                  

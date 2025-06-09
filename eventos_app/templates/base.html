@@ -53,8 +53,8 @@
                     <li class="nav-item">{% navbar_link 'rating' 'Rating' %}</li>
                     {% if request.user.is_authenticated %}
                         <li class="nav-item">{% navbar_link 'favoritos' 'Favoritos' %}</li>
-                        <li class="nav-item">{% navbar_link 'rating' 'Rating' %}</li>
-                        <li class="nav-item"><span class="nav-link">Hola, {{ request.user.username }}</span></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'my_account' %}">Mi Cuenta</a></li>
+
                         <li class="nav-item">
                             <form method="post" action="{% url 'logout' %}" class="d-flex align-items-center">
                                 {% csrf_token %}
