@@ -1,8 +1,53 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block content %}
 <!-- Formulario de búsqueda debajo del navbar -->
 {% include "app/search_form.html" %}
+
+<!-- Carrusel de imágenes con texto -->
+<div class="container mt-4">
+  <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-indicators">
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="1" aria-label="Slide 2"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="2" aria-label="Slide 3"></button>
+    </div>
+    <div class="carousel-inner">
+      <div class="carousel-item active">
+        <img src="{% static 'img/Musica_Concierto_AbelPinto.jpg' %}" class="d-block w-100 img-fluid" style="max-height: 500px; object-fit: cover;" alt="Concierto Abel Pintos">
+        <div class="carousel-caption d-none d-md-block">
+          <h5 style="font-size: 2rem; color: #706fa9; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: bold;">Concierto de Abel Pintos</h5>
+          <p style="font-size: 1rem; color: #706fa9; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: normal;">Vibrante noche de música en vivo.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="{% static 'img/Musica_Clasica2.jpg' %}" class="d-block w-100 img-fluid" style="max-height: 500px; object-fit: cover;" alt="Música Clásica">
+        <div class="carousel-caption d-none d-md-block">
+          <h5 style="font-size: 2rem; color: #c8a5d08e; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: bold;">Gala de Música Clásica</h5>
+          <p style="font-size: 1rem; color: #706fa9; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: normal;">Un evento lleno de armonía y elegancia.</p>
+        </div>
+      </div>
+      <div class="carousel-item">
+        <img src="{% static 'img/Musica_BillieEilish.jpg' %}" class="d-block w-100 img-fluid" style="max-height: 500px; object-fit: cover;" alt="Concierto Billie Eilish">
+        <div class="carousel-caption d-none d-md-block">
+          <h5 style="font-size: 2rem; color: #7b2b2b; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: bold;">Billie Eilish en vivo</h5>
+          <p style="font-size: 1rem; color: #7b2b2b; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: normal;" >Una noche única con la estrella internacional.</p>
+        </div>
+      </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Siguiente</span>
+    </button>
+  </div>
+</div>
+
+<!-- Presentación -->
 <div class="container mt-4">
     <div class="p-8 bg-light rounded-3">
         <h1 class="display-5 fw-bold">Eventos y Entradas</h1>
@@ -12,7 +57,7 @@
     <p>Hay {{ events|length }} eventos.</p>
 </div>
 
-
+<!-- Carrusel de eventos -->
 <div class="container py-4">
     <div id="options-type" class="glide position-relative">
         <div class="glide__track" data-glide-el="track">
@@ -34,7 +79,7 @@
             </ul>
         </div>
 
-        <!-- Controles -->
+        <!-- Controles del glide -->
         <div class="glide__arrows d-flex justify-content-between align-items-center w-100 position-absolute top-50 start-0 translate-middle-y px-3"
             data-glide-el="controls">
             <button class="glide__arrow glide__arrow--left btn btn-light"
@@ -49,7 +94,6 @@
             </button>
         </div>
     </div>
-
 </div>
 
 {% endblock content %}
