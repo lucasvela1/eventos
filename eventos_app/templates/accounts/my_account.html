@@ -8,7 +8,7 @@
         <h1><span class="nav-link">Hola, {{ request.user.username }}</span></h1>
     </div>
     <h2>Mis tickets</h2>
-    <div class="table-responsive">
+    <div class="table-responsive mb-5">
         <table class="table table-bordered table-hover">
             <thead class="thead-light">
                 <tr>
@@ -21,27 +21,28 @@
                 </tr>
             </thead>
             <tbody>
-                <!-- AGREGAR LA LOGICA DE LOS TICKETS CUANDO ESTÉ -->
                 {% for ticket in tickets %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ ticket.evento.nombre }}</td>
-                    <td>{{ ticket.fecha }}</td>
-                    <td>{{ ticket.cantidad }}</td>
+                    <td>{{ ticket.event.title }}</td>
+                    <td>{{ ticket.event.date|date:"d/m/Y" }}</td>
+                    <td>{{ ticket.quantity }}</td>
                     <td>${{ ticket.total }}</td>
                     <td>
-                        <!-- Ver evento. TERMINAR DE CONFIGURAR -->
-                        <a href="{% url 'evento_detail' ticket.evento.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
+                        <!-- Ver evento. -->
+                         {% if ticket.event %}
+                        <a href="{% url 'event_detail' ticket.event.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
                             <i class="bi bi-eye"></i>
                         </a>
+                        {% endif %}
 
                         <!-- Comprar más TERMINAR DE CONFIGURAR -->
-                        <a href="{% url 'comprar_ticket' ticket.evento.id %}" class="btn btn-sm btn-outline-success me-1" title="Comprar más">
+                        <a href="#" class="btn btn-sm btn-outline-success me-1" title="Comprar más">
                             <i class="bi bi-cart-plus"></i>
                         </a>
 
                         <!-- Pedir reembolso. TERMINAR DE CONFIGURAR -->
-                        <a href="{% url 'pedir_reembolso' ticket.id %}" class="btn btn-sm btn-outline-danger" title="Pedir reembolso">
+                        <a href="{% url 'refund_requests' ticket.id %}" class="btn btn-sm btn-outline-danger" title="Pedir reembolso">
                             <i class="bi bi-cash"></i>
                         </a>
                     </td>
@@ -53,33 +54,49 @@
                 {% endfor %}
             </tbody>
         </table>
-    
-    <h2 class="mt-5">Nuevas notificaciones</h2>
-        {% if unread_notifications %}
-            <table>
-                <tr>
-                    <th>Título</th>
-                    <th>Mensaje</th>
-                    <th>Prioridad</th>
-                    <th>Fecha</th>
-                </tr>
-                {% for notif in unread_notifications %}
-                    <tr>
-                        <td>{{ notif.title }}</td>
-                        <td>{{ notif.message }}</td>
-                        <td>{{ notif.priority }}</td>
-                        <td>{{ notif.created_at|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                {% endfor %}
-            </table>
-            <br>
-            <a href="{% url 'notification_list' %}" class="btn btn-primary">Ver todas</a>
-        {% else %}
-            <p>No tenés notificaciones nuevas.</p>
-        {% endif %}
+    </div>
 
+    <h2 class="mb-3">Mis Notificaciones</h2>
+    <div class="mb-5">
+        <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Título</th>
+                        <th>Mensaje</th>
+                        <th>Prioridad</th>
+                        <th>Fecha</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if unread_notifications %}
+                        {% if unread_notifications|length > 5 %}
+                            <tr class="table-light">
+                                <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
+                            </tr>
+                        {% endif %}
+                        {% for notif in unread_notifications %}
+                            <tr>
+                                <td>{{ notif.title }}</td>
+                                <td>{{ notif.message }}</td>
+                                <td>{{ notif.priority }}</td>
+                                <td>{{ notif.created_at|date:"d/m/Y H:i" }}</td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr class="table-light"><td colspan="4" class="text-center">No tenés notificaciones nuevas.</td></tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-end mt-3">
+            <a href="{% url 'notifications' %}" class="btn btn-warning rounded-pill fw-bold px-4 py-2">Ver Todas</a>
+        </div>
+    </div>     
+    
     <h2 >Mis Datos</h2>
-    <div class="card mb-4">
+    <div class="card mb-5">
         <div class="card-body">
             <p><strong>Nombre:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
             <p><strong>Email:</strong> {{ request.user.email }}</p>

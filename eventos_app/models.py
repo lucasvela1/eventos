@@ -221,8 +221,8 @@ class Ticket(models.Model):
     ticket_code = models.TextField(unique=True)
     quantity = models.IntegerField() #Se puede hacer una compra, y en ella se pueden comprar varias entradas
     type = models.TextField(choices=Type.choices, default=Type.general)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=False, blank=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=False, blank=False)
     
     def __str__(self):
         return self.ticket_code
