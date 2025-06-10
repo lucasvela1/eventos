@@ -21,7 +21,7 @@
 .navbar {
   padding-top: 1.5rem !important;
   padding-bottom: 1.5rem !important;
-  min-height: 70px;
+  min-height: 80px;
 }
 footer.footer {
     background-color: #212529; /* igual que navbar-dark bg-dark */

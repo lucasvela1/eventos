@@ -53,6 +53,40 @@
                 {% endfor %}
             </tbody>
         </table>
+    
+    <h2 class="mt-5">Nuevas notificaciones</h2>
+        {% if unread_notifications %}
+            <table>
+                <tr>
+                    <th>Título</th>
+                    <th>Mensaje</th>
+                    <th>Prioridad</th>
+                    <th>Fecha</th>
+                </tr>
+                {% for notif in unread_notifications %}
+                    <tr>
+                        <td>{{ notif.title }}</td>
+                        <td>{{ notif.message }}</td>
+                        <td>{{ notif.priority }}</td>
+                        <td>{{ notif.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <br>
+            <a href="{% url 'notification_list' %}" class="btn btn-primary">Ver todas</a>
+        {% else %}
+            <p>No tenés notificaciones nuevas.</p>
+        {% endif %}
+
+    <h2 >Mis Datos</h2>
+    <div class="card mb-4">
+        <div class="card-body">
+            <p><strong>Nombre:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
+            <p><strong>Email:</strong> {{ request.user.email }}</p>
+            <p><strong>Username:</strong> {{ request.user.username }}</p>
+            <p><strong>Fecha de registro:</strong> {{ request.user.date_joined|date:"d M Y" }}</p>
+        </div>
+    </div>    
 </div>
 {% endblock %}
 

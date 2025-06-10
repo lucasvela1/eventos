@@ -22,6 +22,7 @@ class HomeView(TemplateView):
         context['events'] = Event.objects.all().order_by("date")  # Pasa la lista de eventos al contexto
         return context
 
+
 class EventListView(ListView):
     model = Event #Clase que manipula la vista
     template_name = "app/events.html" #Incluyo el template que controla la vista
@@ -204,4 +205,6 @@ class MiCuentaView(TemplateView):
         context['user'] = user
         context['favoritos'] = Favorito.objects.filter(user=user)
         context['refund_requests'] = RefundRequest.objects.filter(user=user)
+        context['unread_notifications'] = Notification.objects.filter(user=user, read=False)
+        context['tickets'] = Ticket.objects.filter(user=user)
         return context
