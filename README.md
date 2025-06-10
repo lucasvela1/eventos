@@ -20,3 +20,12 @@ python manage.py loaddata events.json
 
 ## Correr app
 python manage.py runserver
+
+## Agregar cambios
+git add .
+git commit -m " ejem : hice un cambio"
+
+## Subir cambios al repositorio remoto
+git push origin main
+
+
