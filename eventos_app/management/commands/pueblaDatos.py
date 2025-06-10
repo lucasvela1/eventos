@@ -10,9 +10,9 @@ class Command(BaseCommand):
 
     @transaction.atomic # Asegura que todas las operaciones se hagan en una sola transacción
     def handle(self, *args, **options):
-        if Category.objects.exists() or Event.objects.exists(): #Si ya hay datos en la base de datos, no se hace nada
-            self.stdout.write(self.style.WARNING('La base de datos ya contiene datos. No se realizó ninguna acción.'))
-            return
+        #if Category.objects.exists() or Event.objects.exists(): #Si ya hay datos en la base de datos, no se hace nada
+         #   self.stdout.write(self.style.WARNING('La base de datos ya contiene datos. No se realizó ninguna acción.'))
+          #  return
         
         #El borrado es por las dudas, por si quedó alguna basura, algún dato suelto, etc
         self.stdout.write('Borrando datos antiguos (si los hubiera)...')
