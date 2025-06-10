@@ -143,15 +143,6 @@ class Priority(models.TextChoices):
     medium = 'MEDIUM'
     low = 'LOW'
 
-class Notification(models.Model):
-    title = models.CharField(max_length=200)
-    message = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)  #Se pone como DateTimeFiel para también tener la hora
-    priority = models.TextField(choices=Priority.choices)
-    read = models.BooleanField(default=False)
-
-    def __str__(self):
-        return self.title
 
 class UserRole(models.TextChoices):
     ADMIN = 'ADMIN', 'Administrador'
@@ -161,7 +152,7 @@ class UserRole(models.TextChoices):
 class CustomUser(AbstractUser):
     #username = models.CharField(max_length=50) Comentado porque el usuario ya tiene un campo username por heredar de AbstractUser
     #email = models.TextField()
-    notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
+    #notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
     puntaje= models.IntegerField(default=0)
     rol = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.CLIENTE) #Solo se puede elegir entre los roles ya creados
 
@@ -198,7 +189,17 @@ class CustomUser(AbstractUser):
         self.save()
 
 
+class Notification(models.Model):
+    title = models.CharField(max_length=200)
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)  #Se pone como DateTimeFiel para también tener la hora
+    priority = models.TextField(choices=Priority.choices)
+    read = models.BooleanField(default=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False, related_name="notifications_user")
 
+    def __str__(self):
+        return self.title
+    
 class RefundRequest(models.Model):
     approved = models.BooleanField()
     approval_date = models.DateField(auto_now_add=True)
@@ -220,8 +221,8 @@ class Ticket(models.Model):
     ticket_code = models.TextField(unique=True)
     quantity = models.IntegerField() #Se puede hacer una compra, y en ella se pueden comprar varias entradas
     type = models.TextField(choices=Type.choices, default=Type.general)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=False, blank=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=False, blank=False)
     
     def __str__(self):
         return self.ticket_code

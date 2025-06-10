@@ -22,6 +22,7 @@ class HomeView(TemplateView):
         context['events'] = Event.objects.all().order_by("date")  # Pasa la lista de eventos al contexto
         return context
 
+
 class EventListView(ListView):
     model = Event #Clase que manipula la vista
     template_name = "app/events.html" #Incluyo el template que controla la vista
@@ -41,7 +42,7 @@ class EventDetailView(DetailView):
     context_object_name = "event"
 
 
-class NotificationListView(ListView):
+class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
     template_name = "app/notification.html"
     context_object_name = "notifications"
@@ -54,7 +55,9 @@ class NotificationListView(ListView):
             default=Value(4), # Para cualquier otro valor o si es None
             output_field=IntegerField(),
         )
-        return Notification.objects.all().order_by(priority_order, "-created_at")  # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
+        return Notification.objects.filter(user=self.request.user).order_by(priority_order, "-created_at") 
+         #filtrar notificaciones por usuario
+         # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -120,7 +123,7 @@ class RegisterView(FormView):
 class RefundRequestListView(ListView):
     model = RefundRequest
     template_name = "app/refundRequest.html"
-    context_object_name = "refundRequests"
+    context_object_name = "refund_requests"
 
     def get_queryset(self):
         priority_order = Case(
@@ -204,4 +207,6 @@ class MiCuentaView(TemplateView):
         context['user'] = user
         context['favoritos'] = Favorito.objects.filter(user=user)
         context['refund_requests'] = RefundRequest.objects.filter(user=user)
+        context['unread_notifications'] = Notification.objects.filter(user=user, read=False)
+        context['tickets'] = Ticket.objects.filter(user=user)
         return context
