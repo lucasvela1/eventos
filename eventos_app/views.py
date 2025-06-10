@@ -1,8 +1,10 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
+from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, FormView
 
@@ -59,7 +61,7 @@ class NotificationListView(ListView):
         return context
     
 
-class FavoritosListView(ListView):
+class FavoritosListView(LoginRequiredMixin, ListView):
     model = Favorito
     template_name = "app/favoritos.html"
     context_object_name = "favoritos"
@@ -80,7 +82,16 @@ class FavoritosListView(ListView):
         context = super().get_context_data(**kwargs)
         return context
 
+class ToggleFavoritoView(LoginRequiredMixin, View):
+    login_url = "/accounts/login/"
 
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        favorito, creado = Favorito.objects.get_or_create(user=request.user, event=event)
+        if not creado:
+            favorito.delete()
+        return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
+    
 
 class RegisterView(FormView):
     template_name = "accounts/register.html"
@@ -105,16 +116,7 @@ class RegisterView(FormView):
         return super().form_invalid(form)
 
 
-#para agregar o quitar favoritos
-@login_required
-def toggle_favorito(request, event_id):
-    event = get_object_or_404(Event, id=event_id)
-    favorito, creado = Favorito.objects.get_or_create(user=request.user, event=event)
 
-    if not creado:
-        favorito.delete()  # Si ya existía, lo quitamos
-
-    return redirect(request.META.get('HTTP_REFERER', 'event_list'))
 class RefundRequestListView(ListView):
     model = RefundRequest
     template_name = "app/refundRequest.html"
@@ -193,3 +195,13 @@ class BuscarEventosView(ListView):
         context['query'] = getattr(self, 'query', '')
         return context
 
+class MiCuentaView(TemplateView):
+    template_name = "accounts/my_account.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['user'] = user
+        context['favoritos'] = Favorito.objects.filter(user=user)
+        context['refund_requests'] = RefundRequest.objects.filter(user=user)
+        return context
