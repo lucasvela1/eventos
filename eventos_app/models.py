@@ -83,12 +83,12 @@ class Event(models.Model):
     price=models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    total_rating = models.IntegerField()
+    total_rating = models.IntegerField(default=0)
     categoria = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=False)
-    suma_puntaje=models.BooleanField()
-    cantidad_puntos=models.IntegerField()
-    cancelado=models.BooleanField()
+    suma_puntaje=models.BooleanField(default=False)
+    cantidad_puntos=models.IntegerField(default=0)
+    cancelado=models.BooleanField(default=False)
     id_img = models.CharField(max_length=2083, default='sin_imagen') # Solamente id de la imagen
 
     def __str__(self):
