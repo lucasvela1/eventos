@@ -150,9 +150,6 @@ class UserRole(models.TextChoices):
     CLIENTE = 'CLIENTE', 'Cliente'
 
 class CustomUser(AbstractUser):
-    #username = models.CharField(max_length=50) Comentado porque el usuario ya tiene un campo username por heredar de AbstractUser
-    #email = models.TextField()
-    #notification = models.ForeignKey(Notification, on_delete=models.SET_NULL, null=True, blank=True )
     puntaje= models.IntegerField(default=0)
     rol = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.CLIENTE) #Solo se puede elegir entre los roles ya creados
 
