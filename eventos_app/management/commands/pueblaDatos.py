@@ -32,7 +32,6 @@ class Command(BaseCommand):
         musica = Category.objects.create(name="Música", description="Eventos musicales")
         tecnologia = Category.objects.create(name="Tecnología", description="Conferencias de tecnología")
         teatro = Category.objects.create(name="Teatro", description="Obras de teatro en vivo")
-
         
         luna_park = Venue.objects.create(name="Luna Park", address="Av. Madero 420", city="Buenos Aires", capacity=10000, contact="info@lunapark.com")
         teatro_colon = Venue.objects.create(name="Teatro Colón", address="Cerrito 628", city="Buenos Aires", capacity=2500, contact="contacto@colon.org.ar")
