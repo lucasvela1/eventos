@@ -9,7 +9,8 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, FormView
 import uuid
 from .forms import RatingForm, UsuarioRegisterForm
-from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos
 
 
 
@@ -17,10 +18,14 @@ from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
 class HomeView(TemplateView):
     template_name = "home.html"
 
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['events'] = Event.objects.all().order_by("date")  # Pasa la lista de eventos al contexto
+        context['events_destacados'] = obtener_eventos_destacados()
+        context['events_proximos'] = obtener_eventos_proximos()
+        context['categorys'] = Category.objects.filter(is_active=True)
         return context
+
 
 
 class EventListView(ListView):

@@ -1,12 +1,134 @@
 {% extends "base.html" %}
 {% load static %}
 
+
 {% block content %}
 <!-- Formulario de búsqueda debajo del navbar -->
 {% include "app/search_form.html" %}
 
-<!-- Carrusel de imágenes con texto -->
+
+
+
+<!--  CARRUSEL DE EVENTOS DESTACADOS-->
 <div class="container mt-2">
+  <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
+   
+    <!-- Indicadores -->
+    <div class="carousel-indicators">
+      {% for event in events_destacados %}
+        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"
+          class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Slide {{ forloop.counter }}"></button>
+      {% endfor %}
+    </div>
+
+
+    <!-- Slides -->
+    <div class="carousel-inner">
+      {% for event in events_destacados %}
+        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+          <img src="{{ event.imagen_url_directa }}" class="d-block w-100 img-fluid"
+            style="max-height: 500px; object-fit: cover;" alt="{{ event.title }}">
+          <div class="carousel-caption d-none d-md-block">
+            <h5 style="font-size: 2rem; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: bold;">
+              {{ event.title }}
+            </h5>
+            <p style="font-size: 1rem; color: #ddd; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: normal;">
+              {{ event.description|truncatechars:80 }}
+            </p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+
+    <!-- Controles -->
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Anterior</span>
+    </button>
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+      <span class="visually-hidden">Siguiente</span>
+    </button>
+  </div>
+</div>
+
+
+
+
+<!-- Carrusel de Categorías -->
+<div class="container py-4">
+  <h2 class="mb-4">Explorá por Categoría</h2>
+  <div id="carrusel-categorias" class="glide">
+    <div class="glide__track" data-glide-el="track">
+      <ul class="glide__slides">
+        {% for categoria in categorys %}
+        <li class="glide__slide">
+          <a href="#" style="text-decoration: none;">
+            <div class="card mx-2" style="width: 18rem;">
+              <img src="{{ categoria.imagen_url_directa }}" class="card-img-top" alt="{{ categoria.name }}"
+                style="height: 200px; object-fit: cover;">
+              <div class="card-body">
+                <h5 class="card-title text-center">{{ categoria.name }}</h5>
+              </div>
+            </div>
+          </a>
+        </li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="glide__arrows" data-glide-el="controls">
+      <button class="glide__arrow glide__arrow--left" data-glide-dir="<">‹</button>
+      <button class="glide__arrow glide__arrow--right" data-glide-dir=">">›</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Carrusel de Próximos Eventos -->
+<div class="container py-4">
+  <h2 class="mb-4">Próximos Eventos</h2>
+  <div id="carrusel-proximos" class="glide">
+    <div class="glide__track" data-glide-el="track">
+      <ul class="glide__slides">
+        {% for event in events_proximos %}
+        <li class="glide__slide">
+          <a href="{% url 'event_detail' event.id %}" style="text-decoration: none;">
+            <div class="card bg-light text-dark mx-2" style="width: 18rem; height: 315px;">
+              <img src="{{ event.imagen_url_directa }}" class="card-img-top" alt="{{ event.title }}"
+                style="height: 200px; object-fit: cover;">
+              <div class="card-body">
+                <h5 class="card-title">{{ event.title }}</h5>
+                <p class="card-text">{{ event.date|date:"d/m/Y" }}</p>
+              </div>
+            </div>
+          </a>
+        </li>
+        {% endfor %}
+        <!-- Card de "Ver Más" -->
+        <li class="glide__slide">
+          <a href="{% url 'events' %}" style="text-decoration: none;">
+            <div class="card text-center bg-light text-dark mx-2" style="width: 18rem; height: 315px; display: flex; align-items: center; justify-content: center;">
+              <div class="card-body">
+                <h4 class="card-title">Ver más eventos</h4>
+              </div>
+            </div>
+          </a>
+        </li>
+      </ul>
+    </div>
+    <div class="glide__arrows" data-glide-el="controls">
+      <button class="glide__arrow glide__arrow--left" data-glide-dir="<">‹</button>
+      <button class="glide__arrow glide__arrow--right" data-glide-dir=">">›</button>
+    </div>
+  </div>
+</div>
+
+
+
+
+<!-- Carrusel de imágenes con texto -->
+<!--<div class="container mt-2">
   <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-indicators">
       <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -45,21 +167,28 @@
       <span class="visually-hidden">Siguiente</span>
     </button>
   </div>
-</div>
+</div>-->
+
+
+
+
+
 
 <!-- Presentación -->
-<div class="container mt-4">
+<!--<div class="container mt-4">
     <div <div class="p-4 rounded-3" style="background-color: transparent;">
+
 
         <h1 class="display-5 fw-bold">Eventos y Entradas</h1>
         <p class="fs-4">Descubre, organiza y participa en los mejores eventos. Compra entradas, deja
             comentarios y califica tus experiencias.</p>
     </div>
     <p>Hay {{ events|length }} eventos.</p>
-</div>
+</div>-->
+
 
 <!-- Carrusel de eventos -->
-<div class="container py-4">
+<!--<div class="container py-4">
     <div id="options-type" class="glide position-relative">
         <div class="glide__track" data-glide-el="track">
             <ul class="glide__slides">
@@ -78,10 +207,11 @@
                 </li>
             {% endfor %}
             </ul>
-        </div>
+        </div>-->
+
 
         <!-- Controles del glide -->
-        <div class="glide__arrows d-flex justify-content-between align-items-center w-100 position-absolute top-50 start-0 translate-middle-y px-3"
+        <!--<div class="glide__arrows d-flex justify-content-between align-items-center w-100 position-absolute top-50 start-0 translate-middle-y px-3"
             data-glide-el="controls">
             <button class="glide__arrow glide__arrow--left btn btn-light"
                     style="width: 40px; height: 40px; font-size: 1.5rem; border-radius: 50%; box-shadow: 0 2px 6px rgba(0,0,0,0.2);"
@@ -95,6 +225,11 @@
             </button>
         </div>
     </div>
-</div>
+
+
+</div>-->
+
 
 {% endblock content %}
+
+

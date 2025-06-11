@@ -21,8 +21,8 @@
         name="viewport"
         content="width=device-width, initial-scale=1"
     />
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.theme.min.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100"  style="background-color: #f5f5f5;">
@@ -103,13 +103,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        new Glide('.glide', {
-            type: 'carousel',
-            focusAT: 'center',
-            perView: 3
-        }).mount();
+        if (document.querySelector('#carrusel-categorias')) {
+            new Glide('#carrusel-categorias', {type: 'carousel', perView: 3, gap: 20}).mount();
+        }
+        if (document.querySelector('#carrusel-proximos')) {
+            new Glide('#carrusel-proximos', {type: 'carousel', perView: 3, gap: 20}).mount();
+        }
     });
 </script>
+
 
 
 </html>
