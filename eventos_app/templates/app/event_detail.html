@@ -27,10 +27,13 @@
 
                     <!-- BOTÓN de calificar -->
                     {% if user.is_authenticated %}
-                        <a href="{% url 'crear_rating' event.id %}" class="btn btn-primary mt-3">Calificar este evento</a>
+                        <a href="{% url 'crear_rating' event.id %}" class="btn btn-warning px-4 shadow" style="background-color: #f5d376; border-radius: 2rem; font-weight: bold;">Calificar este evento</a>
                     {% else %}
                         <p>Iniciá sesión para calificar este evento.</p>
                     {% endif %}
+                     <a href="{% url 'events'  %}" class="btn btn-warning px-4 shadow" style="background-color: #f5d376; border-radius: 2rem; font-weight: bold;">volver atrás</a>
+                 <!--  <button type="submit" class="btn btn-warning px-4 shadow" style="background-color: #f5d376; border-radius: 2rem; font-weight: bold;">Buscar</button>
+  -->
                 </div> 
 
             </div> <!-- /.card-body -->
