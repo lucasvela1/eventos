@@ -33,6 +33,13 @@ class EventListView(ListView):
 
     def get_context_data(self, **kwargs):  #Llamo al context data del padre, me traigo todos los objetos de event
         context = super().get_context_data(**kwargs)
+        #agrego!!!!!!!!
+        user = self.request.user
+        if user.is_authenticated:
+            favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
+            context['favoritos_ids'] = list(favoritos_ids)
+        else:
+            context['favoritos_ids'] = []
         return context  
     
 
