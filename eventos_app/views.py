@@ -111,28 +111,22 @@ class CarritoView(LoginRequiredMixin, View):
        if cantidad < 1:
          messages.error(request, "La cantidad debe ser al menos 1.")
          return redirect("carrito", event_id=event_id)
-
-       # Verifica si ya existe un ticket para ese usuario y evento
-       ticket, creado = Ticket.objects.get_or_create( #REVISAR, porque se debería en teoría poder comprar varios tickets
-           user=request.user, event=event,            #probablemente haya que crear varias instancias de tickets     
-           defaults={
-           'ticket_code': str(uuid.uuid4()),
-           'quantity': cantidad,
-           'total': cantidad * event.price,
-            })
-
-       if not creado:
-          # Si ya existe, actualiza cantidad y total
-          ticket.quantity += cantidad
-          ticket.total += cantidad * event.price
-          ticket.save()
+       #Por más que en el html no aparezca para poner menos a 0, o 0. Se puede manipular y enviar de alguna forma
+       #un valor que no corresponde, por eso con esto validamos en nuestra parte "backend"
+       Ticket.objects.create(
+            user=request.user,
+            event=event,
+            quantity=cantidad,
+            total=cantidad * event.price,
+            ticket_code=str(uuid.uuid4())
+        ) 
 
        messages.success(request, f"{cantidad} ticket(s) comprados correctamente.")
        Notification.objects.create(
            user=request.user,
            title="Ticket comprado",
            message=f"Se ha comprado exitosamente {cantidad} ticket/s para {event.title}",
-           priority="Media"
+           priority="MEDIUM"
        )
        return redirect("my_account")
 

@@ -228,9 +228,6 @@ class Ticket(models.Model):
     def __str__(self):
         return self.ticket_code
     
-    class Meta:
-        unique_together = ("user", "event")
-
 class Rating(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
