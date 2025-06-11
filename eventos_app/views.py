@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, FormView
-
+import uuid
 from .forms import RatingForm, UsuarioRegisterForm
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
 
@@ -95,6 +95,40 @@ class ToggleFavoritoView(LoginRequiredMixin, View):
             favorito.delete()
         return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
     
+
+
+class CarritoView(LoginRequiredMixin, View):
+    login_url = "/accounts/login/"
+
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        return render(request, "app/carrito.html", {"event": event})
+
+    def post(self, request, event_id):
+       event = get_object_or_404(Event, id=event_id)
+       cantidad = int(request.POST.get("cantidad", 1))
+
+       if cantidad < 1:
+         messages.error(request, "La cantidad debe ser al menos 1.")
+         return redirect("carrito", event_id=event_id)
+
+       # Verifica si ya existe un ticket para ese usuario y evento
+       ticket, creado = Ticket.objects.get_or_create(
+           user=request.user, event=event,
+           defaults={
+           'ticket_code': str(uuid.uuid4()),
+           'quantity': cantidad,
+           'total': cantidad * event.price,
+            })
+
+       if not creado:
+          # Si ya existe, actualiza cantidad y total
+          ticket.quantity += cantidad
+          ticket.total += cantidad * event.price
+          ticket.save()
+
+       messages.success(request, f"{cantidad} ticket(s) comprados correctamente.")
+       return redirect("my_account")
 
 class RegisterView(FormView):
     template_name = "accounts/register.html"

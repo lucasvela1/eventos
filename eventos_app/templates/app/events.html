@@ -1,61 +1,61 @@
-{% extends "base.html" %}
+    {% extends "base.html" %}
 
-{% block title %}Eventos{% endblock %}
+    {% block title %}Eventos{% endblock %}
 
-{% block content %}
-<div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Eventos</h1>
+    {% block content %}
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Eventos</h1>
+        </div>
+        {% include "app/search_form.html" %}
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Título</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for event in events%}
+                    <tr>
+                        <td>{{ event.title }}</td>
+                        <td>{{ event.description }}</td>
+                        <td>{{ event.date|date:"d/m/Y" }}</td>
+                        <td>
+                            <div class="hstack gap-1">
+                                <a href="{% url 'event_detail' event.id %}"
+                                class="btn btn-sm btn-outline-primary"
+                                aria-label="Ver detalle"
+                                title="Ver detalle">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </a>
+                                <!-- Botón para marcar como favorito. VER COMO RELLENAR CUANDO ESTA EN FAVORITOS -->
+                                {% if user.is_authenticated %}
+                                    <a href="{% url 'toggle_favorito' event.id %}"
+                                        class="btn btn-sm btn-outline-danger"
+                                        aria-label="Marcar como favorito"
+                                        title="Marcar como favorito">
+                                        <i class="bi bi-heart{% if event in user.favorite_events.all %}-fill text-danger{% endif %}" aria-hidden="true"></i>
+                                    </a>
+                                    <!-- Botón para añadir al carro-->
+                                    <a href="{% url 'carrito' event.id %}" 
+                                       class="btn btn-sm btn-outline-success"
+                                       aria-label="Añadir al carro"
+                                       title="Añadir al carro">
+                                       <i class="bi bi-cart-plus" aria-hidden="true"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center">No hay eventos disponibles</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
-    {% include "app/search_form.html" %}
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Título</th>
-                <th>Descripción</th>
-                <th>Fecha</th>
-                <th>Acciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for event in events%}
-                <tr>
-                    <td>{{ event.title }}</td>
-                    <td>{{ event.description }}</td>
-                    <td>{{ event.date|date:"d/m/Y" }}</td>
-                    <td>
-                        <div class="hstack gap-1">
-                            <a href="{% url 'event_detail' event.id %}"
-                               class="btn btn-sm btn-outline-primary"
-                               aria-label="Ver detalle"
-                               title="Ver detalle">
-                                <i class="bi bi-eye" aria-hidden="true"></i>
-                            </a>
-                            <!-- Botón para marcar como favorito. VER COMO RELLENAR CUANDO ESTA EN FAVORITOS -->
-                            {% if user.is_authenticated %}
-                                <a href="{% url 'toggle_favorito' event.id %}"
-                                    class="btn btn-sm btn-outline-danger"
-                                    aria-label="Marcar como favorito"
-                                    title="Marcar como favorito">
-                                    <i class="bi bi-heart{% if event in user.favorite_events.all %}-fill text-danger{% endif %}" aria-hidden="true"></i>
-                                </a>
-                                <!-- Botón para añadir al carro TERMINAR REDIRECCIONAMIENTO-->
-                                <a href="#" 
-                                    class="btn btn-sm btn-outline-success"
-                                    aria-label="Añadir al carro"
-                                    title="Añadir al carro">
-                                    <i class="bi bi-cart-plus" aria-hidden="true"></i>
-                                </a>
-                            {% endif %}
-                        </div>
-                    </td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="4" class="text-center">No hay eventos disponibles</td>
-                </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-</div>
-{% endblock %}
+    {% endblock %}
