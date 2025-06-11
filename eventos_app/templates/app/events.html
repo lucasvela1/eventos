@@ -25,20 +25,14 @@
                         <td>{{ event.date|date:"d/m/Y" }}</td>
                         <td>
                             <div class="hstack gap-1">
+                                <!-- Botón ver evento-->
                                 <a href="{% url 'event_detail' event.id %}"
-                                class="btn btn-sm btn-outline-primary"
-                                aria-label="Ver detalle"
-                                title="Ver detalle">
+                                    class="btn btn-sm btn-outline-primary"
+                                    aria-label="Ver detalle"
+                                    title="Ver detalle">
                                     <i class="bi bi-eye" aria-hidden="true"></i>
                                 </a>
-                                <!-- Botón para marcar como favorito. VER COMO RELLENAR CUANDO ESTA EN FAVORITOS 
-                                 <a href="{% url 'toggle_favorito' event.id %}"
-                                        class="btn btn-sm {% if event in user.favorite_events.all %}btn-danger{% else %}btn-outline-danger{% endif %}"
-                                        aria-label="Marcar como favorito"
-                                        title="Marcar como favorito">
-                                        <i class="bi bi-heart{% if event in user.favorite_events.all %}-fill text-danger{% endif %}" aria-hidden="true"></i>
-                                    </a>
-                                 -->
+                                <!-- Botón para marcar como favorito.-->
                                 {% if user.is_authenticated %}
                                      <a href="{% url 'toggle_favorito' event.id %}"
                                         class="btn btn-sm btn-outline-danger"
