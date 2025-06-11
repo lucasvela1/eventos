@@ -12,7 +12,8 @@ from .views import (
     RegisterView,
     crear_rating,
     BuscarEventosView,
-    MiCuentaView
+    MiCuentaView,
+    CarritoView
 )
 from . import views
 from .forms import LoginForm, UsuarioRegisterForm
@@ -31,4 +32,4 @@ urlpatterns = [
     path("accounts/login/", auth_views.LoginView.as_view(template_name="accounts/login.html",authentication_form=LoginForm), name="login"),
     path("accounts/register/", RegisterView.as_view(), name="register"),
     path("accounts/register/usuario/", MiCuentaView.as_view(), name="my_account" ),
-]
+    path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),]

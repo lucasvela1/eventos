@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Carrito de Compras</h2>
+
+  <div>
+    <h3>{{ event.title }}</h3>
+    <p><strong>Fecha:</strong> {{ event.date }}</p>
+    <p><strong>Lugar:</strong> {{ event.location }}</p>
+    <p><strong>Precio:</strong> ${{ event.price }}</p>
+    <p><strong>Descripción:</strong> {{ event.description }}</p>
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <label for="cantidad">Cantidad de tickets:</label>
+    <input type="number" name="cantidad" id="cantidad" value="1" min="1" required>
+    <button type="submit" class="btn btn-success mt-2">Comprar</button>
+  </form>
+{% endblock %}
+
+<!-- Para hacer que el precio se actualice habría que hacer un script de javascript que tome el valor
+     unitario y lo multiplique por el total.-->
+

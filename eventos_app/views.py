@@ -7,7 +7,7 @@ from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, FormView
-
+import uuid
 from .forms import RatingForm, UsuarioRegisterForm
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
 
@@ -95,6 +95,40 @@ class ToggleFavoritoView(LoginRequiredMixin, View):
             favorito.delete()
         return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
     
+
+
+class CarritoView(LoginRequiredMixin, View):
+    login_url = "/accounts/login/"
+
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, id=event_id)
+        return render(request, "app/carrito.html", {"event": event})
+
+    def post(self, request, event_id):
+       event = get_object_or_404(Event, id=event_id)
+       cantidad = int(request.POST.get("cantidad", 1))
+
+       if cantidad < 1:
+         messages.error(request, "La cantidad debe ser al menos 1.")
+         return redirect("carrito", event_id=event_id)
+       #Por más que en el html no aparezca para poner menos a 0, o 0. Se puede manipular y enviar de alguna forma
+       #un valor que no corresponde, por eso con esto validamos en nuestra parte "backend"
+       Ticket.objects.create(
+            user=request.user,
+            event=event,
+            quantity=cantidad,
+            total=cantidad * event.price,
+            ticket_code=str(uuid.uuid4())
+        ) 
+
+       messages.success(request, f"{cantidad} ticket(s) comprados correctamente.")
+       Notification.objects.create(
+           user=request.user,
+           title="Ticket comprado",
+           message=f"Se ha comprado exitosamente {cantidad} ticket/s para {event.title}",
+           priority="MEDIUM"
+       )
+       return redirect("my_account")
 
 class RegisterView(FormView):
     template_name = "accounts/register.html"
