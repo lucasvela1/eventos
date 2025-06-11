@@ -9,10 +9,16 @@ class RatingForm(forms.ModelForm):
     class Meta:
         model = Rating
         fields = ['title', 'text', 'rating']
+        labels = {
+            'title': 'Título',
+            'text': 'Comentario',
+            'rating': 'Puntaje',
+        }
         widgets = {
             'title': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Título de la calificación'}),
             'text': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Escribe tu comentario'}),
-            'rating': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 5}),
+            #'rating': forms.NumberInput(attrs={'class': 'form-control', 'min': 1, 'max': 5}),
+            'rating': forms.RadioSelect(choices=[(i, f'{i} estrellas') for i in range(1, 6)]),
         }
 
 

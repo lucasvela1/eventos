@@ -5,6 +5,7 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-center mb-4">Rating de Eventos</h2>
+    <h3 class="text-center mb-4">Aquí podrá ver los eventos pasados con su respectiva calificación.</h3>
 
     <table class="table table-striped text-center">
         <thead class="table-dark">
@@ -13,7 +14,8 @@
                 <th>Evento</th>
                 <th>Rating</th>
                 <th>Fecha</th>
-                <th>Estado</th> <!-- Nueva columna -->
+                <th>Estado</th> 
+                <th>Acciones</th>
             </tr>
         </thead>
        <tbody>
@@ -28,6 +30,21 @@
                     <span class="badge bg-danger">Cancelado</span>
                 {% else %}
                     <span class="badge bg-success">Activo</span>
+                {% endif %}
+            </td>
+            <td>
+                {% if user.is_authenticated %}
+                    {% if event.id in eventos_con_ticket %}
+                        {% if event.id in eventos_ya_calificados %}
+                            <span class="text-muted">Ya calificado</span>
+                        {% else %}
+                            <a href="{% url 'crear_rating' event.id %}" class="btn btn-sm btn-outline-primary">Calificar</a>
+                        {% endif %}
+                    {% else %}
+                        <span class="text-muted">Sin ticket</span>
+                    {% endif %}
+                {% else %}
+                    <a href="{% url 'login' %}?next={% url 'crear_rating' event.id %}" class="btn btn-sm btn-secondary">Iniciar sesión</a>
                 {% endif %}
             </td>
         </tr>

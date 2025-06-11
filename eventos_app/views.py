@@ -184,7 +184,7 @@ class RefundRequestListView(ListView):
         return context
 
 
-
+# Lista de eventos por rating
 class RatingView(ListView):
     model = Event
     template_name = "app/rating.html"
@@ -199,33 +199,52 @@ class RatingView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
+        if user.is_authenticated:
+            # Eventos con ticket comprado
+            tickets = Ticket.objects.filter(user=user).values_list('event_id', flat=True)
+            # Eventos ya calificados
+            ratings = Rating.objects.filter(user=user).values_list('event_id', flat=True)
+            context['eventos_con_ticket'] = set(tickets)
+            context['eventos_ya_calificados'] = set(ratings)
+        else:
+            context['eventos_con_ticket'] = set()
+            context['eventos_ya_calificados'] = set()
+
         return context
     
-@login_required
-def crear_rating(request, event_id):
-    event= get_object_or_404(Event, pk=event_id)
-    user= request.user
-        
-    if Rating.objects.filter(user=user, event=event).exists():
-        messages.error(request, "Ya has calificado este evento.")
-        return redirect('event_detail', pk=event_id)
-        
-    if not Ticket.objects.filter(user=user, event=event).exists():
-        messages.error(request, "Debes comprar un ticket para calificar este evento.")
-        return redirect('event_detail', pk=event_id)
-        
-    if request.method == "POST":
-        form = RatingForm(request.POST)
-        if form.is_valid():
-            rating = form.save(commit=False)
-            rating.user = user
-            rating.event = event
-            rating.save()
-            messages.success(request, "Calificación creada correctamente.")
-            return redirect('event_detail', pk=event_id)
-    else:
-        form = RatingForm()
-    return render(request, 'app/crear_rating.html', {'form': form, 'event': event}) 
+class CrearRatingView(LoginRequiredMixin, FormView):
+    template_name = 'app/crear_rating.html'
+    form_class = RatingForm
+
+    def dispatch(self, request, *args, **kwargs):
+        self.event = get_object_or_404(Event, pk=kwargs['event_id'])
+        self.user = request.user
+
+        # Ya calificó
+        if Rating.objects.filter(user=self.user, event=self.event).exists():
+            messages.error(request, "Ya has calificado este evento.")
+            return redirect('event_detail', pk=self.event.pk)
+
+        # No compró ticket
+        if not Ticket.objects.filter(user=self.user, event=self.event).exists():
+            messages.error(request, "Debes comprar un ticket para calificar este evento.")
+            return redirect('event_detail', pk=self.event.pk)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        rating = form.save(commit=False)
+        rating.user = self.user
+        rating.event = self.event
+        rating.save()
+        messages.success(self.request, "Calificación creada correctamente.")
+        return redirect('event_detail', pk=self.event.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['event'] = self.event
+        return context
         
 class BuscarEventosView(ListView):
     model = Event
