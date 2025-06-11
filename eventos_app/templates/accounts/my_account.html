@@ -69,13 +69,15 @@
                     </tr>
                 </thead>
                 <tbody>
+                    
                     {% if unread_notifications %}
                         {% if unread_notifications|length > 5 %}
                             <tr class="table-light">
                                 <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
+                                <p>Hay {{ unread_notifications|length }} notificaciones no leidas.</p>
                             </tr>
                         {% endif %}
-                        {% for notif in unread_notifications %}
+                        {% for notif in unread_notifications|slice:":5" %}
                             <tr>
                                 <td>{{ notif.title }}</td>
                                 <td>{{ notif.message }}</td>
