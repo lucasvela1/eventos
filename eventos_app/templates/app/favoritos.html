@@ -10,26 +10,45 @@
     <table class="table">
         <thead>
             <tr>
-                <th>Favorito</th>
                 <th>Título</th>
                 <th>Descripción</th>
                 <th>Fecha</th>
-                <th>Rating promedio</th>
+                <th>Accciones</th>
+
             </tr>
         </thead>
         <tbody>
             {% for favorito in favoritos%}
                 <tr>
-                    <td><i class="bi bi-heart-fill text-danger fs-4"></i></td> 
                     <td>{{ favorito.event.title }}</td>
                     <td>{{ favorito.event.description }}</td>
                     <td>{{ favorito.event.date|date:"d/m/Y" }}</td>
                     <td>
-                        {% if favorito.rating_promedio %}
-                            {{ favorito.rating_promedio|floatformat:1 }} <i class="bi bi-star-fill text-warning"></i>
-                        {% else %}
-                            Sin calificación
-                        {% endif %}
+                            <div class="hstack gap-1">
+                                <!-- Botón ver evento-->
+                                <a href="{% url 'event_detail' favorito.event.id %}"
+                                    class="btn btn-sm btn-outline-primary"
+                                    aria-label="Ver detalle"
+                                    title="Ver detalle">
+                                    <i class="bi bi-eye" aria-hidden="true"></i>
+                                </a>
+                                <!-- Botón para desmarcar como favorito.-->
+                                     <a href="{% url 'toggle_favorito' favorito.event.id %}"
+                                        class="btn btn-sm btn-outline-danger"
+                                        aria-label="Quitar de favoritos"
+                                        title="Quitar de favoritos">
+                                        <i class="bi bi-heart-fill text-danger" aria-hidden="true"></i>
+                                    </a>
+                                    
+                                    <!-- Botón para añadir al carro-->
+                                    <a href="{% url 'carrito' favorito.event.id %}" 
+                                       class="btn btn-sm btn-outline-success"
+                                       aria-label="Añadir al carro"
+                                       title="Añadir al carro">
+                                       <i class="bi bi-cart-plus" aria-hidden="true"></i>
+                                    </a>
+                            </div>
+                        </td>
                 </tr>
             {% empty %}
                 <tr>
