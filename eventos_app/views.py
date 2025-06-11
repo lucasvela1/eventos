@@ -113,8 +113,8 @@ class CarritoView(LoginRequiredMixin, View):
          return redirect("carrito", event_id=event_id)
 
        # Verifica si ya existe un ticket para ese usuario y evento
-       ticket, creado = Ticket.objects.get_or_create(
-           user=request.user, event=event,
+       ticket, creado = Ticket.objects.get_or_create( #REVISAR, porque se debería en teoría poder comprar varios tickets
+           user=request.user, event=event,            #probablemente haya que crear varias instancias de tickets     
            defaults={
            'ticket_code': str(uuid.uuid4()),
            'quantity': cantidad,
@@ -128,6 +128,12 @@ class CarritoView(LoginRequiredMixin, View):
           ticket.save()
 
        messages.success(request, f"{cantidad} ticket(s) comprados correctamente.")
+       Notification.objects.create(
+           user=request.user,
+           title="Ticket comprado",
+           message=f"Se ha comprado exitosamente {cantidad} ticket/s para {event.title}",
+           priority="Media"
+       )
        return redirect("my_account")
 
 class RegisterView(FormView):
