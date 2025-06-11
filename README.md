@@ -28,4 +28,22 @@ git commit -m " ejem : hice un cambio"
 ## Subir cambios al repositorio remoto
 git push origin main
 
+## crear una rama
+git branch nombre-de-la-rama
+
+## cambiarse de rama
+git checkout nombre-de-la-rama
+
+## crear y cambiarse de rama
+git checkout -b nombre-de-la-rama
+
+## subir a una rama del repositorio
+git push -u origin nombre-de-la-rama
+
+## agregar los cambios
+git add .
+
+## ver cambios que hiciste y no te acordas
+git status
+
 

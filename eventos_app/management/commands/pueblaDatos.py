@@ -30,8 +30,8 @@ class Command(BaseCommand):
         teatro = Category.objects.create(name="Teatro", description="Obras de teatro en vivo")
 
         #Venues
-        luna_park = Venue.objects.create(name="Luna Park", address="Av. Madero 420", city="Buenos Aires", capacity=10000, email="info@lunapark.com")
-        teatro_colon = Venue.objects.create(name="Teatro Colón", address="Cerrito 628", city="Buenos Aires", capacity=2500, email="contacto@colon.org.ar")
+        luna_park = Venue.objects.create(name="Luna Park", address="Av. Madero 420", city="Buenos Aires", capacity=10000, contact="info@lunapark.com")
+        teatro_colon = Venue.objects.create(name="Teatro Colón", address="Cerrito 628", city="Buenos Aires", capacity=2500, contact="contacto@colon.org.ar")
         
         #Notificaciones
         notif1 = Notification.objects.create(title="Bienvenido", message="Gracias por unirte", priority="LOW")
@@ -43,7 +43,7 @@ class Command(BaseCommand):
             email="admin@eventos.com",
             password="1234",
             rol="ADMIN",
-            notification=notif1
+            #notification=notif1
         )
 
         #Eventos
