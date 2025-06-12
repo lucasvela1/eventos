@@ -55,7 +55,7 @@
                         <li class="nav-item">{% navbar_link 'favoritos' 'Favoritos' %}</li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'my_account' %}">Mi Cuenta</a></li>
                         {%if request.user.rol != 'CLIENTE'%}
-                            <li class="nav-item"><a class="btn btn-outline-light" href="{% url 'admin:index' %}" style="border-radius: 2rem; font-weight: bold;">Ingresar al Admin</a></li>
+                            <li class="nav-item"><a class="btn btn-outline-light" href="{% url 'admin:index' %}" target="_blank" style="border-radius: 2rem; font-weight: bold;">Ingresar al Admin</a></li>
                         {%endif%}
                         <li class="nav-item">
                             <form method="post" action="{% url 'logout' %}" class="d-flex align-items-center">
