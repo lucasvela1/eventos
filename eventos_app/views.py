@@ -6,8 +6,12 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import CreateView, FormView
+from django.views.generic.edit import FormView
+from django.utils.timezone import now
+from django.db.models import Q, Avg
 import uuid
+from django.db import models
+from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category
 from .utils import obtener_eventos_destacados, obtener_eventos_proximos
@@ -26,19 +30,17 @@ class HomeView(TemplateView):
         context['categorys'] = Category.objects.filter(is_active=True)
         return context
 
-
-
 class EventListView(ListView):
     model = Event #Clase que manipula la vista
     template_name = "app/events.html" #Incluyo el template que controla la vista
     context_object_name = "events"
 
     def get_queryset(self): #Pasarle una lista distinta al context
-        return Event.objects.all().order_by("date")  #Me ordena los eventos por fecha
+        today = now().date()
+        return Event.objects.filter(date__gte=today, cancelado=False).order_by("date")
 
     def get_context_data(self, **kwargs):  #Llamo al context data del padre, me traigo todos los objetos de event
         context = super().get_context_data(**kwargs)
-        #agrego!!!!!!!!
         user = self.request.user
         if user.is_authenticated:
             favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
@@ -47,12 +49,10 @@ class EventListView(ListView):
             context['favoritos_ids'] = []
         return context  
     
-
 class EventDetailView(DetailView):
     model = Event
     template_name = "app/event_detail.html"
     context_object_name = "event"
-
 
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
@@ -75,7 +75,6 @@ class NotificationListView(LoginRequiredMixin, ListView):
         context = super().get_context_data(**kwargs)
         return context
     
-
 class FavoritosListView(LoginRequiredMixin, ListView):
     model = Favorito
     template_name = "app/favoritos.html"
@@ -107,8 +106,6 @@ class ToggleFavoritoView(LoginRequiredMixin, View):
             favorito.delete()
         return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
     
-
-
 class CarritoView(LoginRequiredMixin, View):
     login_url = "/accounts/login/"
 
@@ -164,8 +161,6 @@ class RegisterView(FormView):
             
         return super().form_invalid(form)
 
-
-
 class RefundRequestListView(ListView):
     model = RefundRequest
     template_name = "app/refundRequest.html"
@@ -183,16 +178,16 @@ class RefundRequestListView(ListView):
         context = super().get_context_data(**kwargs)
         return context
 
-
-# Lista de eventos por rating
 class RatingView(ListView):
     model = Event
     template_name = "app/rating.html"
     context_object_name = "events"
 
     def get_queryset(self):
+        yesterday = now().date() - timedelta(days=1)
         return (
             Event.objects
+            .filter(Q(date__lt=yesterday) | Q(cancelado=True))  # Eventos finalizados o cancelados
             .annotate(rating_promedio=Avg("rating__rating"))  # Calcula el promedio de ratings
             .order_by("-rating_promedio")
         )
@@ -229,6 +224,12 @@ class CrearRatingView(LoginRequiredMixin, FormView):
         # No compró ticket
         if not Ticket.objects.filter(user=self.user, event=self.event).exists():
             messages.error(request, "Debes comprar un ticket para calificar este evento.")
+            return redirect('event_detail', pk=self.event.pk)
+        
+        # Solo permitir si el evento ya finalizó o fue cancelado
+        today = now().date() 
+        if self.event.date > today and not self.event.cancelado:
+            messages.error(request, "Solo puedes calificar eventos finalizados o cancelados.")
             return redirect('event_detail', pk=self.event.pk)
 
         return super().dispatch(request, *args, **kwargs)
@@ -274,4 +275,22 @@ class MiCuentaView(TemplateView):
         context['refund_requests'] = RefundRequest.objects.filter(user=user)
         context['unread_notifications'] = Notification.objects.filter(user=user, read=False)
         context['tickets'] = Ticket.objects.filter(user=user)
+        today = now().date()
+        # Eventos para los que el usuario compró ticket
+        eventos_con_ticket = Ticket.objects.filter(user=user).values_list('event', flat=True)
+
+        # Eventos ya calificados por el usuario
+        eventos_ya_calificados = Rating.objects.filter(user=user).values_list('event', flat=True)
+
+        # Eventos para calificar: con ticket comprado, que ya finalizaron o fueron cancelados,
+        # y que el usuario no haya calificado aún
+        eventos_a_calificar = Event.objects.filter(
+            id__in=eventos_con_ticket
+        ).exclude(
+            id__in=eventos_ya_calificados
+        ).filter(
+            models.Q(cancelado=True) | models.Q(date__lt=today)  # Eventos cancelados o pasados
+        )
+
+        context['eventos_a_calificar'] = eventos_a_calificar
         return context

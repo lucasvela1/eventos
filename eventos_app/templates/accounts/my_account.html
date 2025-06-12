@@ -9,8 +9,8 @@
     </div>
     <h2>Mis Tickets</h2>
     <div class="table-responsive mb-5">
-        <table class="table table-bordered table-hover">
-            <thead class="thead-light">
+        <table class="table table-striped">
+            <thead class="table-dark">
                 <tr>
                     <th>#</th>
                     <th>Evento</th>
@@ -63,9 +63,10 @@
 
     </div>
     <h2>Eventos a Calificar</h2>
+    <h6>En esta sección podrás calificar eventos si: has comprado un ticket y el evento finalizó o fué cancelado</h6>
     <div class="table-responsive mb-5">
-        <table class="table table-bordered table-hover">
-            <thead class="thead-light">
+        <table class="table table-striped">
+            <thead class="table-dark">
                 <tr>
                     <th>#</th>
                     <th>Evento</th>
@@ -74,7 +75,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for ticket in tickets %}
+                {% for evento in eventos_a_calificar %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ ticket.event.title }}</td>
@@ -95,7 +96,7 @@
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">No hay eventos para calificar</td>
+                    <td colspan="5" class="text-center">Aún no hay eventos para calificar</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -105,8 +106,8 @@
     <h2 class="mb-3">Mis Notificaciones</h2>
     <div class="mb-5">
         <div class="table-responsive">
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
+            <table class="table table-striped">
+                <thead class="table-dark">
                     <tr>
                         <th>Título</th>
                         <th>Mensaje</th>

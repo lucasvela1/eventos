@@ -1,5 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser #para heredar el usuario definido en Django
+from django.utils.timezone import now
+from datetime import timedelta
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -137,6 +139,10 @@ class Event(models.Model):
     
     def imagen_url_directa(self):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
+    
+    @property
+    def finalizado(self):
+        return self.date < now().date()- timedelta(days=1)
 
 class Priority(models.TextChoices):
     high = 'HIGH'
