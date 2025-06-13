@@ -10,6 +10,8 @@ from django.views.generic.edit import FormView
 from django.utils.timezone import now
 from django.db.models import Q, Avg
 import uuid
+from django.db.models import Prefetch
+
 from django.db import models
 from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm
@@ -279,8 +281,14 @@ class MiCuentaView(TemplateView):
         # Eventos para los que el usuario compró ticket
         eventos_con_ticket = Ticket.objects.filter(user=user).values_list('event', flat=True)
 
+        # Filtrar solo los eventos no finalizados y no cancelados
+        tickets_eventos_activos = Ticket.objects.filter(user=user,event__date__gte=today,event__cancelado=False)
+
         # Eventos ya calificados por el usuario
-        eventos_ya_calificados = Rating.objects.filter(user=user).values_list('event', flat=True)
+        user_ratings = Rating.objects.filter(user=user)
+        eventos_ya_calificados = Event.objects.filter(rating__user=user).prefetch_related(
+            Prefetch('rating_set', queryset=user_ratings, to_attr='user_rating')
+        ).distinct()
 
         # Eventos para calificar: con ticket comprado, que ya finalizaron o fueron cancelados,
         # y que el usuario no haya calificado aún
@@ -291,8 +299,11 @@ class MiCuentaView(TemplateView):
         ).filter(
             models.Q(cancelado=True) | models.Q(date__lt=today)  # Eventos cancelados o pasados
         )
-
+        context['eventos_con_ticket'] = eventos_con_ticket
         context['eventos_a_calificar'] = eventos_a_calificar
+        context['eventos_ya_calificados'] = eventos_ya_calificados
+        context['tickets_eventos_activos'] = tickets_eventos_activos
+
         return context
     
 class AceptarReembolsoView(PermissionRequiredMixin, View):
