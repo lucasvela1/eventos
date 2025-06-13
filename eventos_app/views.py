@@ -1,6 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
@@ -294,3 +294,6 @@ class MiCuentaView(TemplateView):
 
         context['eventos_a_calificar'] = eventos_a_calificar
         return context
+    
+class AceptarReembolsoView(PermissionRequiredMixin, View):
+    permission_required = 'app_name.can_accept_refund'

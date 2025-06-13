@@ -74,3 +74,8 @@ class UsuarioRegisterForm(UserCreationForm):
         self.fields['password2'].error_messages['required'] = "El campo de confirmación de contraseña es obligatorio."
         self.fields['password1'].error_messages['min_length'] = "La contraseña debe tener al menos 8 caracteres."
 
+#para crear vendedores y clientes desde el admin
+class CustomUserCreationForm(UserCreationForm):
+    class Meta:
+        model = CustomUser
+        fields = ("username", "email", "rol", "password1", "password2")

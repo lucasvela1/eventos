@@ -214,6 +214,12 @@ class RefundRequest(models.Model):
     def __str__(self):
         return self.ticket_code
     
+    class Meta:
+        permissions = [
+            ('can_accept_refund', 'Puede aceptar reembolsos'),
+            ('can_reject_refund', 'Puede rechazar reembolsos'),
+        ]
+    
 
 class Type(models.TextChoices):
     general = 'GENERAL'
