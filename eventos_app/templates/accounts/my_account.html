@@ -45,12 +45,9 @@
                             <i class="bi bi-cash"></i>
                         </a>
 
-                        {# Calificar está comentado, lo dejo así #}
-                        {# 
                         <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
                             <i class="bi bi-star"></i>
                         </a>
-                        #}
                     </td>
                 </tr>
                 {% empty %}
@@ -159,16 +156,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% if unread_notifications %}
-                        {% if unread_notifications|length > 5 %}
+                    {% if total_unread > 0 %}
+                        {% if total_unread > 5 %}
                             <tr class="table-light">
                                 <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
                             </tr>
+                            <!--
                             <tr>
-                                <td colspan="4" class="text-center">Hay {{ unread_notifications|length }} notificaciones no leídas.</td>
+                                <td colspan="4" class="text-center">Hay {{ total_unread }} notificaciones no leídas.</td>
                             </tr>
+                            -->
                         {% endif %}
-                        {% for notif in unread_notifications|slice:":5" %}
+                        {% for notif in unread_notifications %}
                             <tr>
                                 <td>{{ notif.title }}</td>
                                 <td>{{ notif.message }}</td>

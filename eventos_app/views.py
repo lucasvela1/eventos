@@ -6,7 +6,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 from django.utils.timezone import now
 from django.db.models import Q, Avg
 import uuid
@@ -248,7 +248,38 @@ class CrearRatingView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         return context
-        
+
+class EditarRatingView(LoginRequiredMixin, UpdateView):
+    model = Rating
+    form_class = RatingForm
+    template_name = 'app/editar_rating.html'
+    context_object_name = 'rating'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.rating = get_object_or_404(Rating, pk=kwargs['pk'])
+
+        if self.rating.user != request.user:
+            messages.error(request, "No tienes permiso para editar esta calificación.")
+            return redirect('event_detail', pk=self.rating.event.pk)
+
+        # Solo permitir edición si el evento finalizó o fue cancelado
+        today = now().date()
+        if self.rating.event.date > today and not self.rating.event.cancelado:
+            messages.error(request, "Solo puedes editar calificaciones de eventos finalizados o cancelados.")
+            return redirect('event_detail', pk=self.rating.event.pk)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Calificación actualizada correctamente.")
+        return redirect('event_detail', pk=self.rating.event.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['event'] = self.rating.event
+        return context 
+
 class BuscarEventosView(ListView):
     model = Event
     template_name = "app/resultados_busqueda.html"
@@ -275,7 +306,9 @@ class MiCuentaView(TemplateView):
         context['user'] = user
         context['favoritos'] = Favorito.objects.filter(user=user)
         context['refund_requests'] = RefundRequest.objects.filter(user=user)
-        context['unread_notifications'] = Notification.objects.filter(user=user, read=False)
+        unread_notifications = Notification.objects.filter(user=user, read=False).order_by('-created_at')[:5]
+        context['unread_notifications'] = unread_notifications
+        context['total_unread'] = Notification.objects.filter(user=user, read=False).count()
         context['tickets'] = Ticket.objects.filter(user=user)
         today = now().date()
         # Eventos para los que el usuario compró ticket
