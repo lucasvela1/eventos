@@ -20,8 +20,13 @@ class EventAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return qs
         if request.user.rol == 'VENDEDOR':
-            return qs.filter(vendedor=request.user)
-        return qs.none()
+            return qs
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        if request.user.rol == 'VENDEDOR':
+            return True
+        return False
 
 # Administración del modelo Comment
 class CommentAdmin(admin.ModelAdmin):

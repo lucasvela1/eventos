@@ -1,12 +1,26 @@
 from django.contrib.auth.models import Permission
 from django.contrib.contenttypes.models import ContentType
-from django.db.models.signals import post_save
+from django.db.models.signals import pre_save, post_save
 from django.dispatch import receiver
 from .models import (
     CustomUser, Category, Venue, Event, RefundRequest,
     Comment, Ticket, Rating, Favorito, Notification
 )
 
+# Señal PRE_SAVE → Asignar is_staff y is_superuser antes de guardar
+@receiver(pre_save, sender=CustomUser)
+def set_staff_flags_based_on_role(sender, instance, **kwargs):
+    if instance.rol == 'VENDEDOR':
+        instance.is_staff = True
+        instance.is_superuser = False
+    elif instance.rol == 'ADMIN':
+        instance.is_staff = True
+        instance.is_superuser = True
+    else:  
+        instance.is_staff = False
+        instance.is_superuser = False
+
+# Señal POST_SAVE → Asignar permisos después de crear el usuario
 @receiver(post_save, sender=CustomUser)
 def assign_user_permissions(sender, instance, created, **kwargs):
     if not created:
@@ -67,10 +81,6 @@ def assign_user_permissions(sender, instance, created, **kwargs):
             accept_refund,
             reject_refund,
         ])
-        instance.is_staff = True
-        instance.save(update_fields=['is_staff'])
 
     elif instance.rol == 'ADMIN':
-        instance.is_staff = True
-        instance.is_superuser = True
-        instance.save()
+        instance.user_permissions.set(Permission.objects.all())
