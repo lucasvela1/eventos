@@ -32,7 +32,10 @@ class Command(BaseCommand):
         musica = Category.objects.create(name="Música", description="Eventos musicales")
         tecnologia = Category.objects.create(name="Tecnología", description="Conferencias de tecnología")
         teatro = Category.objects.create(name="Teatro", description="Obras de teatro en vivo")
+        conferencia = Category.objects.create(name="Teatro", description="Conferencias")
+
         
+        #lugares
         luna_park = Venue.objects.create(name="Luna Park", address="Av. Madero 420", city="Buenos Aires", capacity=10000, contact="info@lunapark.com")
         teatro_colon = Venue.objects.create(name="Teatro Colón", address="Cerrito 628", city="Buenos Aires", capacity=2500, contact="contacto@colon.org.ar")
         
@@ -67,7 +70,7 @@ class Command(BaseCommand):
             description="Charlas de expertos en IA",
             date=date(2025, 8, 15),
             price=8000,
-            categoria=tecnologia,
+            categoria=tecnologia, 
             venue=teatro_colon,
             id_img="1ep9auYAfIXmRqNUWx1zRmLvhjmbjuqQH",
             total_rating=0,
@@ -88,6 +91,20 @@ class Command(BaseCommand):
             suma_puntaje=False,
             cantidad_puntos=0,
             cancelado=False
+        )
+
+        Event.objects.create(
+            title="Conferencia sobre Biodiversidad",
+            description="El doctor José Hernandez nos presenta su tesis sobre biodiversidad",
+            date=date(2025, 6, 12),
+            price=5000,
+            categoria=conferencia,
+            venue=luna_park,
+            id_img="17im6Xdq54mv5JHEeaCot5EIBjWBdiXyR/view",
+            total_rating=0,        
+            suma_puntaje=False,   
+            cantidad_puntos=0,     
+            cancelado=False        
         )
 
         self.stdout.write(self.style.SUCCESS('✅ Datos iniciales cargados correctamente.'))

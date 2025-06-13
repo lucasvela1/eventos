@@ -6,8 +6,11 @@ python -m venv env
 
 ## Activar entorno virtual
 - Linux/Mac: source env/bin/activate
-- Windows: source env/Scripts/activate
+- Windows: source env/Scripts/activate   o   .\venv\Scripts\Activate
 - Windows (alternativa): ./env/Scripts.activate
+
+## Poblar base de datos 
+python manage.py pueblaDatos
 
 ## Instalar dependencias
 pip install -r requirements

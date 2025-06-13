@@ -21,8 +21,8 @@
         name="viewport"
         content="width=device-width, initial-scale=1"
     />
-      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.core.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@glidejs/glide/dist/css/glide.theme.min.css">
 </head>
 
 <body class="d-flex flex-column min-vh-100"  style="background-color: #f5f5f5;">
@@ -54,11 +54,13 @@
                     {% if request.user.is_authenticated %}
                         <li class="nav-item">{% navbar_link 'favoritos' 'Favoritos' %}</li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'my_account' %}">Mi Cuenta</a></li>
-
+                        {%if request.user.rol != 'CLIENTE'%}
+                            <li class="nav-item"><a class="btn btn-outline-light" href="{% url 'admin:index' %}" target="_blank" style="border-radius: 2rem; font-weight: bold;">Ingresar al Admin</a></li>
+                        {%endif%}
                         <li class="nav-item">
                             <form method="post" action="{% url 'logout' %}" class="d-flex align-items-center">
                                 {% csrf_token %}
-                                <button type="submit" class="btn btn-sm btn-outline-danger">Cerrar sesión</button>
+                                <button type="submit" class="btn btn-sm btn-outline-danger" style="border-radius: 2rem; font-weight: bold;">Cerrar sesión</button>
                             </form>
                         </li>
                     {% else %}
@@ -103,13 +105,15 @@
 <script src="https://cdn.jsdelivr.net/npm/@glidejs/glide"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function () {
-        new Glide('.glide', {
-            type: 'carousel',
-            focusAT: 'center',
-            perView: 3
-        }).mount();
+        if (document.querySelector('#carrusel-categorias')) {
+            new Glide('#carrusel-categorias', {type: 'carousel', perView: 3, gap: 20}).mount();
+        }
+        if (document.querySelector('#carrusel-proximos')) {
+            new Glide('#carrusel-proximos', {type: 'carousel', perView: 3, gap: 20}).mount();
+        }
     });
 </script>
+
 
 
 </html>
