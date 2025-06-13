@@ -1,15 +1,17 @@
 #from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 from django.utils.timezone import now
 from django.db.models import Q, Avg
 import uuid
+from django.db.models import Prefetch
+
 from django.db import models
 from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm
@@ -247,7 +249,38 @@ class CrearRatingView(LoginRequiredMixin, FormView):
         context = super().get_context_data(**kwargs)
         context['event'] = self.event
         return context
-        
+
+class EditarRatingView(LoginRequiredMixin, UpdateView):
+    model = Rating
+    form_class = RatingForm
+    template_name = 'app/editar_rating.html'
+    context_object_name = 'rating'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.rating = get_object_or_404(Rating, pk=kwargs['pk'])
+
+        if self.rating.user != request.user:
+            messages.error(request, "No tienes permiso para editar esta calificación.")
+            return redirect('event_detail', pk=self.rating.event.pk)
+
+        # Solo permitir edición si el evento finalizó o fue cancelado
+        today = now().date()
+        if self.rating.event.date > today and not self.rating.event.cancelado:
+            messages.error(request, "Solo puedes editar calificaciones de eventos finalizados o cancelados.")
+            return redirect('event_detail', pk=self.rating.event.pk)
+
+        return super().dispatch(request, *args, **kwargs)
+
+    def form_valid(self, form):
+        form.save()
+        messages.success(self.request, "Calificación actualizada correctamente.")
+        return redirect('event_detail', pk=self.rating.event.pk)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['event'] = self.rating.event
+        return context 
+
 class BuscarEventosView(ListView):
     model = Event
     template_name = "app/resultados_busqueda.html"
@@ -274,14 +307,22 @@ class MiCuentaView(TemplateView):
         context['user'] = user
         context['favoritos'] = Favorito.objects.filter(user=user)
         context['refund_requests'] = RefundRequest.objects.filter(user=user)
-        context['unread_notifications'] = Notification.objects.filter(user=user, read=False)
+        unread_notifications = Notification.objects.filter(user=user, read=False).order_by('-created_at')[:5]
+        context['unread_notifications'] = unread_notifications
+        context['total_unread'] = Notification.objects.filter(user=user, read=False).count()
         context['tickets'] = Ticket.objects.filter(user=user)
         today = now().date()
         # Eventos para los que el usuario compró ticket
         eventos_con_ticket = Ticket.objects.filter(user=user).values_list('event', flat=True)
 
+        # Filtrar solo los eventos no finalizados y no cancelados
+        tickets_eventos_activos = Ticket.objects.filter(user=user,event__date__gte=today,event__cancelado=False)
+
         # Eventos ya calificados por el usuario
-        eventos_ya_calificados = Rating.objects.filter(user=user).values_list('event', flat=True)
+        user_ratings = Rating.objects.filter(user=user)
+        eventos_ya_calificados = Event.objects.filter(rating__user=user).prefetch_related(
+            Prefetch('rating_set', queryset=user_ratings, to_attr='user_rating')
+        ).distinct()
 
         # Eventos para calificar: con ticket comprado, que ya finalizaron o fueron cancelados,
         # y que el usuario no haya calificado aún
@@ -292,6 +333,12 @@ class MiCuentaView(TemplateView):
         ).filter(
             models.Q(cancelado=True) | models.Q(date__lt=today)  # Eventos cancelados o pasados
         )
-
+        context['eventos_con_ticket'] = eventos_con_ticket
         context['eventos_a_calificar'] = eventos_a_calificar
+        context['eventos_ya_calificados'] = eventos_ya_calificados
+        context['tickets_eventos_activos'] = tickets_eventos_activos
+
         return context
+    
+class AceptarReembolsoView(PermissionRequiredMixin, View):
+    permission_required = 'app_name.can_accept_refund'

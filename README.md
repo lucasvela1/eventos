@@ -49,4 +49,23 @@ git add .
 ## ver cambios que hiciste y no te acordas
 git status
 
+# Permisos:
+# CLIENTES
+Solo pueden ver eventos existentes.
+Pueden crear, editar y eliminar comentarios propios.
+Pueden crear solicitudes de reembolso.
+Pueden ver notificaciones.
+Pueden crear, editar y eliminar calificaciones.
+Pueden comprar tickets.
+Pueden agregar/eliminar favoritos.
 
+# VENDEDORES
+Pueden acceder al admin.
+Pueden ver eventos existentes y ya ocurridos.
+No pueden crear ni eliminar eventos, solo editarlos.
+Pueden editar y eliminar comentarios propios y ajenos.
+Pueden aceptar o rechazar reembolsos.
+Pueden editar/eliminar tickets únicamente si hay reembolso aceptado.
+Pueden crear, editar y eliminar notificaciones.
+Pueden crear y editar calificaciones.
+No pueden manipular categorías o venues.

@@ -7,6 +7,8 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><span class="nav-link">Hola, {{ request.user.username }}</span></h1>
     </div>
+
+    <!-- Mis Tickets -->
     <h2>Mis Tickets</h2>
     <div class="table-responsive mb-5">
         <table class="table table-striped">
@@ -21,7 +23,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for ticket in tickets %}
+                {% for ticket in tickets_eventos_activos %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
                     <td>{{ ticket.event.title }}</td>
@@ -29,41 +31,37 @@
                     <td>{{ ticket.quantity }}</td>
                     <td>${{ ticket.total }}</td>
                     <td>
-                        <!-- Ver evento. -->
-                         {% if ticket.event %}
+                        {% if ticket.event %}
                         <a href="{% url 'event_detail' ticket.event.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
                             <i class="bi bi-eye"></i>
                         </a>
                         {% endif %}
 
-                        <!-- Comprar más -->
                         <a href="{% url 'carrito' ticket.event.id %}" class="btn btn-sm btn-outline-success me-1" title="Comprar más">
                             <i class="bi bi-cart-plus"></i>
                         </a>
 
-                        <!-- Pedir reembolso. TERMINAR DE CONFIGURAR -->
                         <a href="{% url 'refund_requests' ticket.id %}" class="btn btn-sm btn-outline-danger" title="Pedir reembolso">
                             <i class="bi bi-cash"></i>
                         </a>
 
-                        <!-- Calificar 
-                         <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
+                        <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
                             <i class="bi bi-star"></i>
-                        </a>-->
+                        </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">Aún no has comprado tickets.</td>
+                    <td colspan="6" class="text-center">Aún no has comprado tickets.</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
-    </div>
+    <!-- Eventos a Calificar -->
     <h2>Eventos a Calificar</h2>
-    <h6>En esta sección podrás calificar eventos si: has comprado un ticket y el evento finalizó o fué cancelado</h6>
+    <h6>En esta sección podrás calificar eventos si: has comprado un ticket y el evento finalizó o fue cancelado</h6>
     <div class="table-responsive mb-5">
         <table class="table table-striped">
             <thead class="table-dark">
@@ -78,31 +76,73 @@
                 {% for evento in eventos_a_calificar %}
                 <tr>
                     <td>{{ forloop.counter }}</td>
-                    <td>{{ ticket.event.title }}</td>
-                    <td>{{ ticket.event.date|date:"d/m/Y" }}</td>
+                    <td>{{ evento.title }}</td>
+                    <td>{{ evento.date|date:"d/m/Y" }}</td>
                     <td>
-                        <!-- Ver evento. -->
-                         {% if ticket.event %}
-                        <a href="{% url 'event_detail' ticket.event.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
+                        <a href="{% url 'event_detail' evento.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
                             <i class="bi bi-eye"></i>
                         </a>
-                        {% endif %}
 
-                        <!-- Calificar -->
-                         <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
+                        <a href="{% url 'crear_rating' evento.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
                             <i class="bi bi-star"></i>
                         </a>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="5" class="text-center">Aún no hay eventos para calificar</td>
+                    <td colspan="4" class="text-center">Aún no hay eventos para calificar</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
     </div>
 
+    <!-- Eventos Calificados -->
+    <h2>Eventos Calificados</h2>
+    <h6>En esta sección podrás ver todos los eventos que calificaste.</h6>
+    <div class="table-responsive mb-5">
+        <table class="table table-striped">
+            <thead class="table-dark">
+                <tr>
+                    <th>#</th>
+                    <th>Evento</th>
+                    <th>Fecha</th>
+                    <th>Calificación</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evento in eventos_ya_calificados %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td>{{ evento.title }}</td>
+                    <td>{{ evento.date|date:"d/m/Y" }}</td>
+                    <td>{% if evento.user_rating %}
+                            {{ evento.user_rating.0.score }} ⭐
+                        {% else %}
+                            Sin calificación
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'event_detail' evento.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <!--TEMINAR ESTA OPCIÓN-->
+                        <a href="{% url 'editar_rating' evento.user_rating.0.id %}" class="btn btn-sm btn-outline-warning" title="Modificar calificación">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center">Aún no hay eventos calificados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Mis Notificaciones -->
     <h2 class="mb-3">Mis Notificaciones</h2>
     <div class="mb-5">
         <div class="table-responsive">
@@ -116,15 +156,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    
-                    {% if unread_notifications %}
-                        {% if unread_notifications|length > 5 %}
+                    {% if total_unread > 0 %}
+                        {% if total_unread > 5 %}
                             <tr class="table-light">
                                 <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
-                                <p>Hay {{ unread_notifications|length }} notificaciones no leidas.</p>
                             </tr>
+                            <!--
+                            <tr>
+                                <td colspan="4" class="text-center">Hay {{ total_unread }} notificaciones no leídas.</td>
+                            </tr>
+                            -->
                         {% endif %}
-                        {% for notif in unread_notifications|slice:":5" %}
+                        {% for notif in unread_notifications %}
                             <tr>
                                 <td>{{ notif.title }}</td>
                                 <td>{{ notif.message }}</td>
@@ -133,7 +176,9 @@
                             </tr>
                         {% endfor %}
                     {% else %}
-                        <tr class="table-light"><td colspan="4" class="text-center">No tenés notificaciones nuevas.</td></tr>
+                        <tr class="table-light">
+                            <td colspan="4" class="text-center">No tenés notificaciones nuevas.</td>
+                        </tr>
                     {% endif %}
                 </tbody>
             </table>
@@ -142,9 +187,10 @@
         <div class="text-end mt-3">
             <a href="{% url 'notifications' %}" class="btn btn-warning rounded-pill fw-bold px-4 py-2">Ver Todas</a>
         </div>
-    </div>     
-    
-    <h2 >Mis Datos</h2>
+    </div>
+
+    <!-- Mis Datos -->
+    <h2>Mis Datos</h2>
     <div class="card mb-5">
         <div class="card-body">
             <p><strong>Nombre:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
@@ -152,8 +198,6 @@
             <p><strong>Username:</strong> {{ request.user.username }}</p>
             <p><strong>Fecha de registro:</strong> {{ request.user.date_joined|date:"d M Y" }}</p>
         </div>
-    </div>    
+    </div>
 </div>
 {% endblock %}
-
-                  

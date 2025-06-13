@@ -13,7 +13,8 @@ from .views import (
     CrearRatingView,
     BuscarEventosView,
     MiCuentaView,
-    CarritoView
+    CarritoView, 
+    EditarRatingView
 )
 from .forms import LoginForm, UsuarioRegisterForm
 
@@ -26,6 +27,7 @@ urlpatterns = [
     path("favoritos/", FavoritosListView.as_view(), name="favoritos"),
     path('eventos/<int:event_id>/toggle_favorito/', ToggleFavoritoView.as_view(), name='toggle_favorito'),
     path("rating/", RatingView.as_view(), name="rating"),
+    path('ratings/<int:pk>/editar/', EditarRatingView.as_view(), name='editar_rating'),
     path("events/<int:event_id>/calificar/", CrearRatingView.as_view(), name='crear_rating'),
     path('buscar/', BuscarEventosView.as_view(), name='buscar_eventos'),
     path("accounts/login/", auth_views.LoginView.as_view(template_name="accounts/login.html",authentication_form=LoginForm), name="login"),
