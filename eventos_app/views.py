@@ -1,4 +1,4 @@
-from django.contrib import messages
+#from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
@@ -123,7 +123,6 @@ class CarritoView(LoginRequiredMixin, View):
        cantidad = int(request.POST.get("cantidad", 1))
 
        if cantidad < 1:
-         messages.error(request, "La cantidad debe ser al menos 1.")
          return redirect("carrito", event_id=event_id)
        #Por más que en el html no aparezca para poner menos a 0, o 0. Se puede manipular y enviar de alguna forma
        #un valor que no corresponde, por eso con esto validamos en nuestra parte "backend"
@@ -131,7 +130,7 @@ class CarritoView(LoginRequiredMixin, View):
        with transaction.atomic():
            capacidad_libre = event.venue.capacity - event.capacidad_ocupada
            if cantidad > capacidad_libre:
-                messages.error(request, f"Hay {capacidad_libre} tickets restantes para este event.")
+                #messages.error(self.request, f"Hay {capacidad_libre} tickets restantes para este event.")
                 return redirect("carrito", event_id=event_id)
            
        event.capacidad_ocupada+=cantidad
@@ -144,7 +143,7 @@ class CarritoView(LoginRequiredMixin, View):
             ticket_code=str(uuid.uuid4())
         ) 
 
-       messages.success(request, f"{cantidad} ticket(s) comprados correctamente.")
+       #messages.success(self.request, f"{cantidad} ticket(s) comprados correctamente.")
        Notification.objects.create(
            user=request.user,
            title="Ticket comprado",
@@ -160,20 +159,8 @@ class RegisterView(FormView):
 
     def form_valid(self, form):
         form.save()
-        messages.success(self.request, "Usuario registrado correctamente.")
         return super().form_valid(form)
     
-    def form_invalid(self, form):
-        # Itera sobre todos los errores del formulario
-        for field in form:
-            for error in field.errors:
-                # Añade cada error como un mensaje de error
-                messages.error(self.request, error)
-        
-        for error in form.non_field_errors():
-            messages.error(self.request, error) #por ejemplo que la contra y su confirmarcion no coinciden
-            
-        return super().form_invalid(form)
 
 class RefundRequestListView(ListView):
     model = RefundRequest
@@ -232,18 +219,18 @@ class CrearRatingView(LoginRequiredMixin, FormView):
 
         # Ya calificó
         if Rating.objects.filter(user=self.user, event=self.event).exists():
-            messages.error(request, "Ya has calificado este evento.")
+            #messages.error(request, "Ya has calificado este evento.")
             return redirect('event_detail', pk=self.event.pk)
 
         # No compró ticket
         if not Ticket.objects.filter(user=self.user, event=self.event).exists():
-            messages.error(request, "Debes comprar un ticket para calificar este evento.")
+            #messages.error(request, "Debes comprar un ticket para calificar este evento.")
             return redirect('event_detail', pk=self.event.pk)
         
         # Solo permitir si el evento ya finalizó o fue cancelado
         today = now().date() 
         if self.event.date > today and not self.event.cancelado:
-            messages.error(request, "Solo puedes calificar eventos finalizados o cancelados.")
+            #messages.error(request, "Solo puedes calificar eventos finalizados o cancelados.")
             return redirect('event_detail', pk=self.event.pk)
 
         return super().dispatch(request, *args, **kwargs)
@@ -253,7 +240,7 @@ class CrearRatingView(LoginRequiredMixin, FormView):
         rating.user = self.user
         rating.event = self.event
         rating.save()
-        messages.success(self.request, "Calificación creada correctamente.")
+        #messages.success(self.request, "Calificación creada correctamente.")
         return redirect('event_detail', pk=self.event.pk)
 
     def get_context_data(self, **kwargs):
