@@ -9,8 +9,8 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import CreateView, FormView
 import uuid
 from .forms import RatingForm, UsuarioRegisterForm
-from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket
-
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Venue
+from django.db import transaction
 
 
 
@@ -101,11 +101,15 @@ class CarritoView(LoginRequiredMixin, View):
     login_url = "/accounts/login/"
 
     def get(self, request, event_id):
-        event = get_object_or_404(Event, id=event_id)
-        return render(request, "app/carrito.html", {"event": event})
+      event = Event.objects.get(id=event_id)
+      tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+      return render(request, "app/carrito.html", {
+        "event": event,
+        "tickets_restantes": tickets_restantes,
+    })
 
     def post(self, request, event_id):
-       event = get_object_or_404(Event, id=event_id)
+       event = Event.objects.get(id=event_id)
        cantidad = int(request.POST.get("cantidad", 1))
 
        if cantidad < 1:
@@ -113,6 +117,15 @@ class CarritoView(LoginRequiredMixin, View):
          return redirect("carrito", event_id=event_id)
        #Por más que en el html no aparezca para poner menos a 0, o 0. Se puede manipular y enviar de alguna forma
        #un valor que no corresponde, por eso con esto validamos en nuestra parte "backend"
+       
+       with transaction.atomic():
+           capacidad_libre = event.venue.capacity - event.capacidad_ocupada
+           if cantidad > capacidad_libre:
+                messages.error(request, f"Hay {capacidad_libre} tickets restantes para este event.")
+                return redirect("carrito", event_id=event_id)
+           
+       event.capacidad_ocupada+=cantidad
+       event.save()
        Ticket.objects.create(
             user=request.user,
             event=event,

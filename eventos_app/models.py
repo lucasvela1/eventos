@@ -44,7 +44,7 @@ class Venue(models.Model):
     name = models.CharField(max_length=200)
     address = models.TextField()
     city = models.TextField()
-    capacity = models.IntegerField()
+    capacity = models.IntegerField(default=100)
     contact =models.TextField()
 
     def __str__(self):
@@ -90,6 +90,7 @@ class Event(models.Model):
     cantidad_puntos=models.IntegerField(default=0)
     cancelado=models.BooleanField(default=False)
     id_img = models.CharField(max_length=2083, default='sin_imagen') # Solamente id de la imagen
+    capacidad_ocupada=models.IntegerField(default=0)
 
     def __str__(self):
         return self.title
