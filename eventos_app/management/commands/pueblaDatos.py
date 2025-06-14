@@ -135,7 +135,7 @@ class Command(BaseCommand):
             price=5000,
             categoria=conferencia,
             venue=luna_park,
-            id_img="17im6Xdq54mv5JHEeaCot5EIBjWBdiXyR/view",
+            id_img="17im6Xdq54mv5JHEeaCot5EIBjWBdiXyR",
             total_rating=0,        
             suma_puntaje=False,   
             cantidad_puntos=0,     
