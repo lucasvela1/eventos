@@ -14,7 +14,8 @@ from .views import (
     BuscarEventosView,
     MiCuentaView,
     CarritoView, 
-    EditarRatingView
+    EditarRatingView,
+    ReembolsoView
 )
 from .forms import LoginForm, UsuarioRegisterForm
 
@@ -23,7 +24,7 @@ urlpatterns = [
     path("events/", EventListView.as_view(), name="events"),
     path("events/<int:pk>/", EventDetailView.as_view(), name="event_detail"),
     path("notifications/", NotificationListView.as_view(), name="notifications"),
-    path("refundRequests/<int:ticket_id>/", RefundRequestListView.as_view(), name="refund_requests"),
+    path("refundRequests/", RefundRequestListView.as_view(), name="refund_requests"),
     path("favoritos/", FavoritosListView.as_view(), name="favoritos"),
     path('eventos/<int:event_id>/toggle_favorito/', ToggleFavoritoView.as_view(), name='toggle_favorito'),
     path("rating/", RatingView.as_view(), name="rating"),
@@ -33,4 +34,5 @@ urlpatterns = [
     path("accounts/login/", auth_views.LoginView.as_view(template_name="accounts/login.html",authentication_form=LoginForm), name="login"),
     path("accounts/register/", RegisterView.as_view(), name="register"),
     path("accounts/register/usuario/", MiCuentaView.as_view(), name="my_account" ),
-    path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),]
+    path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),
+    path("reembolso/<str:ticket_code>/", ReembolsoView.as_view(), name="reembolso"),]

@@ -18,17 +18,18 @@
             </tr>
         </thead>
         <tbody>
-            {% for refundRequest in refundRequests%}
+            {% for refundRequest  in refund_requests %}
                 <tr>
                     <td>{{ refundRequest.ticket_code}}</td>
                     <td>{{ refundRequest.reason }}</td>
                     <td>{{ refundRequest.created_at|date:"d b Y" }}</td>
                     <td>
-                        {% if refundRequest.approved == True %}
+                        {% if refundRequest.approved %}
                             <span class="badge bg-success">Aprobado</span>
                         {% else %}
                             <span class="badge bg-secondary">Pendiente</span>
                         {% endif %}
+                    </td>
                     <td>
                         {% if refundRequest.approved == True %}
                             {{ refundRequest.approval_date|date:"d b Y" }}

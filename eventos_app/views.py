@@ -1,4 +1,4 @@
-#from django.contrib import messages
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
@@ -340,5 +340,52 @@ class MiCuentaView(TemplateView):
 
         return context
     
+
+
+class ReembolsoView(LoginRequiredMixin, View):
+    def get(self, request, ticket_code):
+        ticket = get_object_or_404(Ticket, ticket_code=ticket_code, user=request.user)
+
+        ya_solicitado = RefundRequest.objects.filter(ticket_code=ticket.ticket_code).exists()
+        evento_pasado = ticket.event.date <= now().date()
+
+        return render(request, "app/reembolso.html", {
+            "ticket": ticket,
+            "ya_solicitado": ya_solicitado,
+            "evento_pasado": evento_pasado
+        })
+
+    def post(self, request, ticket_code):
+        ticket = get_object_or_404(Ticket, ticket_code=ticket_code, user=request.user)
+
+        if ticket.event.date > now().date():
+            return redirect("my_account")
+        
+        if RefundRequest.objects.filter(ticket_code=ticket.ticket_code).exists():
+            return redirect("my_account")
+
+        reason = request.POST.get("reason", "").strip()
+        if not reason:
+            return redirect("reembolso", ticket_code=ticket.ticket_code)
+
+
+        RefundRequest.objects.create(
+            approved=False,  # Se aprueba más tarde manualmente
+            ticket_code=ticket.ticket_code,
+            reason=reason,
+            user=request.user
+        )
+
+        Notification.objects.create(
+            user=request.user,
+            title="Reembolso solicitado",
+            message=f"Se ha solicitado el reembolso para el evento {ticket.event.title}.",
+            priority="HIGH"
+        )
+
+        return redirect("my_account")
+
+
 class AceptarReembolsoView(PermissionRequiredMixin, View):
     permission_required = 'app_name.can_accept_refund'
+
