@@ -55,62 +55,28 @@ html, body {
 }
 
 
-body {
+/* Modernización tipográfica para la vista de detalle de eventos */
+.event-detail h3 {
   font-family: 'Inter', sans-serif;
-  color: #333;
-  line-height: 1.6;
-}
-
-h1, h2, h3, h4, h5, h6 {
-  font-weight: 600;
-  color: #111;
-}
-
-.card-title {
+  font-size: 2rem;
   font-weight: 700;
-  font-size: 1.5rem;
+  color: #111;
+  letter-spacing: -0.02rem;
+  margin-bottom: 1rem;
 }
 
-.card-text {
+.event-detail p {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+  color: #444;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.event-detail h6 {
+  font-family: 'Inter', sans-serif;
   font-size: 1rem;
-  color: #444;
-}
-
-a.btn, .btn {
-  font-weight: 500;
-  letter-spacing: 0.3px;
-}
-
-a {
-  text-decoration: none;
-}
-
-a:hover {
-  text-decoration: underline;
-}
-
-/* Estilo moderno para títulos */
-.card-title, h5, h2 {
-  font-family: 'Inter', sans-serif;
-  font-weight: 700;
-  font-size: 1.75rem;
-  color: #111;
-}
-
-/* Estilo para descripciones */
-.card-text, p {
-  font-family: 'Inter', sans-serif;
-  font-size: 1.1rem;
-  color: #444;
-  line-height: 1.7;
-}
-
-/* Botones modernos */
-.btn {
   font-weight: 600;
-  border-radius: 2rem;
-  letter-spacing: 0.4px;
+  color: #222;
+  margin-bottom: 0.2rem;
 }
-
-
-
