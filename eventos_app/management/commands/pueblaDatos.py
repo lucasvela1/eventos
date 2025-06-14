@@ -40,7 +40,113 @@ class Command(BaseCommand):
         #lugares
         luna_park = Venue.objects.create(name="Luna Park", address="Av. Madero 420", city="Buenos Aires", capacity=10000, contact="info@lunapark.com")
         teatro_colon = Venue.objects.create(name="Teatro Colón", address="Cerrito 628", city="Buenos Aires", capacity=2500, contact="contacto@colon.org.ar")
-        
+        movistar_arena = Venue.objects.create(
+            name="Movistar Arena", 
+            address="Humboldt 450", 
+            city="Buenos Aires", 
+            capacity=15000, 
+            contact="info@movistararena.com"
+        )
+        estadio_velez = Venue.objects.create(
+            name="Estadio José Amalfitani", 
+            address="Av. Juan B. Justo 9200", 
+            city="Buenos Aires", 
+            capacity=49000, 
+            contact="contacto@velezsarfield.com"
+        )
+        niceto_club = Venue.objects.create(
+            name="Niceto Club", 
+            address="Niceto Vega 5510", 
+            city="Buenos Aires", 
+            capacity=1000, 
+            contact="info@nicetoclub.com"
+        )
+        konex = Venue.objects.create(
+            name="Ciudad Cultural Konex", 
+            address="Sarmiento 3131", 
+            city="Buenos Aires", 
+            capacity=3000, 
+            contact="eventos@konex.org"
+        )
+        centro_cultural_recoleta = Venue.objects.create(
+            name="Centro Cultural Recoleta", 
+            address="Junín 1930", 
+            city="Buenos Aires", 
+            capacity=1200, 
+            contact="info@centroculturalrecoleta.org"
+        )
+        teatro_gran_rix = Venue.objects.create(
+            name="Teatro Gran Rivadavia", 
+            address="Av. Rivadavia 8636", 
+            city="Buenos Aires", 
+            capacity=1800, 
+            contact="contacto@granrivadavia.com"
+        )
+        quality_espacio = Venue.objects.create(
+            name="Quality Espacio",
+            address="Av. Cruz Roja Argentina 200",
+            city="Córdoba",
+            capacity=5500,
+            contact="info@qualityespacio.com"
+        )
+
+        teatro_real = Venue.objects.create(
+            name="Teatro Real",
+            address="San Jerónimo 66",
+            city="Córdoba",
+            capacity=900,
+            contact="contacto@teatroreal.gob.ar"
+        )
+        metropolitano_rosario = Venue.objects.create(
+            name="Centro de Convenciones Metropolitano",
+            address="Junín 501",
+            city="Rosario",
+            capacity=5000,
+            contact="info@metropolitanorosario.com"
+        )
+
+        teatro_el_circulo = Venue.objects.create(
+            name="Teatro El Círculo",
+            address="Laprida 1235",
+            city="Rosario",
+            capacity=1600,
+            contact="contacto@teatroelcirculo.com"
+        )
+        arena_maipu = Venue.objects.create(
+            name="Arena Maipú Stadium",
+            address="Emilio Civit 791",
+            city="Mendoza",
+            capacity=7500,
+            contact="info@arenamaipu.com"
+        )
+
+        teatro_independencia = Venue.objects.create(
+            name="Teatro Independencia",
+            address="Chile 1184",
+            city="Mendoza",
+            capacity=1100,
+            contact="teatro@cultura.mendoza.gov.ar"
+        )
+        teatro_radio_city = Venue.objects.create(
+            name="Teatro Radio City",
+            address="San Luis 1750",
+            city="Mar del Plata",
+            capacity=900,
+            contact="info@teatroradiocitymdp.com"
+        )
+
+        estadio_polideportivo = Venue.objects.create(
+            name="Polideportivo Islas Malvinas",
+            address="Juan B. Justo 3525",
+            city="Mar del Plata",
+            capacity=7200,
+            contact="eventos@mdq.gov.ar"
+        )
+
+
+
+
+
         # Crear Usuarios
         admin_user = CustomUser.objects.create_superuser(
             username="Grupo4",

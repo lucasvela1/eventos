@@ -32,20 +32,24 @@
                     <td>${{ ticket.total }}</td>
                     <td>
                         {% if ticket.event %}
-                        <a href="{% url 'event_detail' ticket.event.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
+                        <a href="{% url 'event_detail' ticket.event.id %}" class="btn btn-sm btn-outline-primary me-1"
+                            title="Ver evento">
                             <i class="bi bi-eye"></i>
                         </a>
                         {% endif %}
 
-                        <a href="{% url 'carrito' ticket.event.id %}" class="btn btn-sm btn-outline-success me-1" title="Comprar más">
+                        <a href="{% url 'carrito' ticket.event.id %}" class="btn btn-sm btn-outline-success me-1"
+                            title="Comprar más">
                             <i class="bi bi-cart-plus"></i>
                         </a>
 
-                        <a href="{% url 'refund_requests' ticket.id %}" class="btn btn-sm btn-outline-danger" title="Pedir reembolso">
+                        <a href="{% url 'reembolso' ticket.ticket_code %}" class="btn btn-sm btn-outline-danger"
+                            title="Pedir reembolso">
                             <i class="bi bi-cash"></i>
                         </a>
 
-                        <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
+                        <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning"
+                            title="Calificar">
                             <i class="bi bi-star"></i>
                         </a>
                     </td>
@@ -79,11 +83,13 @@
                     <td>{{ evento.title }}</td>
                     <td>{{ evento.date|date:"d/m/Y" }}</td>
                     <td>
-                        <a href="{% url 'event_detail' evento.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
+                        <a href="{% url 'event_detail' evento.id %}" class="btn btn-sm btn-outline-primary me-1"
+                            title="Ver evento">
                             <i class="bi bi-eye"></i>
                         </a>
 
-                        <a href="{% url 'crear_rating' evento.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
+                        <a href="{% url 'crear_rating' evento.id %}" class="btn btn-sm btn-outline-warning"
+                            title="Calificar">
                             <i class="bi bi-star"></i>
                         </a>
                     </td>
@@ -118,17 +124,19 @@
                     <td>{{ evento.title }}</td>
                     <td>{{ evento.date|date:"d/m/Y" }}</td>
                     <td>{% if evento.user_rating %}
-                            {{ evento.user_rating.0.score }} ⭐
+                        {{ evento.user_rating.0.score }} ⭐
                         {% else %}
-                            Sin calificación
+                        Sin calificación
                         {% endif %}
                     </td>
                     <td>
-                        <a href="{% url 'event_detail' evento.id %}" class="btn btn-sm btn-outline-primary me-1" title="Ver evento">
+                        <a href="{% url 'event_detail' evento.id %}" class="btn btn-sm btn-outline-primary me-1"
+                            title="Ver evento">
                             <i class="bi bi-eye"></i>
                         </a>
                         <!--TEMINAR ESTA OPCIÓN-->
-                        <a href="{% url 'editar_rating' evento.user_rating.0.id %}" class="btn btn-sm btn-outline-warning" title="Modificar calificación">
+                        <a href="{% url 'editar_rating' evento.user_rating.0.id %}"
+                            class="btn btn-sm btn-outline-warning" title="Modificar calificación">
                             <i class="bi bi-pencil"></i>
                         </a>
                     </td>
@@ -157,28 +165,28 @@
                 </thead>
                 <tbody>
                     {% if total_unread > 0 %}
-                        {% if total_unread > 5 %}
-                            <tr class="table-light">
-                                <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
-                            </tr>
-                            <!--
+                    {% if total_unread > 5 %}
+                    <tr class="table-light">
+                        <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
+                    </tr>
+                    <!--
                             <tr>
                                 <td colspan="4" class="text-center">Hay {{ total_unread }} notificaciones no leídas.</td>
                             </tr>
                             -->
-                        {% endif %}
-                        {% for notif in unread_notifications %}
-                            <tr>
-                                <td>{{ notif.title }}</td>
-                                <td>{{ notif.message }}</td>
-                                <td>{{ notif.priority }}</td>
-                                <td>{{ notif.created_at|date:"d/m/Y H:i" }}</td>
-                            </tr>
-                        {% endfor %}
+                    {% endif %}
+                    {% for notif in unread_notifications %}
+                    <tr>
+                        <td>{{ notif.title }}</td>
+                        <td>{{ notif.message }}</td>
+                        <td>{{ notif.priority }}</td>
+                        <td>{{ notif.created_at|date:"d/m/Y H:i" }}</td>
+                    </tr>
+                    {% endfor %}
                     {% else %}
-                        <tr class="table-light">
-                            <td colspan="4" class="text-center">No tenés notificaciones nuevas.</td>
-                        </tr>
+                    <tr class="table-light">
+                        <td colspan="4" class="text-center">No tenés notificaciones nuevas.</td>
+                    </tr>
                     {% endif %}
                 </tbody>
             </table>
@@ -186,6 +194,68 @@
 
         <div class="text-end mt-3">
             <a href="{% url 'notifications' %}" class="btn btn-warning rounded-pill fw-bold px-4 py-2">Ver Todas</a>
+        </div>
+    </div>
+
+    <h2 class="mb-3">Mis Solicitudes de Reembolso</h2>
+    <div class="mb-5">
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Código de Ticket</th>
+                        <th>Razón</th>
+                        <th>Estado</th>
+                        <th>Fecha de Solicitud</th>
+                        <th>Fecha de Aprobación</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if refund_requests|length > 0 %}
+                    {% if refund_requests|length > 5 %}
+                    <tr class="table-light">
+                        <td colspan="5" class="text-center">
+                            Mostrando las últimas 5 solicitudes de reembolso
+                        </td>
+                    </tr>
+                    {% endif %}
+
+                    {% for request in refund_requests|slice:":5" %}
+                    <tr>
+                        <td>{{ request.ticket_code }}</td>
+                        <td>{{ request.reason|truncatewords:10 }}</td>
+                        <td>
+                            {% if request.approved %}
+                            <span class="badge bg-success">Aprobado</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Pendiente</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ request.created_at|date:"d/m/Y" }}</td>
+                        <td>
+                            {% if request.approved %}
+                            {{ request.approval_date|date:"d/m/Y" }}
+                            {% else %}
+                            <span class="text-muted">-</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr class="table-light">
+                        <td colspan="5" class="text-center">
+                            No tenés solicitudes de reembolso.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-end mt-3">
+            <a href="{% url 'refund_requests' %}" class="btn btn-primary rounded-pill fw-bold px-4 py-2">
+                Ver Todas
+            </a>
         </div>
     </div>
 
