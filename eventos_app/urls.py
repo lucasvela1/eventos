@@ -1,4 +1,6 @@
 from django.urls import path
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib.auth import views as auth_views
 from .views import (
     HomeView,
@@ -16,6 +18,7 @@ from .views import (
     CarritoView, 
     EditarRatingView
 )
+
 from .forms import LoginForm, UsuarioRegisterForm
 
 urlpatterns = [
@@ -33,4 +36,6 @@ urlpatterns = [
     path("accounts/login/", auth_views.LoginView.as_view(template_name="accounts/login.html",authentication_form=LoginForm), name="login"),
     path("accounts/register/", RegisterView.as_view(), name="register"),
     path("accounts/register/usuario/", MiCuentaView.as_view(), name="my_account" ),
-    path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),]
+    path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),
+    
+    ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

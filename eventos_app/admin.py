@@ -7,14 +7,23 @@ from .models import (
 from .forms import CustomUserCreationForm
 
 # Administración del modelo Event
+admin.site.site_header = "Panel de Administración - Grupo 4"
+admin.site.site_title = "Administración de Eventos"
+admin.site.index_title = "Bienvenido al panel de administración"
+
 class EventAdmin(admin.ModelAdmin):
+    list_display = ['title', 'date','venue','price','cancelado']
+    list_editable = ['price']
+    search_fields =['title', 'description']
+    list_filter = ['categoria', 'venue', 'cancelado']
+    list_per_page = 10
+    ordering = ['-date']
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return []
         if request.user.rol == 'VENDEDOR':
             return ['created_at', 'updated_at', 'total_rating', 'cantidad_puntos', 'suma_puntaje']
         return super().get_readonly_fields(request, obj)
-
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
@@ -77,15 +86,24 @@ class CustomUserAdmin(UserAdmin):
         if request.user.rol == UserRole.VENDEDOR:
             return ['username', 'email', 'rol']
         return super().get_readonly_fields(request, obj)
+    
+class VenueAdmin(admin.ModelAdmin):
+    list_display = ['name', 'address','city','capacity','contact']
+    #list_editable = ['address']
+    search_fields =['name']
+    list_filter = ['name']
+
+    
 
 # Registrar los modelos
 admin.site.register(Event, EventAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(Category)
-admin.site.register(Venue)
+admin.site.register(Venue, VenueAdmin)
 admin.site.register(RefundRequest)
 admin.site.register(Ticket)
 admin.site.register(Rating)
 admin.site.register(Favorito)
 admin.site.register(Notification)
+

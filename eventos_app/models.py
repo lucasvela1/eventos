@@ -136,8 +136,8 @@ class Event(models.Model):
             self.date = date
         if id_img is not None:
             self.id_img = id_img
-        self.save()
-    
+        self.save()     
+   
     def imagen_url_directa(self):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
     
