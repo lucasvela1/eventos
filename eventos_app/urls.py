@@ -38,9 +38,6 @@ urlpatterns = [
     path("accounts/register/", RegisterView.as_view(), name="register"),
     path("accounts/register/usuario/", MiCuentaView.as_view(), name="my_account" ),
     path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),
-<<<<<<< HEAD
-    path("reembolso/<str:ticket_code>/", ReembolsoView.as_view(), name="reembolso"),]
-=======
-    
-    ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
->>>>>>> 3fb4632 (se mejora el admin)
+    path("reembolso/<str:ticket_code>/", ReembolsoView.as_view(), name="reembolso"),
+    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

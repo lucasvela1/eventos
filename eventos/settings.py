@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "eventos_app",
+    "eventos_app"
 ]
 
 AUTH_USER_MODEL = 'eventos_app.CustomUser' #usamos un user modificado
