@@ -29,15 +29,16 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    "admin_interface",  # Admin interface mejorado
     "admin_eventos",
-    #"colorfield",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.staticfiles",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
-    "eventos_app"
+    "eventos_app",
+    "colorfield",
 ]
 
 AUTH_USER_MODEL = 'eventos_app.CustomUser' #usamos un user modificado
