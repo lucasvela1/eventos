@@ -18,8 +18,8 @@ pip install -r requirements
 ## Hacer migraciones
 python manage.py migrate
 
-## Llenar base de datos con fixture
-python manage.py loaddata events.json
+## Instalar el tema de admin desde fixture
+python manage.py loaddata theme_fixture.json
 
 ## Correr app
 python manage.py runserver
