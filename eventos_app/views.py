@@ -70,6 +70,29 @@ class EventDetailView(DetailView):
     model = Event
     template_name = "app/event_detail.html"
     context_object_name = "event"
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        event = self.get_object() 
+        user_can_rate = False
+        user_has_ticket = False
+        event_has_passed = event.date < now().date() # Verifica si la fecha del evento es anterior a la actual
+        user_already_rated = False
+
+        # Condición 1: El usuario debe estar autenticado
+        if self.request.user.is_authenticated:
+            # Condición 2: El usuario debe tener un ticket para este evento
+            user_has_ticket = Ticket.objects.filter(user=self.request.user, event=event).exists()
+            # Condición 3: El usuario no calificó este evento
+            user_already_rated = Rating.objects.filter(user=self.request.user, event=event).exists() #Si ya calificó el evento
+            # Condición 4: Se puede calificar si el usuario está logueado, tiene ticket, el evento ya pasó y no lo califico aun
+            if user_has_ticket and event_has_passed and not user_already_rated:
+                user_can_rate = True
+        context['user_can_rate'] = user_can_rate
+        context['user_has_ticket'] = user_has_ticket
+        context['event_has_passed'] = event_has_passed
+        context['user_already_rated'] = user_already_rated
+        
+        return context
 
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification

@@ -24,11 +24,28 @@
 
       <div class="mt-3">
         {% if user.is_authenticated %}
-          <a href="{% url 'crear_rating' event.id %}" class="btn btn-warning mb-2 w-100" style="background-color: #f5d376; font-weight: bold; border-radius: 2rem;">
-            Calificar este evento
+            {% if user_can_rate%}
+              <a href="{% url 'crear_rating' event.id %}" class="btn btn-warning mb-2 w-100" style="background-color: #f5d376; font-weight: bold; border-radius: 2rem;">
+               Calificar este evento
+              </a>
+            {% else %}
+               {%if not user_has_ticket %}
+                 <p class ="text-muted">No podés calificar este evento porque no compraste entrada.</p>
+               {% elif not event_has_passed %}
+                 <p class ="text-muted">Este evento aún no ha ocurido. Podrás calificarlo cuando termine.</p>
+               {% else %}    
+                 <p class ="text-muted">Ya calificaste este evento.</p>
+               {% endif %}
+            {% endif %}  
+        {% else %}    
+          <p class="text-muted">Iniciá sesión para calificar este evento.</p>
+        {% endif %}
+        {% if not event_has_passed %} 
+          <a href="{% url 'carrito' event.id %}" class="btn btn-primary mb-2 w-100" style="font-weight: bold; border-radius: 2rem;">
+            Comprar Tickets
           </a>
         {% else %}
-          <p class="text-muted">Iniciá sesión para calificar este evento.</p>
+          <p class="text-muted">La venta de tickets para este evento ha finalizado.</p> 
         {% endif %}
         <a href="{% url 'events' %}" class="btn btn-outline-secondary w-100" style="border-radius: 2rem;">Volver atrás</a>
       </div>
