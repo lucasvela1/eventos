@@ -11,7 +11,6 @@ from django.utils.timezone import now
 from django.db.models import Q, Avg
 import uuid
 from django.db.models import Prefetch
-
 from django.db import models
 from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm
@@ -29,7 +28,22 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['events_destacados'] = obtener_eventos_destacados()
-        context['events_proximos'] = obtener_eventos_proximos()
+        category_id = self.request.GET.get('category_id')
+        if category_id:
+            try:
+                category = get_object_or_404(Category, id=category_id)
+                # La logica del filtrado por categoria para el carrousel de eventos proximos en el home
+                context['events_proximos'] = Event.objects.filter(
+                    date__gte=now().date(),
+                    cancelado=False,
+                    categoria=category
+                ).order_by("date") #Los ordenamos por su fecha
+                context['selected_category'] = category #Se envia la categoría seleccionada al template
+            except:
+                #Si surge un error al obtener la categoría, se obtienen los eventos próximos sin filtrar
+                context['events_proximos'] = obtener_eventos_proximos()
+        else:
+           context['events_proximos'] = obtener_eventos_proximos()
         context['categorys'] = Category.objects.filter(is_active=True)
         return context
 

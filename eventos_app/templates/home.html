@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load static %}
-
 {% block content %}
 <!-- Formulario de búsqueda debajo del navbar -->
 {% include "app/search_form.html" %}
@@ -52,14 +51,18 @@
 </div>
 
 <!-- Carrusel de Categorías -->
-<div class="container py-4">
+<div class="container py-4" id="carrusel-categorias-section"> <!-- Para anclar, tipo, si hacemos click en una categoria no vuelve al inicio de pagina arriba, se queda aca-->
   <h2 class="mb-4">Explorá por Categoría</h2>
   <div id="carrusel-categorias" class="glide">
     <div class="glide__track" data-glide-el="track">
       <ul class="glide__slides">
         {% for categoria in categorys %}
         <li class="glide__slide">
-          <a href="#" style="text-decoration: none;">
+          {% if selected_category and selected_category.id == categoria.id %}
+            <a href="{% url 'home' %}#carrusel-categorias-section" style="text-decoration: none;"> <!-- Si es la misma, quita el filtro -->
+          {% else %}
+            <a href="{% url 'home' %}?category_id={{ categoria.id }}#carrusel-categorias-section" style="text-decoration: none;">  <!-- Si es diferente, aplica el filtro -->
+          {% endif %}
             <div class="card mx-2" style="width: 18rem;">
               <img src="{{ categoria.imagen_url_directa }}" class="card-img-top" alt="{{ categoria.name }}"
                 style="height: 200px; object-fit: cover;">
@@ -81,7 +84,7 @@
 
 <!-- Carrusel de Próximos Eventos -->
 <div class="container py-4">
-  <h2 class="mb-4">Próximos Eventos</h2>
+  <h2 class="mb-4">Próximos Eventos{% if selected_category %}- {{ selected_category.name }}{% endif %}</h2>
   <div id="carrusel-proximos" class="glide">
     <div class="glide__track" data-glide-el="track">
       <ul class="glide__slides">
