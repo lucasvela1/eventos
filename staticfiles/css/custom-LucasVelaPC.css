@@ -1,0 +1,60 @@
+/* custom.css */
+
+.navbar-dark .nav-link {
+  color: #ffffff !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.navbar-nav .nav-item {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.navbar-dark .nav-link.active {
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: underline;
+}
+.navbar {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+  min-height: 70px;
+}
+footer.footer {
+    background-color: #212529; /* igual que navbar-dark bg-dark */
+    padding: 1rem 0;
+    text-align: center;
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+}
+
+footer.footer .nav {
+    justify-content: center;
+    gap: 2rem;
+}
+
+footer.footer .nav-link {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+footer.footer .nav-link:hover {
+    color: #f5d376;
+}
+
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+
+
