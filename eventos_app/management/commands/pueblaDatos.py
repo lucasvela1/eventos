@@ -34,8 +34,12 @@ class Command(BaseCommand):
         musica = Category.objects.create(name="Música", description="Eventos musicales", id_img = "1bihHzC1USW8qMQo-hzO-nI4C6dJi_k9i")
         tecnologia = Category.objects.create(name="Tecnología", description="Conferencias de tecnología", id_img = "1Gmxz8SczAQwJQwRUsNEttApHysy16_hn")
         teatro = Category.objects.create(name="Teatro", description="Obras de teatro en vivo", id_img = "1BX--T1S4d9bQgoPQ0eq60ugGOJ8n2W65")
-        conferencia = Category.objects.create(name="Teatro", description="Conferencias", id_img = "1PQ2_kGNetdUYgJXb_w3qlt6NEJygjNMy")
-
+        conferencia = Category.objects.create(name="Conferencia", description="Conferencias", id_img = "1Pf_8mxdFBij33-dTuRhYdEErb-X-SWpg")
+        pelicula = Category.objects.create(name="Pelicula", description="Peliculas", id_img = "17pW8ERXaZ6bgjsdr7QfdQ5ZTzunir916")
+        deporte = Category.objects.create(name="Deporte", description="Eventos deportivos", id_img = "1LZZ-vW_Q-LtWyk-I02U8GVap0fkD0fqz")
+        arte = Category.objects.create(name="Arte", description="Exposiciones de arte", id_img = "1xPjhxTF8AaVj6ZO6ugkZ4FYPBDLZ8HkT")
+        literatura = Category.objects.create(name="Literatura", description="Eventos literarios", id_img = "16coPtu6AfaegS2KR2UgVt36a0vhENx-F")
+        
         
         #lugares
         luna_park = Venue.objects.create(name="Luna Park", address="Av. Madero 420", city="Buenos Aires", capacity=10000, contact="info@lunapark.com")
