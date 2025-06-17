@@ -83,4 +83,4 @@ def assign_user_permissions(sender, instance, created, **kwargs):
         ])
 
     elif instance.rol == 'ADMIN':
-        instance.user_permissions.set(Permission.objects.all())
+        instance.user_permissions.set(Permission.objects.all()) #El admin tiene todos los permisos 
