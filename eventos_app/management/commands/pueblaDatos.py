@@ -312,11 +312,40 @@ class Command(BaseCommand):
             text="Un espectáculo inolvidable"
         )
         Rating.objects.create(
-            title='Chico'
+            title='Chico',
             user=cliente2,
             event=evento4,
             rating=3,
             text="Mucha gente"
+        )
+
+
+        Comment.objects.create(
+            title=evento4,
+            text='¿Quién más va?',
+            user=cliente2,
+            created_at=date(2025, 6, 1),
+        )
+
+        Comment.objects.create(
+            title=evento2,
+            text='¿Cuándo es?',
+            user=cliente2,
+            created_at=date(2025, 6, 10),
+        )
+
+        Comment.objects.create(
+            title=evento3,
+            text='Puedo esperar',
+            user=cliente2,
+            created_at=date(2025, 6, 14),
+        )
+
+        Comment.objects.create(
+            title=evento1,
+            text="No puedo esperar",
+            user=cliente1,
+            created_at=date(2025, 6, 12),
         )
 
         self.stdout.write(self.style.SUCCESS('✅ Datos iniciales cargados correctamente.'))
