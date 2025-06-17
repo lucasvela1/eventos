@@ -19,16 +19,27 @@ class EventAdmin(admin.ModelAdmin):
     list_per_page = 10
     ordering = ['-date']
 
-    actions = ['marcar_como_cancelado', 'marcar_como_no_cancelado']
-    @admin.action(description="Marcar eventos seleccionados como Cancelados")
-    def marcar_como_cancelado(self, request, queryset):
-       eventos_actualizados= queryset.update(cancelado=True)
-       self.message_user(request, f"{eventos_actualizados} eventos han sido marcados como cancelados.")
+    actions = ['cancelar_eventos', 'habilitar_eventos','duplicar_eventos'] #Donde metermos las acciones personalizadas del evento
+    
+    def duplicar_eventos(self,request, queryset):
+        for event in queryset: #Por cada evento seleccionad le creamos una copia, para que sea más comodo la creacion de un nuevo evento
+            nuevo_evento = Event.objects.create(
+                title = f"{event.title} (Copia)",
+                description = event.description,
+                date = event.date,
+                price = event.price,
+                categoria = event.categoria,
+                venue = event.venue,
+                id_img = event.id_img,
+                cancelado = False,
+                capacidad_ocupada = 0,
+            )
+          
+    def cancelar_eventos(self, request, queryset):
+        eventos_actualizados = queryset.update(cancelado=True)
 
-    @admin.action(description="Marcar eventos seleccionados como No Cancelados")
-    def marcar_como_no_cancelado(self, request, queryset):
-       eventos_actualizados= queryset.update(cancelado=False)
-       self.message_user(request, f"{eventos_actualizados} eventos han sido marcados como no cancelados.")   
+    def habilitar_eventos(self, request, queryset):
+        eventos_actualizados = queryset.update(cancelado=False)
 
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
@@ -51,6 +62,9 @@ class EventAdmin(admin.ModelAdmin):
 
 # Administración del modelo Comment
 class CommentAdmin(admin.ModelAdmin):
+    list_display = ['user', 'created_at']
+    ordering = ['-created_at']    
+
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return []
@@ -70,34 +84,43 @@ class CommentAdmin(admin.ModelAdmin):
 class CustomUserAdmin(UserAdmin):
     add_form = CustomUserCreationForm
     model = CustomUser
-    list_display = ['username', 'email', 'rol', 'is_staff', 'is_superuser']
+    list_display = ['username', 'email', 'rol', 'is_staff', 'is_superuser', 'puntaje']
+    actions = ['reiniciar_puntaje']
+    ordering = ['-is_superuser','-puntaje']
 
-    fieldsets = UserAdmin.fieldsets + (
+    fieldsets = list(UserAdmin.fieldsets) + [
         ('Información Adicional', {'fields': ('rol', 'puntaje')}),
-    )
-
-    # Agregamos esta sección para que aparezca 'rol' al crear usuario
-    add_fieldsets = (
+    ]
+    add_fieldsets = list(UserAdmin.add_fieldsets) + [
         (None, {
             'classes': ('wide',),
             'fields': ('username', 'email', 'rol', 'password1', 'password2'),
         }),
-    )
+    ]
+
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
             return qs
-        if request.user.rol == UserRole.VENDEDOR:
-            return qs.filter(id=request.user.id)
+        if hasattr(request.user, 'rol') and request.user.rol == UserRole.VENDEDOR:
+            if hasattr(request.user, 'id'):
+                return qs.filter(id=request.user.id)
         return qs.none()
-
-    def get_readonly_fields(self, request, obj=None):  
+    
+    def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return []
-        if request.user.rol == UserRole.VENDEDOR:
+        if hasattr(request.user, 'rol') and request.user.rol == UserRole.VENDEDOR:
             return ['username', 'email', 'rol']
         return super().get_readonly_fields(request, obj)
+        return super().get_readonly_fields(request, obj)
+    
+    def reiniciar_puntaje(self, request, queryset):
+        for user in queryset:
+            user.puntaje = 0
+            user.save()
+        self.message_user(request, "Puntajes reiniciados exitosamente.")
     
 class VenueAdmin(admin.ModelAdmin):
     list_display = ['name', 'address','city','capacity','contact']
@@ -105,17 +128,67 @@ class VenueAdmin(admin.ModelAdmin):
     search_fields =['name']
     list_filter = ['name']
 
+class NotificationAdmin(admin.ModelAdmin):
+    list_display = ['title', 'user', 'created_at', 'read']
+    search_fields = ['title', 'user']
+    ordering = ['read','-created_at']    
+    actions = ['marcar_como_leida', 'marcar_como_no_leida']
     
+    def marcar_como_leida(self, request, queryset):
+        queryset.update(read=True)
+        self.message_user(request, "Notificaciones marcadas como leídas.")
+
+    def marcar_como_no_leida(self, request, queryset):
+        queryset.update(read=False)
+        self.message_user(request, "Notificaciones marcadas como no leídas.")    
+
+class RefundRequestAdmin(admin.ModelAdmin):
+    list_display = ['user', 'approved', 'created_at']
+    search_fields = ['user__username','reason']
+    list_filter = ['approved', 'created_at']
+    ordering = ['approved','-created_at']
+    actions = ['aprobar_solicitud', 'rechazar_solicitud']
+
+    def aprobar_solicitud(self, request, queryset):
+        for refund in queryset:
+            refund.approved = True
+            refund.save()
+            self.message_user(request, f"Solicitud de reembolso aprobada para {refund.user.username}.")
+
+    def rechazar_solicitud(self, request, queryset):
+        for refund in queryset:
+            refund.approved = False
+            refund.save()
+            self.message_user(request, f"Solicitud de reembolso rechazada para {refund.user.username}.")      
+
+class TicketAdmin(admin.ModelAdmin):
+    list_display = ['event', 'user', 'quantity', 'total', 'buy_date', 'ticket_code']
+    search_fields = ['event__title', 'user__username']
+    list_filter = ['event', 'buy_date']
+    ordering = ['-buy_date']
+
+
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ['name','description','is_active']
+    search_fields =['description']
+    ordering =['name']
+
+
+class RatingAdmin(admin.ModelAdmin):
+    list_display = ['title','user','created_at', 'rating']
+    search_fields = ['user','text']
+    list_filter = ['rating']
+    ordering = ['-rating']
 
 # Registrar los modelos
 admin.site.register(Event, EventAdmin)
 admin.site.register(Comment, CommentAdmin)
 admin.site.register(CustomUser, CustomUserAdmin)
-admin.site.register(Category)
+admin.site.register(Category, CategoryAdmin)
 admin.site.register(Venue, VenueAdmin)
-admin.site.register(RefundRequest)
-admin.site.register(Ticket)
-admin.site.register(Rating)
+admin.site.register(RefundRequest, RefundRequestAdmin)
+admin.site.register(Ticket, TicketAdmin)
+admin.site.register(Rating, RatingAdmin)
 admin.site.register(Favorito)
-admin.site.register(Notification)
+admin.site.register(Notification, NotificationAdmin)
 
