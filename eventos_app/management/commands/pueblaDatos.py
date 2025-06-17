@@ -31,10 +31,10 @@ class Command(BaseCommand):
         self.stdout.write('Creando datos iniciales...')
 
         # Categorías
-        musica = Category.objects.create(name="Música", description="Eventos musicales")
-        tecnologia = Category.objects.create(name="Tecnología", description="Conferencias de tecnología")
-        teatro = Category.objects.create(name="Teatro", description="Obras de teatro en vivo")
-        conferencia = Category.objects.create(name="Teatro", description="Conferencias")
+        musica = Category.objects.create(name="Música", description="Eventos musicales", id_img = "1bihHzC1USW8qMQo-hzO-nI4C6dJi_k9i")
+        tecnologia = Category.objects.create(name="Tecnología", description="Conferencias de tecnología", id_img = "1Gmxz8SczAQwJQwRUsNEttApHysy16_hn")
+        teatro = Category.objects.create(name="Teatro", description="Obras de teatro en vivo", id_img = "1BX--T1S4d9bQgoPQ0eq60ugGOJ8n2W65")
+        conferencia = Category.objects.create(name="Teatro", description="Conferencias", id_img = "1PQ2_kGNetdUYgJXb_w3qlt6NEJygjNMy")
 
         
         #lugares
@@ -255,7 +255,7 @@ class Command(BaseCommand):
             price=5000,
             categoria=musica,
             venue=luna_park,
-            id_img="1B5VGzF-IxZF5nHhurmOb00hZbQwaRJ7Z",
+            id_img="1U3dTrrNGjZpFnAe9oAeYSJSFSohGolo3",
             total_rating=0,        
             suma_puntaje=True,   
             cantidad_puntos=0,     
