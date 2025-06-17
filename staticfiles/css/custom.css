@@ -1,0 +1,82 @@
+/* custom.css */
+
+.navbar-dark .nav-link {
+  color: #ffffff !important;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+}
+
+.navbar-nav .nav-item {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.navbar-dark .nav-link.active {
+  color: #ffffff;
+  font-weight: 800;
+  text-decoration: underline;
+}
+.navbar {
+  padding-top: 1.5rem !important;
+  padding-bottom: 1.5rem !important;
+  min-height: 80px;
+}
+footer.footer {
+    background-color: #212529; /* igual que navbar-dark bg-dark */
+    padding: 1rem 0;
+    text-align: center;
+    bottom: 0;
+    width: 100%;
+    margin-top:auto;
+}
+
+footer.footer .nav {
+    justify-content: center;
+    gap: 2rem;
+}
+
+footer.footer .nav-link {
+    color: white;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: color 0.3s ease;
+}
+
+footer.footer .nav-link:hover {
+    color: #f5d376;
+}
+
+html, body {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* Modernización tipográfica para la vista de detalle de eventos */
+.event-detail h3 {
+  font-family: 'Inter', sans-serif;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #111;
+  letter-spacing: -0.02rem;
+  margin-bottom: 1rem;
+}
+
+.event-detail p {
+  font-family: 'Inter', sans-serif;
+  font-size: 1.125rem;
+  color: #444;
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+
+.event-detail h6 {
+  font-family: 'Inter', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: #222;
+  margin-bottom: 0.2rem;
+}
