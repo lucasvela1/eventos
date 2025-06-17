@@ -25,7 +25,22 @@
         <tr>
             <td>{{ forloop.counter }}</td>
             <td>{{ event.title }}</td>
-            <td>{{ event.total_rating|default:"Sin calificación" }}</td>
+            <td>
+                {% if event.total_rating %}
+                    <div class="text-warning">
+                        {% for i in "12345" %}
+                            {% if i|add:"0"|add:"0" <= event.total_rating %}
+                                <i class="bi bi-star-fill"></i>
+                            {% else %}
+                                <i class="bi bi-star"></i>
+                            {% endif %}
+                        {% endfor %}
+                        <span class="ms-2">{{ event.total_rating }} / 5</span>
+                    </div>
+                {% else %}
+                    Sin calificación
+                {% endif %}
+            </td>
             <td>{{ event.date|date:"d/m/Y" }}</td>
             <td>
                 {% if event.cancelado %}

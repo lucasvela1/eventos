@@ -127,7 +127,15 @@
                     <td>{{ evento.title }}</td>
                     <td>{{ evento.date|date:"d/m/Y" }}</td>
                     <td>{% if evento.user_rating %}
-                        {{ evento.user_rating.0.score }} ⭐
+                        <div class="text-warning">
+                            {% for i in "12345" %}
+                                {% if i|add:"0"|add:"0" <= evento.user_rating.0.score %}
+                                    <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                    <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
                         {% else %}
                         Sin calificación
                         {% endif %}

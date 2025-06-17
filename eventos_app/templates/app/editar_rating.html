@@ -7,10 +7,66 @@
     <h2>Editar Calificación para: {{ event.title }}</h2>
     <form method="post">
         {% csrf_token %}
-        {{ form.as_p }}
+
+        <div class="mb-3">
+            {{ form.title.label_tag }}
+            {{ form.title }}
+        </div>
+
+        <div class="mb-3">
+            {{ form.text.label_tag }}
+            {{ form.text }}
+        </div>
+
+        <div class="mb-3">
+            <label for="rating" class="form-label">Puntaje:</label>
+            <div id="star-rating" class="text-warning fs-3">
+                {% for i in "12345" %}
+                <i class="bi bi-star{% if form.instance.rating >= i|add:'0' %}-fill{% endif %}" data-value="{{ i }}"></i>
+                {% endfor %}
+            </div>
+            <input type="hidden" name="rating" id="rating-value" value="{{ form.instance.rating }}">
+        </div>
+
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
         <a href="{% url 'event_detail' pk=event.pk %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const stars = document.querySelectorAll("#star-rating i");
+    const ratingInput = document.getElementById("rating-value");
+
+    // Mostrar las estrellas activas 
+    const initialValue = parseInt(ratingInput.value);
+    stars.forEach((s, i) => {
+      if (i < initialValue) {
+        s.classList.remove("bi-star");
+        s.classList.add("bi-star-fill");
+      } else {
+        s.classList.remove("bi-star-fill");
+        s.classList.add("bi-star");
+      }
+    });
+
+    stars.forEach((star, index) => {
+      star.addEventListener("click", function () {
+        const value = this.getAttribute("data-value");
+        ratingInput.value = value;
+
+        stars.forEach((s, i) => {
+          if (i < value) {
+            s.classList.remove("bi-star");
+            s.classList.add("bi-star-fill");
+          } else {
+            s.classList.remove("bi-star-fill");
+            s.classList.add("bi-star");
+          }
+        });
+      });
+    });
+  });
+</script>
 {% endblock %}
+
