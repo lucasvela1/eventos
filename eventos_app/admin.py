@@ -1,4 +1,4 @@
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.contrib.auth.admin import UserAdmin
 from .models import (
     Event, Comment, CustomUser, UserRole, Category, Venue,
@@ -18,6 +18,18 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ['categoria', 'venue', 'cancelado']
     list_per_page = 10
     ordering = ['-date']
+
+    actions = ['marcar_como_cancelado', 'marcar_como_no_cancelado']
+    @admin.action(description="Marcar eventos seleccionados como Cancelados")
+    def marcar_como_cancelado(self, request, queryset):
+       eventos_actualizados= queryset.update(cancelado=True)
+       self.message_user(request, f"{eventos_actualizados} eventos han sido marcados como cancelados.")
+
+    @admin.action(description="Marcar eventos seleccionados como No Cancelados")
+    def marcar_como_no_cancelado(self, request, queryset):
+       eventos_actualizados= queryset.update(cancelado=False)
+       self.message_user(request, f"{eventos_actualizados} eventos han sido marcados como no cancelados.")   
+
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return []
