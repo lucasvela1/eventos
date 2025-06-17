@@ -62,7 +62,7 @@ class EventAdmin(admin.ModelAdmin):
 
 # Administración del modelo Comment
 class CommentAdmin(admin.ModelAdmin):
-    list_display = ['user', 'created_at']
+    list_display = ['title','user', 'created_at']
     ordering = ['-created_at']    
 
     def get_readonly_fields(self, request, obj=None):
