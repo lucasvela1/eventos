@@ -13,7 +13,7 @@ admin.site.index_title = "Bienvenido al panel de administración"
 
 class EventAdmin(admin.ModelAdmin):
     list_display = ['title', 'date','venue','price','cancelado']
-    list_editable = ['price']
+    list_editable = ['price', 'date', 'cancelado']
     search_fields =['title', 'description']
     list_filter = ['categoria', 'venue', 'cancelado']
     list_per_page = 10
