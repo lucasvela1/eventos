@@ -17,7 +17,7 @@ from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm, CommentForm
 from django.db import transaction
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment
-from .utils import obtener_eventos_destacados, obtener_eventos_proximos
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating
 
 
 
@@ -286,7 +286,8 @@ class CrearRatingView(LoginRequiredMixin, FormView):
         rating.event = self.event
         rating.save()
         #messages.success(self.request, "Calificación creada correctamente.")
-        return redirect('event_detail', pk=self.event.pk)
+        actualizar_total_rating(self.event)
+        return redirect(reverse_lazy('my_account'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -316,13 +317,25 @@ class EditarRatingView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.save()
+        actualizar_total_rating(self.rating.event)
         messages.success(self.request, "Calificación actualizada correctamente.")
-        return redirect('event_detail', pk=self.rating.event.pk)
+        return redirect(reverse_lazy('my_account'))
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['event'] = self.rating.event
         return context 
+
+class EliminarRatingView(LoginRequiredMixin, View):
+    template_name = 'accounts/confirm_delete.html'
+    def get(self, request, pk):
+        rating = get_object_or_404(Rating, pk=pk, user=request.user)
+        return render(request, self.template_name, {'rating': rating})
+
+    def post(self, request, pk):
+        rating = get_object_or_404(Rating, pk=pk, user=request.user)
+        rating.delete()
+        return redirect(reverse_lazy('my_account'))
 
 class BuscarEventosView(ListView):
     model = Event

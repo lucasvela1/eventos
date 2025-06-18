@@ -13,7 +13,7 @@ python -m venv env
 pip install -r requirements
 
 ## Instalar el interface de Django
-pip intall django-admin-interface
+pip install django-admin-interface
 
 ## Instalar el tema de admin desde fixture
 python manage.py loaddata theme_fixture.json
