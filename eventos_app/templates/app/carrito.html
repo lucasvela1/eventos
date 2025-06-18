@@ -6,17 +6,50 @@
     <h3>{{ event.title }}</h3>
     <p><strong>Fecha:</strong> {{ event.date }}</p>
     <p><strong>Lugar:</strong> {{ event.venue }}</p>
-    <p><strong>Precio:</strong> ${{ event.price }}</p>
+    <p><strong>Precio General:</strong> ${{ event.price|floatformat:2 }}</p>
+    <p><strong>Precio VIP (Recargo 25%):</strong> ${{ tickets_vip}}</p>
     <p><strong>Descripción:</strong> {{ event.description }}</p>
     <p><strong>Tickets restantes:</strong> {{ tickets_restantes}}</p>
   </div>
 
   <form method="post">
-    {% csrf_token %}
-    <label for="cantidad">Cantidad de tickets:</label>
-    <input type="number" name="cantidad" id="cantidad" value="1" min="1" required>
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <label for="cantidad_general" class="form-label">Cantidad de tickets GENERAL:</label>
+            <input type="number" name="cantidad_general" id="cantidad_general" value="0" min="0" class="form-control" onchange="actualizarTotal()">
+        </div>
+
+        <div class="mb-3">
+            <label for="cantidad_vip" class="form-label">Cantidad de tickets VIP:</label>
+            <input type="number" name="cantidad_vip" id="cantidad_vip" value="0" min="0" class="form-control" onchange="actualizarTotal()">
+        </div>
+
+        <hr>
+        <h4>Total a pagar: <span id="total-a-pagar">$0.00</span></h4>
     <button type="submit" class="btn btn-success mt-2">Comprar</button>
   </form>
+
+  <script>
+    function actualizarTotal() {
+      //Obtener los precios del template
+        const precioGeneral = parseFloat("{{ event.price }}");
+        const precioVip = parseFloat("{{ tickets_vip }}");
+
+        // Obtenemos las cantidades de los inputs
+        const cantidadGeneral = parseInt(document.getElementById('cantidad_general').value) || 0;
+        const cantidadVip = parseInt(document.getElementById('cantidad_vip').value) || 0;
+
+        // Calculamos el total
+        const total = (cantidadGeneral * precioGeneral) + (cantidadVip * precioVip);
+
+        // Actualizamos el texto en la página
+        document.getElementById('total-a-pagar').innerText = '$' + total.toFixed(2);
+    }
+
+    // Llama a la función una vez al cargar la página para inicializar el total
+    document.addEventListener('DOMContentLoaded', actualizarTotal);
+</script>
 {% endblock %}
 
 <!-- Para hacer que el precio se actualice habría que hacer un script de javascript que tome el valor

@@ -58,12 +58,30 @@ class EventAdmin(admin.ModelAdmin):
         if request.user.rol == 'VENDEDOR':
             return True
         return False
+    
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
+            return {'cancelar_eventos': actions['cancelar_eventos'], 'habilitar_eventos': actions['habilitar_eventos']}
+        
+        return actions
 
 # Administración del modelo Comment
 class CommentAdmin(admin.ModelAdmin):
     list_display = ['title','user', 'created_at']
     ordering = ['-created_at']    
 
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return True
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        return False
+    
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
             return []
@@ -71,13 +89,6 @@ class CommentAdmin(admin.ModelAdmin):
             return ['created_at', 'user', 'event']
         return super().get_readonly_fields(request, obj)
 
-    def get_queryset(self, request):
-        qs = super().get_queryset(request)
-        if request.user.is_superuser:
-            return qs
-        if request.user.rol == 'VENDEDOR':
-            return qs.filter(user=request.user)
-        return qs.none()
 
 # Administración del modelo CustomUser
 class CustomUserAdmin(UserAdmin):
@@ -140,12 +151,47 @@ class NotificationAdmin(admin.ModelAdmin):
         queryset.update(read=False)
         self.message_user(request, "Notificaciones marcadas como no leídas.")    
 
+    def has_module_permission(self, request):
+        return request.user.is_superuser
+
+
+
 class RefundRequestAdmin(admin.ModelAdmin):
-    list_display = ['user', 'approved', 'created_at']
-    search_fields = ['user__username','reason']
+    list_display = ['user', 'ticket_code', 'reason', 'approved', 'created_at']
+    search_fields = ['user__username', 'reason', 'ticket_code']
     list_filter = ['approved', 'created_at']
-    ordering = ['approved','-created_at']
+    ordering = ['approved', '-created_at']
     actions = ['aprobar_solicitud', 'rechazar_solicitud']
+
+    def aprobar_solicitud(self, request, queryset):
+        queryset.update(approved=True)
+        self.message_user(request, "Las solicitudes seleccionadas han sido aprobadas.")
+
+    def rechazar_solicitud(self, request, queryset):
+        queryset.update(approved=False)
+        self.message_user(request, "Las solicitudes seleccionadas han sido rechazadas.")
+
+
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        return False
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return []
+        
+        if hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
+            if obj:
+                return [field.name for field in self.model._meta.fields]
+        
+        return super().get_readonly_fields(request, obj)
 
     def aprobar_solicitud(self, request, queryset):
         for refund in queryset:
@@ -165,6 +211,27 @@ class TicketAdmin(admin.ModelAdmin):
     list_filter = ['event', 'buy_date']
     ordering = ['-buy_date']
 
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        return False
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+    
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return []
+        
+        if hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
+            if obj:
+                return [field.name for field in self.model._meta.fields]
+        
+        return super().get_readonly_fields(request, obj)
+    
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
 
 class CategoryAdmin(admin.ModelAdmin):
     list_display = ['name','description','is_active']
@@ -177,6 +244,27 @@ class RatingAdmin(admin.ModelAdmin):
     search_fields = ['user','text']
     list_filter = ['rating']
     ordering = ['-rating']
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return []
+        
+        if hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
+            if obj:
+                return [field.name for field in self.model._meta.fields]
+        
+        return super().get_readonly_fields(request, obj)
+    
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+    
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+    
+    def has_change_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        return False
 
 # Registrar los modelos
 admin.site.register(Event, EventAdmin)
