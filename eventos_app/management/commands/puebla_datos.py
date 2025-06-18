@@ -241,7 +241,7 @@ class Command(BaseCommand):
         evento4= Event.objects.create(
             title="Conferencia sobre Biodiversidad",
             description="El doctor José Hernandez nos presenta su tesis sobre biodiversidad",
-            date=date(2025, 9, 11),
+            date=date(2025, 6, 11),
             price=5000,
             categoria=conferencia,
             venue=luna_park,
@@ -264,6 +264,48 @@ class Command(BaseCommand):
             suma_puntaje=True,   
             cantidad_puntos=0,     
             cancelado=False        
+        )
+
+        evento6 = Event.objects.create(
+            title="Festival Arte Urbano",
+            description="Exposición de arte callejero con intervenciones en vivo.",
+            date=date(2025, 6, 5),
+            price=2000,
+            categoria=arte,
+            venue=centro_cultural_recoleta,
+            id_img="1V3artTfK8b7sKzqHURZr6Ye_UrbxMnPo",  # ID ficticio
+            total_rating=3,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+
+        evento7 = Event.objects.create(
+            title="Torneo Nacional de Vóley",
+            description="Los mejores equipos del país compiten en Mar del Plata.",
+            date=date(2025, 4, 20),
+            price=3500,
+            categoria=deporte,
+            venue=estadio_polideportivo,
+            id_img="1ZpolYVleyTornNatC0mpMdp000000000",  # ID ficticio
+            total_rating=5,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+
+        evento8 = Event.objects.create(
+            title="Ciclo de Cine Latinoamericano",
+            description="Proyección de películas destacadas de cine independiente.",
+            date=date(2025, 5, 18),
+            price=1500,
+            categoria=pelicula,
+            venue=teatro_radio_city,
+            id_img="1cinLatAmSeriesQwE7RbQ0ccCineLat",  # ID ficticio
+            total_rating=0,
+            suma_puntaje=True,
+            cantidad_puntos=0,
+            cancelado=False
         )
 
         # Crear tickets comprados por clientes
@@ -302,24 +344,54 @@ class Command(BaseCommand):
             total=10000,
             ticket_code=str(uuid.uuid4())
         )
+        ticket6 = Ticket.objects.create(
+            user=cliente3,
+            event=evento6,
+            quantity=1,
+            total=2000,
+            ticket_code=str(uuid.uuid4())
+        )
+        ticket7 = Ticket.objects.create(
+            user=cliente1,
+            event=evento7,
+            quantity=4,
+            total=14000,
+            ticket_code=str(uuid.uuid4())
+        )
+        ticket8 = Ticket.objects.create(
+            user=cliente2,
+            event=evento8,
+            quantity=2,
+            total=3000,
+            ticket_code=str(uuid.uuid4())
+        )
+
+        ticket9 = Ticket.objects.create(
+            user=cliente3,
+            event=evento8,
+            quantity=1,
+            total=1000,
+            ticket_code=str(uuid.uuid4())
+        )
 
         # Crear calificaciones
         Rating.objects.create(
             title='Inolvidable',
             user=cliente1,
-            event=evento4,
+            event=evento7,
             rating=5,
-            text="Un espectáculo inolvidable"
+            text="Un placer ver al mejor equipo del país en acción"
         )
         Rating.objects.create(
             title='Chico',
             user=cliente2,
-            event=evento4,
+            event=evento6,
             rating=3,
             text="Mucha gente"
         )
 
 
+        #Comentarios
         Comment.objects.create(
             title=str(evento4.title),
             event=evento4,
