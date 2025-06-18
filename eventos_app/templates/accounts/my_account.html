@@ -266,7 +266,6 @@
     <h2>Mis Datos</h2>
     <div class="card mb-5">
         <div class="card-body">
-            <p><strong>Nombre:</strong> {{ request.user.first_name }} {{ request.user.last_name }}</p>
             <p><strong>Email:</strong> {{ request.user.email }}</p>
             <p><strong>Username:</strong> {{ request.user.username }}</p>
             <p><strong>Fecha de registro:</strong> {{ request.user.date_joined|date:"d M Y" }}</p>
