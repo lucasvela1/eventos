@@ -143,7 +143,7 @@ class Notification(models.Model):
     
 class RefundRequest(models.Model):
     approved = models.BooleanField()
-    approval_date = models.DateField(auto_now_add=True)
+    approval_date = models.DateField(null=True, blank=True) #Anteriormente tomaba la fecha de creacion como fecha de aprobacion
     ticket_code = models.TextField(unique=True)
     reason = models.TextField()
     created_at = models.DateField(auto_now_add=True)
