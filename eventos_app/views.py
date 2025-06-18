@@ -11,11 +11,12 @@ from django.utils.timezone import now
 from django.db.models import Q, Avg
 import uuid
 from django.db.models import Prefetch
+
 from django.db import models
 from datetime import timedelta
-from .forms import RatingForm, UsuarioRegisterForm
+from .forms import RatingForm, UsuarioRegisterForm, CommentForm
 from django.db import transaction
-from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment
 from .utils import obtener_eventos_destacados, obtener_eventos_proximos
 
 
@@ -28,22 +29,7 @@ class HomeView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['events_destacados'] = obtener_eventos_destacados()
-        category_id = self.request.GET.get('category_id')
-        if category_id:
-            try:
-                category = get_object_or_404(Category, id=category_id)
-                # La logica del filtrado por categoria para el carrousel de eventos proximos en el home
-                context['events_proximos'] = Event.objects.filter(
-                    date__gte=now().date(),
-                    cancelado=False,
-                    categoria=category
-                ).order_by("date") #Los ordenamos por su fecha
-                context['selected_category'] = category #Se envia la categoría seleccionada al template
-            except:
-                #Si surge un error al obtener la categoría, se obtienen los eventos próximos sin filtrar
-                context['events_proximos'] = obtener_eventos_proximos()
-        else:
-           context['events_proximos'] = obtener_eventos_proximos()
+        context['events_proximos'] = obtener_eventos_proximos()
         context['categorys'] = Category.objects.filter(is_active=True)
         return context
 
@@ -70,29 +56,37 @@ class EventDetailView(DetailView):
     model = Event
     template_name = "app/event_detail.html"
     context_object_name = "event"
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        event = self.get_object() 
-        user_can_rate = False
-        user_has_ticket = False
-        event_has_passed = event.date < now().date() # Verifica si la fecha del evento es anterior a la actual
-        user_already_rated = False
+        event = self.get_object()
+        user = self.request.user
 
-        # Condición 1: El usuario debe estar autenticado
-        if self.request.user.is_authenticated:
-            # Condición 2: El usuario debe tener un ticket para este evento
-            user_has_ticket = Ticket.objects.filter(user=self.request.user, event=event).exists()
-            # Condición 3: El usuario no calificó este evento
-            user_already_rated = Rating.objects.filter(user=self.request.user, event=event).exists() #Si ya calificó el evento
-            # Condición 4: Se puede calificar si el usuario está logueado, tiene ticket, el evento ya pasó y no lo califico aun
-            if user_has_ticket and event_has_passed and not user_already_rated:
-                user_can_rate = True
-        context['user_can_rate'] = user_can_rate
-        context['user_has_ticket'] = user_has_ticket
-        context['event_has_passed'] = event_has_passed
-        context['user_already_rated'] = user_already_rated
-        
+        context['comments'] = Comment.objects.filter(event = event).order_by('-created_at')
+        context['form'] = CommentForm()
+        if user.is_authenticated:
+            context['tiene_ticket'] = Ticket.objects.filter(user=user, event=event).exists()
+        else:
+            context['tiene_ticket'] = False
         return context
+    
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        form = CommentForm(request.POST)
+
+        if request.user.is_authenticated and form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user
+            comment.event = self.object
+            comment.title = self.object.title
+            comment.save()
+
+            return redirect('event_detail', pk=self.object.pk)
+        
+        context = self.get_context_data()
+        context['form'] = form
+        return self.render_to_response(context)
+
 
 class NotificationListView(LoginRequiredMixin, ListView):
     model = Notification
@@ -214,9 +208,6 @@ class RefundRequestListView(ListView):
         )
         return RefundRequest.objects.all().order_by(priority_order, "created_at")  # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
 
 class RatingView(ListView):
     model = Event
@@ -384,27 +375,19 @@ class ReembolsoView(LoginRequiredMixin, View):
         ticket = get_object_or_404(Ticket, ticket_code=ticket_code, user=request.user)
 
         ya_solicitado = RefundRequest.objects.filter(ticket_code=ticket.ticket_code).exists()
-        evento_pasado = ticket.event.date <= now().date()
 
         return render(request, "app/reembolso.html", {
             "ticket": ticket,
-            "ya_solicitado": ya_solicitado,
-            "evento_pasado": evento_pasado
+            "ya_solicitado": ya_solicitado
         })
 
     def post(self, request, ticket_code):
         ticket = get_object_or_404(Ticket, ticket_code=ticket_code, user=request.user)
 
-        if ticket.event.date > now().date():
-            return redirect("my_account")
-        
         if RefundRequest.objects.filter(ticket_code=ticket.ticket_code).exists():
-            return redirect("my_account")
+            return redirect("my_account")  # o mostrar mensaje de error
 
-        reason = request.POST.get("reason", "").strip()
-        if not reason:
-            return redirect("reembolso", ticket_code=ticket.ticket_code)
-
+        reason = request.POST.get("reason")
 
         RefundRequest.objects.create(
             approved=False,  # Se aprueba más tarde manualmente
