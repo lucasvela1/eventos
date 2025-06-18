@@ -60,7 +60,21 @@
                     <li class="nav-item">{% navbar_link 'events' 'Eventos' %}</li>
                     <li class="nav-item">{% navbar_link 'rating' 'Rating' %}</li>
                     {% if request.user.is_authenticated %}
+                        
+
+
                         <li class="nav-item">{% navbar_link 'favoritos' 'Favoritos' %}</li>
+                         <li class="nav-item position-relative">
+                            <a class="nav-link" href="{% url 'notifications' %}">
+                                <i class="bi bi-bell" style="font-size: 1.3rem;"></i>
+                                {% if total_unread > 0 %}
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                {{ total_unread }}
+                                <span class="visually-hidden">notificaciones no leídas</span>
+                                </span>
+                                {% endif %}
+                            </a>
+                         </li>
                         <li class="nav-item"><a class="nav-link" href="{% url 'my_account' %}">Mi Cuenta</a></li>
                         {%if request.user.rol != 'CLIENTE'%}
                             <li class="nav-item"><a class="btn btn-outline-light" href="{% url 'admin:index' %}" target="_blank" style="border-radius: 2rem; font-weight: bold;">Ingresar al Admin</a></li>
