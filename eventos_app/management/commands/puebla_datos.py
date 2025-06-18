@@ -241,7 +241,7 @@ class Command(BaseCommand):
         evento4= Event.objects.create(
             title="Conferencia sobre Biodiversidad",
             description="El doctor José Hernandez nos presenta su tesis sobre biodiversidad",
-            date=date(2025, 6, 11),
+            date=date(2025, 9, 11),
             price=5000,
             categoria=conferencia,
             venue=luna_park,
@@ -255,7 +255,7 @@ class Command(BaseCommand):
         evento5= Event.objects.create(
             title="Concierto de Abel Pintos",
             description="Abel Pintos en vivo tocando grandes éxitos",
-            date=date(2025, 5, 1),
+            date=date(2025, 10, 1),
             price=5000,
             categoria=musica,
             venue=luna_park,
@@ -321,28 +321,32 @@ class Command(BaseCommand):
 
 
         Comment.objects.create(
-            title=evento4,
+            title=str(evento4.title),
+            event=evento4,
             text='¿Quién más va?',
             user=cliente2,
             created_at=date(2025, 6, 1),
         )
 
         Comment.objects.create(
-            title=evento2,
+            title=str(evento2.title),
+            event=evento2,
             text='¿Cuándo es?',
             user=cliente2,
             created_at=date(2025, 6, 10),
         )
 
         Comment.objects.create(
-            title=evento3,
+            title=str(evento3.title),
+            event=evento3,
             text='Puedo esperar',
             user=cliente2,
             created_at=date(2025, 6, 14),
         )
 
         Comment.objects.create(
-            title=evento1,
+            title=str(evento1.title),
+            event=evento1,
             text="No puedo esperar",
             user=cliente1,
             created_at=date(2025, 6, 12),

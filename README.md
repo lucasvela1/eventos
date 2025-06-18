@@ -9,17 +9,20 @@ python -m venv env
 - Windows: source env/Scripts/activate   o   .\venv\Scripts\Activate
 - Windows (alternativa): ./env/Scripts.activate
 
-## Poblar base de datos 
-python manage.py pueblaDatos
-
 ## Instalar dependencias
 pip install -r requirements
+
+## Instalar el interface de Django
+pip intall django-admin-interface
+
+## Instalar el tema de admin desde fixture
+python manage.py loaddata theme_fixture.json
 
 ## Hacer migraciones
 python manage.py migrate
 
-## Instalar el tema de admin desde fixture
-python manage.py loaddata theme_fixture.json
+## Poblar base de datos 
+python manage.py puebla_datos
 
 ## Correr app
 python manage.py runserver
