@@ -157,52 +157,32 @@ class NotificationAdmin(admin.ModelAdmin):
         return request.user.is_superuser
 
 
+class TieneTicketFilter(admin.SimpleListFilter):
+    title = 'Tiene ticket vigente'
+    parameter_name = 'tiene_ticket'
+
+    def lookups(self, request, model_admin):
+        return [
+            ('si', 'Sí'),
+            ('no', 'No'),
+        ]
+
+    def queryset(self, request, queryset):
+        tickets_qs = Ticket.objects.filter(ticket_code=OuterRef('ticket_code'))
+        queryset = queryset.annotate(tiene_ticket=Exists(tickets_qs))
+        if self.value() == 'si':
+            return queryset.filter(tiene_ticket=True)
+        elif self.value() == 'no':
+            return queryset.filter(tiene_ticket=False)
+        return queryset
+
 
 class RefundRequestAdmin(admin.ModelAdmin):
     list_display = ['user', 'ticket_code', 'reason', 'approved', 'created_at']
     search_fields = ['user__username', 'reason', 'ticket_code']
-    list_filter = ['approved', 'created_at']
+    list_filter = ['approved', 'created_at', TieneTicketFilter]
     ordering = ['approved', '-created_at']
     actions = ['aprobar_solicitud', 'rechazar_solicitud', 'borrar_tickets_aprobados']
-
-    # Una vez que se borró el ticket, se oculta la solititud
-    def get_queryset(self, request):
-        queryset = super().get_queryset(request)
-
-        tickets_qs = Ticket.objects.filter(ticket_code=OuterRef('ticket_code'))# Subconsulta para verificar si existe un ticket con el ticket_code de la solicitud
-
-        # Filtrar solicitudes que NO estén aprobadas y que tengan un ticket vigente
-        return queryset.annotate(tiene_ticket=Exists(tickets_qs)).filter(approved=False, tiene_ticket=True)
-
-    def aprobar_solicitud(self, request, queryset):
-        queryset.update(approved=True)
-        self.message_user(request, "Las solicitudes seleccionadas han sido aprobadas.")
-
-    def rechazar_solicitud(self, request, queryset):
-        queryset.update(approved=False)
-        self.message_user(request, "Las solicitudes seleccionadas han sido rechazadas.")
-
-
-    def has_add_permission(self, request):
-        return request.user.is_superuser
-
-    def has_delete_permission(self, request, obj=None):
-        return request.user.is_superuser
-
-    def has_change_permission(self, request, obj=None):
-        if request.user.is_superuser:
-            return True
-        return False
-
-    def get_readonly_fields(self, request, obj=None):
-        if request.user.is_superuser:
-            return []
-        
-        if hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
-            if obj:
-                return [field.name for field in self.model._meta.fields]
-        
-        return super().get_readonly_fields(request, obj)
 
     def aprobar_solicitud(self, request, queryset):
         for refund in queryset:
@@ -212,11 +192,11 @@ class RefundRequestAdmin(admin.ModelAdmin):
             refund.approval_date = timezone.now().date()
             refund.save()
             Notification.objects.create(
-                user = refund.user,
-                title = "Solicitud de reembolso aprobada",
-                message = f"Tu solicitud de reembolso con ticket {refund.ticket_code} fue aprobada.",
-                priority = "HIGH",
-                read = False,
+                user=refund.user,
+                title="Solicitud de reembolso aprobada",
+                message=f"Tu solicitud de reembolso con ticket {refund.ticket_code} fue aprobada.",
+                priority="HIGH",
+                read=False,
             )
             self.message_user(request, f"Solicitud de reembolso aprobada para {refund.user.username}.")
 
@@ -228,26 +208,26 @@ class RefundRequestAdmin(admin.ModelAdmin):
             refund.approval_date = timezone.now().date()
             refund.save()
             Notification.objects.create(
-                user = refund.user,
-                title = "Solicitud de reembolso rechazada",
-                message = f"Tu solicitud de reembolso con ticket {refund.ticket_code} fue rechazada.",
-                priority = "HIGH",
-                read = False,
+                user=refund.user,
+                title="Solicitud de reembolso rechazada",
+                message=f"Tu solicitud de reembolso con ticket {refund.ticket_code} fue rechazada.",
+                priority="HIGH",
+                read=False,
             )
-            self.message_user(request, f"Solicitud de reembolso rechazada para {refund.user.username}.")      
+            self.message_user(request, f"Solicitud de reembolso rechazada para {refund.user.username}.")
 
     def borrar_tickets_aprobados(self, request, queryset):
         tickets_borrados = 0
         for refund in queryset:
             if refund.approved:
-                try: 
+                try:
                     ticket = Ticket.objects.get(ticket_code=refund.ticket_code)
                     ticket.delete()
                     tickets_borrados += 1
                 except Ticket.DoesNotExist:
                     self.message_user(
                         request,
-                        f"No se encontró el ticked con el código {refund.ticket_code}.",
+                        f"No se encontró el ticket con el código {refund.ticket_code}.",
                         level=messages.WARNING
                     )
             else:
@@ -256,9 +236,26 @@ class RefundRequestAdmin(admin.ModelAdmin):
                     f"La solicitud con código {refund.ticket_code} no está aprobada. No se eliminó el ticket.",
                     level=messages.WARNING
                 )
-            if tickets_borrados > 0:
-                self.message_user(request, f"Se eliminaron {tickets_borrados} ticket(s) correctamente.")
+        if tickets_borrados > 0:
+            self.message_user(request, f"Se eliminaron {tickets_borrados} ticket(s) correctamente.")
 
+    # Permisos
+    def has_add_permission(self, request):
+        return request.user.is_superuser
+
+    def has_delete_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def has_change_permission(self, request, obj=None):
+        return request.user.is_superuser
+
+    def get_readonly_fields(self, request, obj=None):
+        if request.user.is_superuser:
+            return []
+        if hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
+            if obj:
+                return [field.name for field in self.model._meta.fields]
+        return super().get_readonly_fields(request, obj)
 
 
 class TicketAdmin(admin.ModelAdmin):
