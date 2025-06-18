@@ -4,7 +4,6 @@ from .models import (
     Event, Comment, CustomUser, UserRole, Category, Venue,
     RefundRequest, Ticket, Rating, Favorito, Notification
 )
-from .forms import CustomUserCreationForm
 
 # Administración del modelo Event
 admin.site.site_header = "Panel de Administración - Grupo 4"
@@ -82,7 +81,6 @@ class CommentAdmin(admin.ModelAdmin):
 
 # Administración del modelo CustomUser
 class CustomUserAdmin(UserAdmin):
-    add_form = CustomUserCreationForm
     model = CustomUser
     list_display = ['username', 'email', 'rol', 'is_staff', 'is_superuser', 'puntaje']
     actions = ['reiniciar_puntaje']
