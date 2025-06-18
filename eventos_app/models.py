@@ -5,6 +5,8 @@ from datetime import timedelta
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
+from django.core.exceptions import ValidationError
+
 class Category(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
@@ -14,31 +16,13 @@ class Category(models.Model):
     def __str__(self):
         return self.name
     
-    @classmethod
-    def validate(cls, name):
-        errors = {}
-        if not name:
-            errors["name"] = "Por favor ingrese un nombre"
-        return errors
+    def clean(self):
+        super().clean()
+        if ((not self.name)|(self.name.strip() == "")):
+            raise ValidationError({'name': 'El nombre de la categoría es requerido.'})
 
-    @classmethod
-    def new(cls, name, description="", is_active=True, id_img="sin_imagen"):
-        errors = cls.validate(name)
-        if errors:
-            return False, errors
-        cls.objects.create(name=name, description=description, is_active=is_active, id_img=id_img)
-        return True, None
-
-    def update(self, name=None, description=None, is_active=None, id_img=None):
-        if name is not None:
-            self.name = name
-        if description is not None:
-            self.description = description
-        if is_active is not None:
-            self.is_active = is_active
-        if id_img is not None:
-            self.id_img = id_img
-        self.save()
+        if ((not self.description)|(self.description.strip() == "")):
+            raise ValidationError({'description': 'La descripción de la categoría es requerida.'})
     
     def imagen_url_directa(self):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
@@ -48,97 +32,63 @@ class Venue(models.Model):
     name = models.CharField(max_length=200)
     address = models.TextField()
     city = models.TextField()
-    capacity = models.IntegerField(default=100)
+    capacity = models.PositiveIntegerField(default=100)
     contact =models.TextField()
+
+    def clean(self):
+        super().clean()
+        if self.capacity < 1:
+            raise ValidationError({'capacity': 'La capacidad no puede ser negativa o cero.'})
+        
+        if ((not self.name)|(self.name.strip() == "")):
+            raise ValidationError({'name': 'El nombre del lugar es requerido.'})
+
+        if ((not self.address)|(self.address.strip() == "")):
+            raise ValidationError({'address': 'La dirección del lugar es requerida.'})
+
+        if ((not self.city)|(self.city.strip() == "")):
+            raise ValidationError({'city': 'La ciudad del lugar es requerida.'})
+        if ((not self.contact)|(self.contact.strip() == "")):
+            raise ValidationError({'contact': 'El contacto del lugar es requerido.'})        
 
     def __str__(self):
         return self.name
     
-    @classmethod
-    def validate(cls, name, address, city, capacity, contact):
-        errors = {}
-        if not name:
-            errors["name"] = "El nombre es requerido"
-        if capacity is not None and capacity < 0:
-            errors["capacity"] = "La capacidad no puede ser negativa"
-        return errors
-
-    @classmethod
-    def new(cls, name, address, city, capacity, contact):
-        errors = cls.validate(name, address, city, capacity, contact)
-        if errors:
-            return False, errors
-        cls.objects.create(name=name, address=address, city=city, capacity=capacity, contact=contact)
-        return True, None
-
-    def update(self, name=None, address=None, city=None, capacity=None, contact=None):
-        self.name = name or self.name
-        self.address = address or self.address
-        self.city = city or self.city
-        self.capacity = capacity if capacity is not None else self.capacity
-        self.contact = contact or self.contact
-        self.save()
-
-
 class Event(models.Model):
     title = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
-    price=models.IntegerField(default=0)
+    price=models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    total_rating = models.IntegerField(default=0)
+    total_rating = models.PositiveIntegerField(default=0)
     categoria = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
     venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=False)
     suma_puntaje=models.BooleanField(default=False)
-    cantidad_puntos=models.IntegerField(default=0)
+    cantidad_puntos=models.PositiveIntegerField(default=0)
     cancelado=models.BooleanField(default=False)
     id_img = models.CharField(max_length=2083, default='sin_imagen') # Solamente id de la imagen
-    capacidad_ocupada=models.IntegerField(default=0)
+    capacidad_ocupada=models.PositiveIntegerField(default=0)
+    
+    def clean(self):
+        super().clean()
+        if self.date < now().date():
+            raise ValidationError({'date': 'La fecha del evento no puede ser una fecha pasada.'})
+
+        if self.venue and self.capacidad_ocupada > self.venue.capacity:
+            raise ValidationError(
+                {'capacidad_ocupada': f'La capacidad ocupada ({self.capacidad_ocupada}) no puede exceder la capacidad del lugar, que es {self.venue.capacity}.'}
+            )
+        
+        if ((not self.title)|(self.title.strip() == "")):
+            raise ValidationError({'title': 'El título del evento no puede estar vacío.'})
+        
+        if self.description == "":
+            raise ValidationError({'description': 'La descripción del evento no puede estar vacía.'})
 
     def __str__(self):
         return self.title
-
-    @classmethod
-    def validate(cls, title, description, date, id_img):
-        errors = {}
-
-        if title == "":
-            errors["title"] = "Por favor ingrese un titulo"
-
-        if description == "":
-            errors["description"] = "Por favor ingrese una descripcion"
-
-        return errors
-
-    @classmethod
-    def new(cls, title, description, date, price, id_img):
-        errors = Event.validate(title, description, date)
-
-        if len(errors.keys()) > 0:
-            return False, errors
-
-        Event.objects.create(
-            title=title,
-            description=description,
-            date=date,
-            price=price,
-            id_img=id_img
-        )
-
-        return True, None
-
-    def update(self, title, description, date, id_img):
-        self.save()
-        if title is not None:
-            self.title = title
-        if description is not None:
-            self.description = description
-        if date is not None:
-            self.date = date
-        if id_img is not None:
-            self.id_img = id_img
-        self.save()     
+    
    
     def imagen_url_directa(self):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
@@ -159,40 +109,22 @@ class UserRole(models.TextChoices):
     CLIENTE = 'CLIENTE', 'Cliente'
 
 class CustomUser(AbstractUser):
-    puntaje= models.IntegerField(default=0)
+    puntaje= models.PositiveIntegerField(default=0)
     rol = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.CLIENTE) #Solo se puede elegir entre los roles ya creados
 
     def __str__(self):
         return self.username
     
-    @classmethod
-    def validate(cls, username, email):
-        errors = {}
-        if not username or username.strip() == "":
-            errors["username"] = "Por favor ingrese un nombre de usuario"
+    def clean(self):
+        super().clean()
+        if self.puntaje < 0:
+            raise ValidationError({'puntaje': 'El puntaje no puede ser negativo.'})
+        
+        if ((not self.username)|(self.username.strip() == "")):
+            raise ValidationError({'username': 'El nombre de usuario es requerido.'})
 
-        if not email or email.strip() == "":
-            errors["email"] = "Por favor ingrese un correo electrónico"
-
-        return errors
-
-    @classmethod
-    def new(cls, username, email, notification=None):
-        errors = cls.validate(username, email)
-        if errors:
-            return False, errors
-
-        cls.objects.create(username=username, email=email, notification=notification)
-        return True, None
-
-    def update(self, username=None, email=None, notification=None):
-        if username is not None:
-            self.username = username
-        if email is not None:
-            self.email = email
-        if notification is not None:
-            self.notification = notification
-        self.save()
+        if ((not self.email)|(self.email.strip() == "")):
+            raise ValidationError({'email': 'El correo electrónico es requerido.'})
 
 
 class Notification(models.Model):
