@@ -271,50 +271,81 @@ class Command(BaseCommand):
             user=cliente1,
             event=evento1,
             quantity=3,
-            total=4000,
+            total=15000,
             ticket_code=str(uuid.uuid4())
         )
         ticket2 = Ticket.objects.create(
             user=cliente1,
             event=evento4,
             quantity=2,
-            total=4000,
+            total=10000,
             ticket_code=str(uuid.uuid4())
         )
         ticket3 = Ticket.objects.create(
             user=cliente1,
             event=evento5,
             quantity=1,
-            total=4000,
+            total=5000,
             ticket_code=str(uuid.uuid4())
         )
         ticket4 = Ticket.objects.create(
             user=cliente2,
             event=evento4,
             quantity=2,
-            total=4000,
+            total=5000,
             ticket_code=str(uuid.uuid4())
         )
         ticket5 = Ticket.objects.create(
             user=cliente2,
             event=evento5,
             quantity=2,
-            total=4000,
+            total=10000,
             ticket_code=str(uuid.uuid4())
         )
 
         # Crear calificaciones
         Rating.objects.create(
+            title='Inolvidable',
             user=cliente1,
             event=evento4,
             rating=5,
             text="Un espectáculo inolvidable"
         )
         Rating.objects.create(
+            title='Chico',
             user=cliente2,
             event=evento4,
             rating=3,
             text="Mucha gente"
+        )
+
+
+        Comment.objects.create(
+            title=evento4,
+            text='¿Quién más va?',
+            user=cliente2,
+            created_at=date(2025, 6, 1),
+        )
+
+        Comment.objects.create(
+            title=evento2,
+            text='¿Cuándo es?',
+            user=cliente2,
+            created_at=date(2025, 6, 10),
+        )
+
+        Comment.objects.create(
+            title=evento3,
+            text='Puedo esperar',
+            user=cliente2,
+            created_at=date(2025, 6, 14),
+        )
+
+        Comment.objects.create(
+            title=evento1,
+            text="No puedo esperar",
+            user=cliente1,
+            created_at=date(2025, 6, 12),
         )
 
         self.stdout.write(self.style.SUCCESS('✅ Datos iniciales cargados correctamente.'))
