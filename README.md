@@ -41,7 +41,7 @@ git branch nombre-de-la-rama
 git checkout nombre-de-la-rama
 
 ## crear y cambiarse de rama
-git checkout -b nombre-de-la-rama
+git checkout -b nombre-de-la-rama 
 
 ## subir a una rama del repositorio
 git push -u origin nombre-de-la-rama
