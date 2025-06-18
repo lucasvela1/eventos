@@ -1,51 +1,68 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<style>
+  .btn-success-primary {
+    background-color: #007bff;
+    color: white !important;
+    border: none;
+  }
+
+  .btn-success-primary:hover {
+    background-color: #0f5cad;
+    color: white !important;
+  }
+
+  textarea.form-control {
+  border-radius: 1rem;
+  padding: 1rem;
+  resize: vertical;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+textarea.form-control:focus {
+  border-color: #e2ce18;
+  box-shadow: 0 0 0 0.2rem rgba(231, 220, 69, 0.25);
+}
+</style>
+
+
+
 <div class="container mt-4">
   <div class="row g-0 shadow rounded overflow-hidden" style="min-height: 400px;">
-    
+
     <!-- Columna izquierda: Texto del evento -->
     <div class="col-md-6 p-4 d-flex flex-column justify-content-between bg-white event-detail">
-        
-     <div class="event-info-modern">
-  <h3>{{ event.title }}</h3>
-  <p>{{ event.description }}</p>
 
-  <div class="event-date d-flex align-items-start mt-4">
-    <div class="icon-wrapper me-3">
-      <i class="bi bi-calendar-event"></i>
-    </div>
-    <div>
-      <h6>Fecha y Hora</h6>
-      <p>{{ event.date|date:"l, j \\d\\e F \\d\\e Y" }}</p>
-    </div>
-  </div>
-</div>
+      <div class="event-info-modern">
+        <h3>{{ event.title }}</h3>
+        <p>{{ event.description }}</p>
+
+        <div class="event-date d-flex align-items-start mt-4">
+          <div class="icon-wrapper me-3">
+            <i class="bi bi-calendar-event"></i>
+          </div>
+          <div>
+            <h6>Fecha y Hora</h6>
+            <p>{{ event.date|date:"l, j \\d\\e F \\d\\e Y" }}</p>
+          </div>
+        </div>
+      </div>
 
       <div class="mt-3">
         {% if user.is_authenticated %}
-            {% if user_can_rate%}
-              <a href="{% url 'crear_rating' event.id %}" class="btn btn-warning mb-2 w-100" style="background-color: #f5d376; font-weight: bold; border-radius: 2rem;">
-               Calificar este evento
-              </a>
-            {% else %}
-               {%if not user_has_ticket %}
-                 <p class ="text-muted">No podés calificar este evento porque no compraste entrada.</p>
-               {% elif not event_has_passed %}
-                 <p class ="text-muted">Este evento aún no ha ocurido. Podrás calificarlo cuando termine.</p>
-               {% else %}    
-                 <p class ="text-muted">Ya calificaste este evento.</p>
-               {% endif %}
-            {% endif %}  
-        {% else %}    
-          <p class="text-muted">Iniciá sesión para calificar este evento.</p>
-        {% endif %}
-        {% if not event_has_passed %} 
-          <a href="{% url 'carrito' event.id %}" class="btn btn-primary mb-2 w-100" style="font-weight: bold; border-radius: 2rem;">
-            Comprar Tickets
-          </a>
+        {% if user_can_rate%}
+        <a href="{% url 'crear_rating' event.id %}" class="btn btn-warning mb-2 w-100"
+          style="background-color: #f5d376; font-weight: bold; border-radius: 2rem;">
+          Calificar este evento
+        </a>
         {% else %}
-          <p class="text-muted">La venta de tickets para este evento ha finalizado.</p> 
+        {%if not user_has_ticket %}
+        <p class="text-muted">No podés calificar este evento porque no compraste entrada.</p>
+        {% elif not event_has_passed %}
+        <p class="text-muted">Este evento aún no ha ocurido. Podrás calificarlo cuando termine.</p>
+        {% else %}
+        <p class="text-muted">Ya calificaste este evento.</p>
         {% endif %}
         <a href="javascript:history.back()" class="btn btn-outline-secondary w-100" style="border-radius: 2rem;">Volver atrás</a>
       </div>
@@ -53,11 +70,58 @@
 
     <!-- Columna derecha: Imagen -->
     <div class="col-md-6">
-      <img src="{{ event.imagen_url_directa }}"
-           alt="{{ event.title }}"
-           class="img-fluid h-100 w-100"
-           style="object-fit: cover;">
+      <img src="{{ event.imagen_url_directa }}" alt="{{ event.title }}" class="img-fluid h-100 w-100"
+        style="object-fit: cover;">
     </div>
   </div>
+
+  <!-- ZONA DE COMENTARIOS -->
+  <div class="row g-0 p-4 mt-4 bg-white shadow rounded overflow-hidden " style="min-height: 400px;">
+    <div class="">
+      <h4>Comentarios</h4>
+
+      {% if user.is_authenticated %}
+        {% if tiene_ticket %}
+          <h3>Agregar comentario</h3>
+          <form method="post" class="mt-4">
+            {% csrf_token %}
+            <div class="mb-3">
+              {{ form.text.label_tag }}
+              {{ form.text }}
+              {% if form.text.errors %}
+                <div class="text-danger">{{ form.text.errors }}</div>
+              {% endif %}
+            </div>
+            <button type="submit" class="btn btn-success-primary mb-2" style="font-weight: bold; border-radius: 2rem;">
+              Enviar comentario
+            </button>
+          </form>
+        {% else %}
+          <div class="alert alert-warning">
+            Solo podés comentar si compraste un ticket para este evento.
+          </div>
+        {% endif %}
+      {% else %}
+        <p class="text-muted mt-3">Iniciá sesión para dejar un comentario.</p>
+      {% endif %}
+
+      {% if comments %}
+      {% for comment in comments %}
+      <div class="border rounded p-3 mb-3 bg-light">
+        <div class="d-flex justify-content-between">
+          <div>
+            <strong>{{ comment.user.username }}</strong>
+            <span class="text-muted small"> — {{ comment.created_at|date:"d/m/Y H:i" }}</span>
+          </div>
+        </div>
+        <p class="mt-2 mb-0">{{ comment.text }}</p>
+      </div>
+      {% endfor %}
+      {% else %}
+      <p class="text-muted">Aún no hay comentarios para este evento.</p>
+      {% endif %}
+    </div>
+  </div>
+
 </div>
 {% endblock %}

@@ -272,9 +272,6 @@ class Comment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )  
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) 
 
-    class Meta():
-        unique_together = ("user", "event") #Solo se permite un comentario por usuario y evento
-
 class Favorito(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False, related_name="favoritos_usuario")
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False, related_name="favoritos_evento")
