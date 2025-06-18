@@ -10,7 +10,9 @@
       <ul class="list-group">
         {% for evento in eventos %}
           <li class="list-group-item">
-            {{ evento.title }} – {{ evento.date }}
+            <a href="{% url 'event_detail' evento.id %}" style="text-decoration: none;">
+            {{ evento.title }}</a> 
+            – {{ evento.date|date:"d/m/Y" }}
           </li>
         {% endfor %}
       </ul>
