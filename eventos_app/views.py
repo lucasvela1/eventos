@@ -161,15 +161,18 @@ class CarritoView(LoginRequiredMixin, View):
     def get(self, request, event_id):
       event = Event.objects.get(id=event_id)
       tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+      vip_price = event.price * 1.25
       return render(request, "app/carrito.html", {
         "event": event,
         "tickets_restantes": tickets_restantes,
+        "tickets_vip": vip_price
     })
 
     def post(self, request, event_id):
        event = Event.objects.get(id=event_id)
-       cantidad = int(request.POST.get("cantidad", 1))
-
+       cantidad_general = int(request.POST.get("cantidad_general", 0))
+       cantidad_vip = int(request.POST.get("cantidad_vip", 0))
+       cantidad = cantidad_general + cantidad_vip
        if cantidad < 1:
          return redirect("carrito", event_id=event_id)
        #Por más que en el html no aparezca para poner menos a 0, o 0. Se puede manipular y enviar de alguna forma
@@ -178,7 +181,6 @@ class CarritoView(LoginRequiredMixin, View):
        with transaction.atomic():
            capacidad_libre = event.venue.capacity - event.capacidad_ocupada
            if cantidad > capacidad_libre:
-                #messages.error(self.request, f"Hay {capacidad_libre} tickets restantes para este event.")
                 return redirect("carrito", event_id=event_id)
            
        event.capacidad_ocupada+=cantidad
@@ -191,7 +193,6 @@ class CarritoView(LoginRequiredMixin, View):
             ticket_code=str(uuid.uuid4())
         ) 
 
-       #messages.success(self.request, f"{cantidad} ticket(s) comprados correctamente.")
        Notification.objects.create(
            user=request.user,
            title="Ticket comprado",
