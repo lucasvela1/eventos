@@ -20,7 +20,7 @@
         <tbody>
             {% for favorito in favoritos%}
                 <tr>
-                    <td>{{ favorito.event.title }}</td>
+                    <td><a href="{%url 'event_detail' favorito.event.id%}" style = "text-decoration: none;">{{ favorito.event.title }} </a></td>
                     <td>{{ favorito.event.description }}</td>
                     <td>{{ favorito.event.date|date:"d/m/Y" }}</td>
                     <td>
