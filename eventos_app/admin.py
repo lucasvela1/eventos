@@ -319,6 +319,12 @@ class RatingAdmin(admin.ModelAdmin):
             return True
         return False
 
+
+class FavoritoAdmin(admin.ModelAdmin):
+    list_display = ['event','user']
+    search_fields = ['user','event']
+    list_filter = ['user', 'event']
+  
 # Registrar los modelos
 admin.site.register(Event, EventAdmin)
 admin.site.register(Comment, CommentAdmin)
@@ -328,6 +334,6 @@ admin.site.register(Venue, VenueAdmin)
 admin.site.register(RefundRequest, RefundRequestAdmin)
 admin.site.register(Ticket, TicketAdmin)
 admin.site.register(Rating, RatingAdmin)
-admin.site.register(Favorito)
+admin.site.register(Favorito, FavoritoAdmin)
 admin.site.register(Notification, NotificationAdmin)
 
