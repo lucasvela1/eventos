@@ -8,6 +8,8 @@ from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.db.models import Avg
 
+from django.core.exceptions import ValidationError
+
 class Category(models.Model):
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
