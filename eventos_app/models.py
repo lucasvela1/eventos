@@ -2,6 +2,11 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser #para heredar el usuario definido en Django
 from django.utils.timezone import now
 from datetime import timedelta
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+
+from django.core.exceptions import ValidationError
+from django.db.models import Avg
 
 from django.core.exceptions import ValidationError
 
@@ -183,6 +188,17 @@ class Rating(models.Model):
     
     class Meta():
         unique_together = ("user", "event")
+
+#calcular el puntaje de un evento.
+@receiver([post_save, post_delete], sender=Rating)
+def update_event_rating(sender, instance, **kwargs):
+    event = instance.event
+    avg = event.rating_set.aggregate(avg=Avg('rating'))['avg']
+    if avg:
+        event.total_rating = max(0, min(5, round(avg)))  # redondeado entre 0 y 5
+    else:
+        event.total_rating = 0  # sin calificación
+        event.save()
 
 class Comment(models.Model):
     title = models.CharField(max_length=200)

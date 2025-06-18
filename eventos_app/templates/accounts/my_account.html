@@ -128,11 +128,20 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ evento.title }}</td>
                     <td>{{ evento.date|date:"d/m/Y" }}</td>
-                    <td>{% if evento.user_rating %}
-                        {{ evento.user_rating.0.score }} ⭐
+                    <td>
+                        {% if evento.total_rating > 0 %}
+                            <div class="text-warning fs-5">
+                            {% for i in "12345" %}
+                                {% if forloop.counter <= evento.total_rating %}
+                                <i class="bi bi-star-fill"></i>
+                                {% else %}
+                                <i class="bi bi-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                            </div>
                         {% else %}
-                        Sin calificación
-                        {% endif %}
+                            Sin calificación
+                        {% endif %}    
                     </td>
                     <td>
                         <a href="{% url 'event_detail' evento.id %}" class="btn btn-sm btn-outline-primary me-1"
@@ -143,6 +152,11 @@
                         <a href="{% url 'editar_rating' evento.user_rating.0.id %}"
                             class="btn btn-sm btn-outline-warning" title="Modificar calificación">
                             <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'eliminar_rating' evento.user_rating.0.id %}" 
+                            class="btn btn-sm btn-outline-danger" 
+                            title="Eliminar calificación">
+                            <i class="bi bi-trash"></i>
                         </a>
                     </td>
                 </tr>

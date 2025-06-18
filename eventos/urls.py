@@ -23,7 +23,7 @@ from eventos_app.views import RegisterView
 
 urlpatterns = [
     path("", include("eventos_app.urls")),
-    path('admin/', admin.site.urls),  # <--- Esta línea agrega el panel de administración
+    path('nuncalodescribiras/', admin.site.urls),  # <--- Esta línea agrega el panel de administración
     path("accounts/login/", auth_views.LoginView.as_view(template_name="accounts/login.html"), name="login"),
     path("accounts/logout/", auth_views.LogoutView.as_view(next_page="/"), name="logout"),
     path("accounts/register/", RegisterView.as_view(), name="register"),
