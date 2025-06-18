@@ -6,6 +6,7 @@ from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 from django.core.exceptions import ValidationError
+from django.db.models import Avg
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -190,7 +191,7 @@ class Rating(models.Model):
 @receiver([post_save, post_delete], sender=Rating)
 def update_event_rating(sender, instance, **kwargs):
     event = instance.event
-    avg = event.ratings.aggregate(avg=Avg('rating'))['avg']
+    avg = event.rating_set.aggregate(avg=Avg('rating'))['avg']
     if avg:
         event.total_rating = max(0, min(5, round(avg)))  # redondeado entre 0 y 5
     else:
