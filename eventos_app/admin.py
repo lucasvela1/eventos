@@ -259,9 +259,9 @@ class RefundRequestAdmin(admin.ModelAdmin):
 
 
 class TicketAdmin(admin.ModelAdmin):
-    list_display = ['event', 'user', 'quantity', 'total', 'buy_date', 'ticket_code']
+    list_display = ['event', 'user','type', 'quantity', 'total', 'buy_date', 'ticket_code']
     search_fields = ['event__title', 'user__username']
-    list_filter = ['event', 'buy_date']
+    list_filter = ['event', 'buy_date','type']
     ordering = ['-buy_date']
 
     def has_change_permission(self, request, obj=None):
