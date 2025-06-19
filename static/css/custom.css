@@ -1,12 +1,20 @@
 /* custom.css */
 
-.navbar-dark .nav-link {
+.navbar-dark .navbar-nav .nav-link {
   color: #ffffff !important;
-  font-weight: 700;
-  letter-spacing: 0.05em;
+  font-weight: 400 !important;
+  font-size: 0.95rem !important;
+  letter-spacing: normal !important;
   padding-left: 1rem !important;
   padding-right: 1rem !important;
 }
+
+
+.navbar-brand img {
+  height: 50px;
+  width: auto;
+}
+
 
 .navbar-nav .nav-item {
   margin-left: 0.5rem;
@@ -19,10 +27,29 @@
   text-decoration: underline;
 }
 .navbar {
-  padding-top: 1.5rem !important;
-  padding-bottom: 1.5rem !important;
-  min-height: 80px;
+  padding-top: 0.6rem !important;
+  padding-bottom: 0.2rem !important;
+  min-height: 56px; /* altura mínima Bootstrap por defecto */
 }
+.navbar .btn-navbar {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.85rem;
+  border-radius: 1.5rem;
+  font-weight: 500;
+  height: 36px;
+  line-height: 1.2;
+}
+
+.btn-navbar {
+  padding: 0.25rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: 1.25rem;
+  font-weight: 500;
+  line-height: 1;
+  height: auto;
+}
+
+
 footer.footer {
     background-color: #212529; /* igual que navbar-dark bg-dark */
     padding: 1rem 0;
