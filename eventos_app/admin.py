@@ -19,7 +19,7 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ['categoria', 'venue', 'cancelado']
     list_per_page = 10
     ordering = ['-date']
-
+    list_per_page = 10
     actions = ['cancelar_eventos', 'habilitar_eventos','duplicar_eventos'] #Donde metermos las acciones personalizadas del evento
     
     def duplicar_eventos(self,request, queryset):
@@ -263,6 +263,7 @@ class TicketAdmin(admin.ModelAdmin):
     search_fields = ['event__title', 'user__username']
     list_filter = ['event', 'buy_date','type']
     ordering = ['-buy_date']
+    list_per_page= 10
 
     def has_change_permission(self, request, obj=None):
         if request.user.is_superuser:
