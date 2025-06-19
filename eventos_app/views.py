@@ -8,9 +8,11 @@ from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView, UpdateView
 from django.utils.timezone import now
+from django.utils import timezone
 from django.db.models import Q, Avg
 import uuid
 from django.db.models import Prefetch
+
 
 from django.db import models
 from datetime import timedelta
@@ -76,13 +78,20 @@ class EventDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         event = self.get_object()
         user = self.request.user
-
+        event_has_passed = event.date < timezone.now().date()
+        context['event_has_passed'] = event_has_passed
         context['comments'] = Comment.objects.filter(event = event).order_by('-created_at')
         context['form'] = CommentForm()
+
         if user.is_authenticated:
+            tiene_ticket = Ticket.objects.filter(user=user, event=event).exists()
             context['tiene_ticket'] = Ticket.objects.filter(user=user, event=event).exists()
+            ha_calificado = Rating.objects.filter(user=user, event=event).exists()
+            user_can_rate = tiene_ticket and event_has_passed and not ha_calificado
+            context['user_can_rate'] = user_can_rate
         else:
             context['tiene_ticket'] = False
+            context['user_can_rate'] = False
         return context
     
     def post(self, request, *args, **kwargs):
