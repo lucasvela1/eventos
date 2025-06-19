@@ -18,7 +18,7 @@ from django.db import models
 from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm, CommentForm
 from django.db import transaction
-from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type
 from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating
 
 
@@ -173,39 +173,67 @@ class CarritoView(LoginRequiredMixin, View):
 
     def get(self, request, event_id):
         event = Event.objects.get(id=event_id)
+        precio_vip = event.price * 1.25
         tickets_restantes = event.venue.capacity - event.capacidad_ocupada
         return render(request, "app/carrito.html", {
             "event": event,
             "tickets_restantes": tickets_restantes,
+            "tickets_vip": precio_vip,
         })
 
     def post(self, request, event_id):
         event = Event.objects.get(id=event_id)
         cantidad = int(request.POST.get("cantidad", 1))
 
-        if cantidad < 1:
+        try:
+            cantidad_general = int(request.POST.get("cantidad_general", 0))
+            cantidad_vip = int(request.POST.get("cantidad_vip", 0))
+        except (ValueError, TypeError):
+            messages.error(request, "Por favor, introduce un número válido de tickets.")
             return redirect("carrito", event_id=event_id)
 
+        total_cantidad_comprada = cantidad_general + cantidad_vip
+
+        if total_cantidad_comprada <= 0:
+            messages.error(request, "Debes seleccionar al menos un ticket para comprar.")
+            return redirect("carrito", event_id=event_id)
+
+        precio_vip = event.price * 1.25
+
         with transaction.atomic():
-            capacidad_libre = event.venue.capacity - event.capacidad_ocupada
-            if cantidad > capacidad_libre:
+            event_a_actualizar = Event.objects.select_for_update().get(id=event_id)
+            
+            capacidad_libre = event_a_actualizar.venue.capacity - event_a_actualizar.capacidad_ocupada
+            if total_cantidad_comprada > capacidad_libre:
+                messages.error(request, f"No hay suficientes tickets. Solo quedan {capacidad_libre} disponibles.")
                 return redirect("carrito", event_id=event_id)
+            event_a_actualizar.capacidad_ocupada += total_cantidad_comprada
+            event_a_actualizar.save()
+            #Por como esta hecho, crea dos tickets, uno general y otro vip con sus cantidades, si se compran ambos tipos
+            if cantidad_general > 0:
+                Ticket.objects.create(
+                    user=request.user,
+                    event=event_a_actualizar,
+                    quantity=cantidad_general,
+                    type=Type.general,  
+                    total=cantidad_general * event_a_actualizar.price,
+                    ticket_code=f"GEN-{uuid.uuid4()}" # Código único con prefijo GEN para diferenciar de los vips
+                )
 
-            event.capacidad_ocupada += cantidad
-            event.save()
-
-            Ticket.objects.create(
-                user=request.user,
-                event=event,
-                quantity=cantidad,
-                total=cantidad * event.price,
-                ticket_code=str(uuid.uuid4())
-            )
+            if cantidad_vip > 0:
+                Ticket.objects.create(
+                    user=request.user,
+                    event=event_a_actualizar,
+                    quantity=cantidad_vip,
+                    type=Type.vip,  
+                    total=cantidad_vip * precio_vip,
+                    ticket_code=f"VIP-{uuid.uuid4()}" # Código único con prefijo VIP para diferenciar de los generales
+                )
 
             Notification.objects.create(
                 user=request.user,
                 title="Ticket comprado",
-                message=f"Se ha comprado exitosamente {cantidad} ticket/s para {event.title}",
+                message=f"Compraste {total_cantidad_comprada} ticket/s para {event_a_actualizar.title}.",
                 priority="MEDIUM"
             )
 
