@@ -113,16 +113,20 @@ class NotificationListView(LoginRequiredMixin, ListView):
             When(priority='HIGH', then=Value(1)),
             When(priority='MEDIUM', then=Value(2)),
             When(priority='LOW', then=Value(3)),
-            default=Value(4), # Para cualquier otro valor o si es None
+            default=Value(4),
             output_field=IntegerField(),
         )
-        return Notification.objects.filter(user=self.request.user).order_by(priority_order, "-created_at") 
-         #filtrar notificaciones por usuario
-         # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+        
+        queryset = Notification.objects.filter(user=self.request.user).order_by(priority_order, "-created_at")
+        
+        queryset.filter(read=False).update(read=True)
+        return queryset
+    
+class EliminarNotificacionesSeleccionadasView(LoginRequiredMixin, View):
+    def post(self, request):
+        ids_a_eliminar = request.POST.getlist("notificaciones")
+        Notification.objects.filter(user=request.user, id__in=ids_a_eliminar).delete()
+        return redirect("notifications")
     
 class FavoritosListView(LoginRequiredMixin, ListView):
     model = Favorito
@@ -159,47 +163,45 @@ class CarritoView(LoginRequiredMixin, View):
     login_url = "/accounts/login/"
 
     def get(self, request, event_id):
-      event = Event.objects.get(id=event_id)
-      tickets_restantes = event.venue.capacity - event.capacidad_ocupada
-      vip_price = event.price * 1.25
-      return render(request, "app/carrito.html", {
-        "event": event,
-        "tickets_restantes": tickets_restantes,
-        "tickets_vip": vip_price
-    })
+        event = Event.objects.get(id=event_id)
+        tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+        return render(request, "app/carrito.html", {
+            "event": event,
+            "tickets_restantes": tickets_restantes,
+        })
 
     def post(self, request, event_id):
-       event = Event.objects.get(id=event_id)
-       cantidad_general = int(request.POST.get("cantidad_general", 0))
-       cantidad_vip = int(request.POST.get("cantidad_vip", 0))
-       cantidad = cantidad_general + cantidad_vip
-       if cantidad < 1:
-         return redirect("carrito", event_id=event_id)
-       #Por más que en el html no aparezca para poner menos a 0, o 0. Se puede manipular y enviar de alguna forma
-       #un valor que no corresponde, por eso con esto validamos en nuestra parte "backend"
-       
-       with transaction.atomic():
-           capacidad_libre = event.venue.capacity - event.capacidad_ocupada
-           if cantidad > capacidad_libre:
-                return redirect("carrito", event_id=event_id)
-           
-       event.capacidad_ocupada+=cantidad
-       event.save()
-       Ticket.objects.create(
-            user=request.user,
-            event=event,
-            quantity=cantidad,
-            total=cantidad * event.price,
-            ticket_code=str(uuid.uuid4())
-        ) 
+        event = Event.objects.get(id=event_id)
+        cantidad = int(request.POST.get("cantidad", 1))
 
-       Notification.objects.create(
-           user=request.user,
-           title="Ticket comprado",
-           message=f"Se ha comprado exitosamente {cantidad} ticket/s para {event.title}",
-           priority="MEDIUM"
-       )
-       return redirect("my_account")
+        if cantidad < 1:
+            return redirect("carrito", event_id=event_id)
+
+        with transaction.atomic():
+            capacidad_libre = event.venue.capacity - event.capacidad_ocupada
+            if cantidad > capacidad_libre:
+                return redirect("carrito", event_id=event_id)
+
+            event.capacidad_ocupada += cantidad
+            event.save()
+
+            Ticket.objects.create(
+                user=request.user,
+                event=event,
+                quantity=cantidad,
+                total=cantidad * event.price,
+                ticket_code=str(uuid.uuid4())
+            )
+
+            Notification.objects.create(
+                user=request.user,
+                title="Ticket comprado",
+                message=f"Se ha comprado exitosamente {cantidad} ticket/s para {event.title}",
+                priority="MEDIUM"
+            )
+
+        return redirect("my_account")
+
 
 class RegisterView(FormView):
     template_name = "accounts/register.html"
