@@ -273,7 +273,7 @@ class Command(BaseCommand):
             price=2000,
             categoria=arte,
             venue=centro_cultural_recoleta,
-            id_img="1V3artTfK8b7sKzqHURZr6Ye_UrbxMnPo",  # ID ficticio
+            id_img="1W-x-SLeRbBxqEutP5cX9uAiSBf7I1Rbc", 
             total_rating=3,
             suma_puntaje=False,
             cantidad_puntos=0,
@@ -287,7 +287,7 @@ class Command(BaseCommand):
             price=3500,
             categoria=deporte,
             venue=estadio_polideportivo,
-            id_img="1ZpolYVleyTornNatC0mpMdp000000000",  # ID ficticio
+            id_img="1HAco7rRERivRSY8XL4s91_HWLdWou-HT",  
             total_rating=5,
             suma_puntaje=False,
             cantidad_puntos=0,
@@ -301,7 +301,7 @@ class Command(BaseCommand):
             price=1500,
             categoria=pelicula,
             venue=teatro_radio_city,
-            id_img="1cinLatAmSeriesQwE7RbQ0ccCineLat",  # ID ficticio
+            id_img="19hohVUqx6A0o5EkS-nPPK6hfrJklZF86",  
             total_rating=0,
             suma_puntaje=True,
             cantidad_puntos=0,
