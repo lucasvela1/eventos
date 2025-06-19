@@ -17,6 +17,7 @@
                     <th>#</th>
                     <th>Evento</th>
                     <th>Fecha</th>
+                    <th>Tipo</th>
                     <th>Cantidad</th>
                     <th>Precio total</th>
                     <th>Acciones</th>
@@ -28,6 +29,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ ticket.event.title }}</td>
                     <td>{{ ticket.event.date|date:"d/m/Y" }}</td>
+                    <td>{{ ticket.type}}</td>
                     <td>{{ ticket.quantity }}</td>
                     <td>${{ ticket.total }}</td>
                     <td>
