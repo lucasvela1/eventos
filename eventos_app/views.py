@@ -1,12 +1,12 @@
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormView, UpdateView, DeleteView
 from django.utils.timezone import now
 from django.utils import timezone
 from django.db.models import Q, Avg
@@ -110,6 +110,27 @@ class EventDetailView(DetailView):
         context = self.get_context_data()
         context['form'] = form
         return self.render_to_response(context)
+
+class CommentEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Comment
+    fields = ['text']
+    template_name = 'app/edit_comment.html'
+
+    def get_success_url(self):
+        return reverse_lazy('event_detail', kwargs={'pk': self.object.event.pk})
+
+    def test_func(self):
+        return self.request.user == self.get_object().user
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'app/delete_comment.html'
+
+    def get_success_url(self):
+        return reverse_lazy('event_detail', kwargs={'pk': self.get_object().event.pk})
+
+    def test_func(self):
+        return self.request.user == self.get_object().user
 
 
 class NotificationListView(LoginRequiredMixin, ListView):
