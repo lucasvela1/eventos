@@ -201,7 +201,6 @@ class Command(BaseCommand):
             description="Banda en vivo tocando grandes éxitos",
             date=date(2025, 7, 1),
             price=5000,
-            categoria=musica,
             venue=luna_park,
             id_img="18IJBal9GtJJDCs5pmYkCEcZ-LyVvO78i",
             total_rating=0,        
@@ -209,13 +208,13 @@ class Command(BaseCommand):
             cantidad_puntos=0,     
             cancelado=False        
         )
+        evento1.categorias.add(musica)
         
         evento2= Event.objects.create(
             title="Conferencia de Inteligencia Artificial",
             description="Charlas de expertos en IA",
             date=date(2025, 8, 15),
             price=8000,
-            categoria=tecnologia, 
             venue=teatro_colon,
             id_img="1ep9auYAfIXmRqNUWx1zRmLvhjmbjuqQH",
             total_rating=0,
@@ -223,13 +222,13 @@ class Command(BaseCommand):
             cantidad_puntos=0,
             cancelado=False
         )
+        evento2.categorias.add(tecnologia)
         
         evento3= Event.objects.create(
             title="Obra de Teatro: Hamlet",
             description="Una puesta clásica del drama de Shakespeare",
             date=date(2025, 6, 20),
             price=3000,
-            categoria=teatro,
             venue=teatro_colon,
             id_img="1FXlSy1jON88Wd2Pa3-uRbFVo9JzdaMXD",
             total_rating=0,
@@ -237,13 +236,13 @@ class Command(BaseCommand):
             cantidad_puntos=0,
             cancelado=False
         )
+        evento3.categorias.add(teatro)
 
         evento4= Event.objects.create(
             title="Conferencia sobre Biodiversidad",
             description="El doctor José Hernandez nos presenta su tesis sobre biodiversidad",
             date=date(2025, 6, 11),
             price=5000,
-            categoria=conferencia,
             venue=luna_park,
             id_img="17im6Xdq54mv5JHEeaCot5EIBjWBdiXyR",
             total_rating=0,        
@@ -251,13 +250,13 @@ class Command(BaseCommand):
             cantidad_puntos=0,     
             cancelado=False        
         )
+        evento4.categorias.add(conferencia)
 
         evento5= Event.objects.create(
             title="Concierto de Abel Pintos",
             description="Abel Pintos en vivo tocando grandes éxitos",
             date=date(2025, 10, 1),
             price=5000,
-            categoria=musica,
             venue=luna_park,
             id_img="1U3dTrrNGjZpFnAe9oAeYSJSFSohGolo3",
             total_rating=0,        
@@ -265,13 +264,13 @@ class Command(BaseCommand):
             cantidad_puntos=0,     
             cancelado=False        
         )
+        evento5.categorias.add(musica)
 
         evento6 = Event.objects.create(
             title="Festival Arte Urbano",
             description="Exposición de arte callejero con intervenciones en vivo.",
             date=date(2025, 6, 5),
             price=2000,
-            categoria=arte,
             venue=centro_cultural_recoleta,
             id_img="1W-x-SLeRbBxqEutP5cX9uAiSBf7I1Rbc", 
             total_rating=3,
@@ -279,13 +278,13 @@ class Command(BaseCommand):
             cantidad_puntos=0,
             cancelado=False
         )
+        evento6.categorias.add(arte)
 
         evento7 = Event.objects.create(
             title="Torneo Nacional de Vóley",
             description="Los mejores equipos del país compiten en Mar del Plata.",
             date=date(2025, 4, 20),
             price=3500,
-            categoria=deporte,
             venue=estadio_polideportivo,
             id_img="1HAco7rRERivRSY8XL4s91_HWLdWou-HT",  
             total_rating=5,
@@ -293,13 +292,13 @@ class Command(BaseCommand):
             cantidad_puntos=0,
             cancelado=False
         )
+        evento7.categorias.add(deporte)
 
         evento8 = Event.objects.create(
             title="Ciclo de Cine Latinoamericano",
             description="Proyección de películas destacadas de cine independiente.",
             date=date(2025, 5, 18),
             price=1500,
-            categoria=pelicula,
             venue=teatro_radio_city,
             id_img="19hohVUqx6A0o5EkS-nPPK6hfrJklZF86",  
             total_rating=0,
@@ -307,6 +306,7 @@ class Command(BaseCommand):
             cantidad_puntos=0,
             cancelado=False
         )
+        evento8.categorias.add(pelicula)
 
         # Crear tickets comprados por clientes
         ticket1 = Ticket.objects.create(

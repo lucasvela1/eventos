@@ -16,25 +16,45 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ['title', 'date','venue','price','cancelado']
     list_editable = ['price', 'date', 'cancelado']
     search_fields =['title', 'description']
-    list_filter = ['categoria', 'venue', 'cancelado']
+    list_filter = ['categorias', 'venue', 'cancelado']
     list_per_page = 10
     ordering = ['-date']
     list_per_page = 10
     actions = ['cancelar_eventos', 'habilitar_eventos','duplicar_eventos'] #Donde metermos las acciones personalizadas del evento
+
+    def display_categorias(self, obj):
+        return ", ".join([categoria.name for categoria in obj.categorias.all()])
+    display_categorias.short_description = 'Categorías'
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'categorias' in form.base_fields:
+            form.base_fields['categorias'].widget.can_add_related = False
+        if 'venue' in form.base_fields:
+            form.base_fields['venue'].widget.can_add_related = False
+            form.base_fields['venue'].widget.can_change_related = False
+            form.base_fields['venue'].widget.can_delete_related = False
+            form.base_fields['venue'].widget.can_view_related = False
+        return form #Todo eso se agrega para que no se puedan cambiar cosas de las venues o categorias desde el formulario de eventos
+    
+
+
     
     def duplicar_eventos(self,request, queryset):
         for event in queryset: #Por cada evento seleccionad le creamos una copia, para que sea más comodo la creacion de un nuevo evento
+            categorias_originales = list(event.categorias.all())
             nuevo_evento = Event.objects.create(
                 title = f"{event.title} (Copia)",
                 description = event.description,
                 date = event.date,
                 price = event.price,
-                categoria = event.categoria,
                 venue = event.venue,
                 id_img = event.id_img,
                 cancelado = False,
                 capacidad_ocupada = 0,
             )
+            if categorias_originales:
+                nuevo_evento.categorias.set(categorias_originales)
           
     def cancelar_eventos(self, request, queryset):
         eventos_actualizados = queryset.update(cancelado=True)
@@ -75,6 +95,20 @@ class CommentAdmin(admin.ModelAdmin):
 
     def has_add_permission(self, request):
         return request.user.is_superuser
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'user' in form.base_fields:
+            form.base_fields['user'].widget.can_add_related = False
+            form.base_fields['user'].widget.can_change_related = False
+            form.base_fields['user'].widget.can_delete_related = False
+            form.base_fields['user'].widget.can_view_related = False
+        if 'event' in form.base_fields:
+            form.base_fields['event'].widget.can_add_related = False
+            form.base_fields['event'].widget.can_change_related = False
+            form.base_fields['event'].widget.can_delete_related = False
+            form.base_fields['event'].widget.can_view_related = False
+        return form  # Esto evita que se puedan agregar o cambiar usuarios desde el formulario de comentarios    
 
     def has_delete_permission(self, request, obj=None):
         return True
@@ -145,6 +179,15 @@ class NotificationAdmin(admin.ModelAdmin):
     ordering = ['read','-created_at']    
     actions = ['marcar_como_leida', 'marcar_como_no_leida']
     
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'user' in form.base_fields:
+            form.base_fields['user'].widget.can_add_related = False
+            form.base_fields['user'].widget.can_change_related = False
+            form.base_fields['user'].widget.can_delete_related = False
+            form.base_fields['user'].widget.can_view_related = False
+        return form  # Esto evita que se puedan agregar o cambiar usuarios desde el formulario de notificaciones    
+
     def marcar_como_leida(self, request, queryset):
         queryset.update(read=True)
         self.message_user(request, "Notificaciones marcadas como leídas.")
@@ -199,6 +242,20 @@ class RefundRequestAdmin(admin.ModelAdmin):
                 read=False,
             )
             self.message_user(request, f"Solicitud de reembolso aprobada para {refund.user.username}.")
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'user' in form.base_fields:
+            form.base_fields['user'].widget.can_add_related = False
+            form.base_fields['user'].widget.can_change_related = False
+            form.base_fields['user'].widget.can_delete_related = False
+            form.base_fields['user'].widget.can_view_related = False
+        if 'ticket_code' in form.base_fields:
+            form.base_fields['ticket_code'].widget.can_add_related = False
+            form.base_fields['ticket_code'].widget.can_change_related = False
+            form.base_fields['ticket_code'].widget.can_delete_related = False
+            form.base_fields['ticket_code'].widget.can_view_related = False
+        return form  # Esto evita que se puedan agregar o cambiar usuarios desde el formulario de solicitudes de reembolso            
 
     def rechazar_solicitud(self, request, queryset):
         for refund in queryset:
@@ -270,6 +327,21 @@ class TicketAdmin(admin.ModelAdmin):
             return True
         return False
     
+
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'event' in form.base_fields:
+            form.base_fields['event'].widget.can_add_related = False
+            form.base_fields['event'].widget.can_change_related = False
+            form.base_fields['event'].widget.can_delete_related = False
+            form.base_fields['event'].widget.can_view_related = False
+            form.base_fields['user'].widget.can_add_related = False
+            form.base_fields['user'].widget.can_change_related = False
+            form.base_fields['user'].widget.can_delete_related = False
+            form.base_fields['user'].widget.can_view_related = False
+        return form
+
+
     def has_add_permission(self, request):
         return request.user.is_superuser
     
@@ -312,6 +384,20 @@ class RatingAdmin(admin.ModelAdmin):
     def has_delete_permission(self, request, obj=None):
         return request.user.is_superuser
     
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'user' in form.base_fields:
+            form.base_fields['user'].widget.can_add_related = False
+            form.base_fields['user'].widget.can_change_related = False
+            form.base_fields['user'].widget.can_delete_related = False
+            form.base_fields['user'].widget.can_view_related = False
+        if 'event' in form.base_fields:
+            form.base_fields['event'].widget.can_add_related = False
+            form.base_fields['event'].widget.can_change_related = False
+            form.base_fields['event'].widget.can_delete_related = False
+            form.base_fields['event'].widget.can_view_related = False
+        return form
+    
     def has_add_permission(self, request):
         return request.user.is_superuser
     
@@ -325,6 +411,20 @@ class FavoritoAdmin(admin.ModelAdmin):
     list_display = ['event','user']
     search_fields = ['user','event']
     list_filter = ['user', 'event']
+    
+    def get_form(self, request, obj=None, **kwargs):
+        form = super().get_form(request, obj, **kwargs)
+        if 'user' in form.base_fields:
+            form.base_fields['user'].widget.can_add_related = False
+            form.base_fields['user'].widget.can_change_related = False
+            form.base_fields['user'].widget.can_delete_related = False
+            form.base_fields['user'].widget.can_view_related = False
+        if 'event' in form.base_fields:
+            form.base_fields['event'].widget.can_add_related = False
+            form.base_fields['event'].widget.can_change_related = False
+            form.base_fields['event'].widget.can_delete_related = False
+            form.base_fields['event'].widget.can_view_related = False
+        return form
   
 # Registrar los modelos
 admin.site.register(Event, EventAdmin)

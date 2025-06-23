@@ -40,8 +40,8 @@ class HomeView(TemplateView):
                 context['events_proximos'] = Event.objects.filter(
                     date__gte=now().date(),
                     cancelado=False,
-                    categoria=category
-                ).order_by("date") #Los ordenamos por su fecha
+                    categorias=category
+                ).order_by("date").distinct() #Los ordenamos por su fecha
                 context['selected_category'] = category #Se envia la categoría seleccionada al template
             except:
                 #Si surge un error al obtener la categoría, se obtienen los eventos próximos sin filtrar
