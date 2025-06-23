@@ -124,6 +124,12 @@ textarea.form-control:focus {
             <strong>{{ comment.user.username }}</strong>
             <span class="text-muted small"> — {{ comment.created_at|date:"d/m/Y H:i" }}</span>
           </div>
+          {% if user == comment.user %}
+            <div>
+              <a href="{% url 'editar_comentario' comment.pk%}" class="btn btn-sm btn-outline-primary">Editar</a>
+              <a href="{% url 'eliminar_comentario' comment.pk%}" class="btn btn-sm btn-outline-primary">Eliminar</a>
+            </div>
+          {% endif %}
         </div>
         <p class="mt-2 mb-0">{{ comment.text }}</p>
       </div>
