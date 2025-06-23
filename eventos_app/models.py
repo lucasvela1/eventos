@@ -65,7 +65,7 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     total_rating = models.PositiveIntegerField(default=0)
-    categoria = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    categorias = models.ManyToManyField(Category, blank=True, related_name='events')
     venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=False)
     suma_puntaje=models.BooleanField(default=False)
     cantidad_puntos=models.PositiveIntegerField(default=0)

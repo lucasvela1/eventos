@@ -16,25 +16,31 @@ class EventAdmin(admin.ModelAdmin):
     list_display = ['title', 'date','venue','price','cancelado']
     list_editable = ['price', 'date', 'cancelado']
     search_fields =['title', 'description']
-    list_filter = ['categoria', 'venue', 'cancelado']
+    list_filter = ['categorias', 'venue', 'cancelado']
     list_per_page = 10
     ordering = ['-date']
     list_per_page = 10
     actions = ['cancelar_eventos', 'habilitar_eventos','duplicar_eventos'] #Donde metermos las acciones personalizadas del evento
+
+    def display_categorias(self, obj):
+        return ", ".join([categoria.name for categoria in obj.categorias.all()])
+    display_categorias.short_description = 'Categorías'
     
     def duplicar_eventos(self,request, queryset):
         for event in queryset: #Por cada evento seleccionad le creamos una copia, para que sea más comodo la creacion de un nuevo evento
+            categorias_originales = list(event.categorias.all())
             nuevo_evento = Event.objects.create(
                 title = f"{event.title} (Copia)",
                 description = event.description,
                 date = event.date,
                 price = event.price,
-                categoria = event.categoria,
                 venue = event.venue,
                 id_img = event.id_img,
                 cancelado = False,
                 capacidad_ocupada = 0,
             )
+            if categorias_originales:
+                nuevo_evento.categorias.set(categorias_originales)
           
     def cancelar_eventos(self, request, queryset):
         eventos_actualizados = queryset.update(cancelado=True)
