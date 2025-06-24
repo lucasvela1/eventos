@@ -57,7 +57,21 @@ class EventListView(ListView):
 
     def get_queryset(self): #Pasarle una lista distinta al context
         today = now().date()
-        return Event.objects.filter(date__gte=today, cancelado=False).order_by("date")
+        user = self.request.user
+        queryset = Event.objects.filter(date__gte=today, cancelado=False).order_by("date")
+        if user.is_authenticated: #para obtener los eventos favoritos del usuario autenticado
+            favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
+            queryset = queryset.annotate(
+                is_favorito=Case(
+                    When(pk__in=list(favoritos_ids), then=Value(1)),
+                    default=Value(0), #Si el evento no es favorito, asigna 0
+                    output_field=IntegerField()
+                )
+            )            
+            return queryset.order_by('-is_favorito', 'date') #Se ordena por favoritos y luego por fecha
+        else:
+            # Si no está autenticado, solo ordenamos por fecha
+            return queryset.order_by('date')
 
     def get_context_data(self, **kwargs):  #Llamo al context data del padre, me traigo todos los objetos de event
         context = super().get_context_data(**kwargs)
