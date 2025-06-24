@@ -36,9 +36,9 @@
                                 {% if user.is_authenticated %}
                                      <a href="{% url 'toggle_favorito' event.id %}"
                                         class="btn btn-sm btn-outline-danger"
-                                        aria-label="{% if event.id in favoritos_ids %}Quitar de favoritos{% else %}Marcar como favorito{% endif %}"
-                                        title="{% if event.id in favoritos_ids %}Quitar de favoritos{% else %}Marcar como favorito{% endif %}">
-                                        <i class="bi bi-heart{% if event.id in favoritos_ids %}-fill text-danger{% endif %}" aria-hidden="true"></i>
+                                        aria-label="{% if event.is_favorito %}Quitar de favoritos{% else %}Marcar como favorito{% endif %}"
+                                        title="{% if event.is_favorito %}Quitar de favoritos{% else %}Marcar como favorito{% endif %}">
+                                        <i class="bi bi-heart{% if event.is_favorito %}-fill text-danger{% endif %}" aria-hidden="true"></i>
                                     </a>
                                     
                                     <!-- Botón para añadir al carro-->

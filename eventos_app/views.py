@@ -1,5 +1,4 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
@@ -9,7 +8,7 @@ from django.views.generic import DetailView, ListView, TemplateView
 from django.views.generic.edit import FormView, UpdateView, DeleteView
 from django.utils.timezone import now
 from django.utils import timezone
-from django.db.models import Q, Avg
+from django.db.models import Q
 import uuid
 from django.db.models import Prefetch
 
