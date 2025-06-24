@@ -30,24 +30,38 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        user = self.request.user
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
+        events_proximos_queryset = Event.objects.filter(date__gte=now().date(), cancelado=False)
         category_id = self.request.GET.get('category_id')
         if category_id:
             try:
                 category = get_object_or_404(Category, id=category_id)
+                events_proximos_queryset = events_proximos_queryset.filter(categorias=category).distinct()
                 # La logica del filtrado por categoria para el carrousel de eventos proximos en el home
-                context['events_proximos'] = Event.objects.filter(
-                    date__gte=now().date(),
-                    cancelado=False,
-                    categorias=category
-                ).order_by("date").distinct() #Los ordenamos por su fecha
-                context['selected_category'] = category #Se envia la categoría seleccionada al template
+                context['selected_category'] = category
             except:
                 #Si surge un error al obtener la categoría, se obtienen los eventos próximos sin filtrar
                 context['events_proximos'] = obtener_eventos_proximos()
         else:
-           context['events_proximos'] = obtener_eventos_proximos()
+            pass
+        if user.is_authenticated:
+            favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
+            
+            events_proximos_queryset = events_proximos_queryset.annotate(
+                is_favorito=Case(
+                    When(pk__in=list(favoritos_ids), then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            )
+            # Ordenamos por favoritos primero, y luego por fecha
+            context['events_proximos'] = events_proximos_queryset.order_by('-is_favorito', 'date')
+        else:
+            # Para usuarios no autenticados, solo ordenamos por fecha
+            context['events_proximos'] = events_proximos_queryset.order_by('date')
+
         return context
 
 class EventListView(ListView):
