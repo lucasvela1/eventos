@@ -15,10 +15,10 @@ from django.db.models import Prefetch
 
 from django.db import models
 from datetime import timedelta
-from .forms import RatingForm, UsuarioRegisterForm, CommentForm
+from .forms import RatingForm, UsuarioRegisterForm, CommentForm, PagoForm
 from django.db import transaction
-from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type
-from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type, Pago
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating, validar_tarjeta_luhn
 
 
 
@@ -228,19 +228,22 @@ class CarritoView(LoginRequiredMixin, View):
         event = Event.objects.get(id=event_id)
         precio_vip = event.price * 1.25
         tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+        form = PagoForm()
         return render(request, "app/carrito.html", {
             "event": event,
             "tickets_restantes": tickets_restantes,
             "tickets_vip": precio_vip,
+            "form": form,
         })
 
     def post(self, request, event_id):
         event = Event.objects.get(id=event_id)
-        cantidad = int(request.POST.get("cantidad", 1))
+        form = PagoForm(request.POST)
 
         try:
             cantidad_general = int(request.POST.get("cantidad_general", 0))
             cantidad_vip = int(request.POST.get("cantidad_vip", 0))
+            numero_tarjeta = request.POST.get("numero_tarjeta","").strip()
         except (ValueError, TypeError):
             messages.error(request, "Por favor, introduce un número válido de tickets.")
             return redirect("carrito", event_id=event_id)
@@ -250,6 +253,29 @@ class CarritoView(LoginRequiredMixin, View):
         if total_cantidad_comprada <= 0:
             messages.error(request, "Debes seleccionar al menos un ticket para comprar.")
             return redirect("carrito", event_id=event_id)
+
+        # Validar tarjeta con el form
+        if not form.is_valid():
+            precio_vip = event.price * 1.25
+            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+            return render(request, "app/carrito.html", {
+                "event": event,
+                "tickets_restantes": tickets_restantes,
+                "tickets_vip": precio_vip,
+                "form": form,
+            })
+
+        numero_tarjeta = form.cleaned_data["numero_tarjeta"]
+        if not validar_tarjeta_luhn(numero_tarjeta):
+            form.add_error("numero_tarjeta", "El número de tarjeta ingresado no es válido.")
+            precio_vip = event.price * 1.25
+            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+            return render(request, "app/carrito.html", {
+                "event": event,
+                "tickets_restantes": tickets_restantes,
+                "tickets_vip": precio_vip,
+                "form": form,
+            })
 
         precio_vip = event.price * 1.25
 

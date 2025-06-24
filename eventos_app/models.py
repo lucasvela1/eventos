@@ -214,3 +214,16 @@ class Favorito(models.Model):
 
     class Meta():
         unique_together = ("user", "event")
+
+class Pago(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
+    nombre_titular = models.CharField("Nombre del titular", max_length=100)
+    numero_tarjeta = models.CharField("Número de tarjeta", max_length=16)
+    fecha_vencimiento = models.CharField("Fecha de expiración (MM/AA)", max_length=5)
+    cvv = models.CharField("Código de seguridad (CVV)", max_length=4)
+    monto = models.DecimalField("Monto total", max_digits=10, decimal_places=2)
+    fecha_creacion = models.DateTimeField("Fecha del pago", auto_now_add=True)
+
+    def __str__(self):
+        return f"Pago de {self.user.username} por ${self.monto}"

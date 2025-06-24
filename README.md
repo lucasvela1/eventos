@@ -72,3 +72,23 @@ Pueden editar/eliminar tickets únicamente si hay reembolso aceptado.
 Pueden crear, editar y eliminar notificaciones.
 Pueden crear y editar calificaciones.
 No pueden manipular categorías o venues.
+
+# Números válidos (pasan Luhn)
+- 4539148803436467
+- 4556737586899855
+- 6011111111111117
+- 371449635398431
+- 378282246310005
+- 5555555555554444
+- 4111111111111111
+- 4012888888881881
+
+# Números inválidos (no pasan Luhn)
+- 4539148803436468
+- 1234567890123456
+- 6011111111111116
+- 371449635398432
+- 5555555555554445
+- 4111111111111112
+- 4012888888881882
+
