@@ -123,31 +123,36 @@ class EventDetailView(DetailView):
     
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = CommentForm(request.POST)
+        user = request.user
+        event = self.object
 
-        if request.user.is_authenticated and form.is_valid():
-            comment = form.save(commit=False)
-            comment.user = request.user
-            comment.event = self.object
-            comment.title = self.object.title
-            comment.save()
-
-            return redirect('event_detail', pk=self.object.pk)
+        if 'delete_comment_id' in request.POST:
+            comment_id = request.POST.get('delete_comment_id')
+            comment = get_object_or_404(Comment, pk=comment_id, user=user)
+            comment.delete()
+            return redirect('event_detail', pk=event.pk)
         
-        context = self.get_context_data()
-        context['form'] = form
-        return self.render_to_response(context)
+        elif 'edit_comment_id' in request.POST:
+            comment_id = request.POST.get('edit_comment_id')
+            new_text = request.POST.get('text','').strip()
+            comment = get_object_or_404(Comment, pk=comment_id, user=user)
+            if new_text:
+                comment.text = new_text
+                comment.save()
+            return redirect('event_detail', pk=event.pk)
+        else:
+            form = CommentForm(request.POST)
+            if user.is_authenticated and form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = user
+                comment.event = event
+                comment.title = event.title
+                comment.save()
+                return redirect('event_detail', pk=event.pk)
 
-class CommentEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Comment
-    fields = ['text']
-    template_name = 'app/edit_comment.html'
-
-    def get_success_url(self):
-        return reverse_lazy('event_detail', kwargs={'pk': self.object.event.pk})
-
-    def test_func(self):
-        return self.request.user == self.get_object().user
+            context = self.get_context_data()
+            context['form'] = form
+            return self.render_to_response(context)
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
@@ -277,6 +282,11 @@ class CarritoView(LoginRequiredMixin, View):
                     total=cantidad_vip * precio_vip,
                     ticket_code=f"VIP-{uuid.uuid4()}" # Código único con prefijo VIP para diferenciar de los generales
                 )
+
+            # Sumar puntos al usuario
+            total_puntos = total_cantidad_comprada * event_a_actualizar.cantidad_puntos
+            request.user.puntaje += total_puntos
+            request.user.save()
 
             Notification.objects.create(
                 user=request.user,

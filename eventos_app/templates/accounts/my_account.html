@@ -4,8 +4,9 @@
 
 {% block content %}
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column align-items-start mb-4">
         <h1><span class="nav-link">Hola, {{ request.user.username }}</span></h1>
+        <h4 class="mt-1">Puntaje: {{ request.user.puntaje }}</h4>
     </div>
 
     <!-- Mis Tickets -->
@@ -46,19 +47,18 @@
                         </a>
 
                         <!-- Sí el evento pasó sale el boton para solicitar reembolso-->
-                        <!--{% if ticket.event.date <= today and ticket.refund_request %}-->
-                        
-                        <!--{% endif %}-->
+                        {% if ticket.event.date <= today and ticket.refund_request %}
+                            <a href="{% url 'reembolso' ticket.ticket_code %}" class="btn btn-sm btn-outline-danger"
+                                title="Pedir reembolso">
+                                <i class="bi bi-cash"></i>
+                            </a>
+                        {% endif %}
 
                         <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning"
                             title="Calificar">
                             <i class="bi bi-star"></i>
                         </a>
 
-                        <a href="{% url 'reembolso' ticket.ticket_code %}" class="btn btn-sm btn-outline-danger"
-                            title="Pedir reembolso">
-                            <i class="bi bi-cash"></i>
-                        </a>
                     </td>
                 </tr>
                 {% empty %}

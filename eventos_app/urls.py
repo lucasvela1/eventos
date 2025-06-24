@@ -18,9 +18,7 @@ from .views import (
     CarritoView, 
     EditarRatingView,
     ReembolsoView, 
-    EliminarRatingView,
-    CommentEditView, 
-    CommentDeleteView
+    EliminarRatingView
 )
 from .views import EliminarNotificacionesSeleccionadasView
 from .forms import LoginForm, UsuarioRegisterForm
@@ -44,7 +42,5 @@ urlpatterns = [
     path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),
     path("reembolso/<str:ticket_code>/", ReembolsoView.as_view(), name="reembolso"),
     path("notifications/eliminar_seleccionadas/", EliminarNotificacionesSeleccionadasView.as_view(), name="eliminar_notificaciones_seleccionadas"),
-    path('comentario/<int:pk>/editar/', CommentEditView.as_view(), name='editar_comentario'),
-    path('comentario/<int:pk>/eliminar/', CommentDeleteView.as_view(), name='eliminar_comentario'),
 
     ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
