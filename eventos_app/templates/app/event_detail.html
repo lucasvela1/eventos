@@ -57,7 +57,7 @@ textarea.form-control:focus {
               Calificar este evento
              </a>
            {% else %}
-             {%if not user_has_ticket %}
+             {%if not tiene_ticket %}
                <p class="text-muted">No podés calificar este evento porque no compraste entrada.</p>
              {% elif not event_has_passed %}
                <p class="text-muted">Este evento aún no ha ocurido. Podrás calificarlo cuando termine.</p>
