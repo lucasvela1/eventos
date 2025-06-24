@@ -15,10 +15,10 @@ from django.db.models import Prefetch
 
 from django.db import models
 from datetime import timedelta
-from .forms import RatingForm, UsuarioRegisterForm, CommentForm
+from .forms import RatingForm, UsuarioRegisterForm, CommentForm, PagoForm
 from django.db import transaction
-from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type
-from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type, Pago
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating, validar_tarjeta_luhn
 
 
 
@@ -123,31 +123,36 @@ class EventDetailView(DetailView):
     
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = CommentForm(request.POST)
+        user = request.user
+        event = self.object
 
-        if request.user.is_authenticated and form.is_valid():
-            comment = form.save(commit=False)
-            comment.user = request.user
-            comment.event = self.object
-            comment.title = self.object.title
-            comment.save()
-
-            return redirect('event_detail', pk=self.object.pk)
+        if 'delete_comment_id' in request.POST:
+            comment_id = request.POST.get('delete_comment_id')
+            comment = get_object_or_404(Comment, pk=comment_id, user=user)
+            comment.delete()
+            return redirect('event_detail', pk=event.pk)
         
-        context = self.get_context_data()
-        context['form'] = form
-        return self.render_to_response(context)
+        elif 'edit_comment_id' in request.POST:
+            comment_id = request.POST.get('edit_comment_id')
+            new_text = request.POST.get('text','').strip()
+            comment = get_object_or_404(Comment, pk=comment_id, user=user)
+            if new_text:
+                comment.text = new_text
+                comment.save()
+            return redirect('event_detail', pk=event.pk)
+        else:
+            form = CommentForm(request.POST)
+            if user.is_authenticated and form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = user
+                comment.event = event
+                comment.title = event.title
+                comment.save()
+                return redirect('event_detail', pk=event.pk)
 
-class CommentEditView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Comment
-    fields = ['text']
-    template_name = 'app/edit_comment.html'
-
-    def get_success_url(self):
-        return reverse_lazy('event_detail', kwargs={'pk': self.object.event.pk})
-
-    def test_func(self):
-        return self.request.user == self.get_object().user
+            context = self.get_context_data()
+            context['form'] = form
+            return self.render_to_response(context)
 
 class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Comment
@@ -223,19 +228,22 @@ class CarritoView(LoginRequiredMixin, View):
         event = Event.objects.get(id=event_id)
         precio_vip = event.price * 1.25
         tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+        form = PagoForm()
         return render(request, "app/carrito.html", {
             "event": event,
             "tickets_restantes": tickets_restantes,
             "tickets_vip": precio_vip,
+            "form": form,
         })
 
     def post(self, request, event_id):
         event = Event.objects.get(id=event_id)
-        cantidad = int(request.POST.get("cantidad", 1))
+        form = PagoForm(request.POST)
 
         try:
             cantidad_general = int(request.POST.get("cantidad_general", 0))
             cantidad_vip = int(request.POST.get("cantidad_vip", 0))
+            numero_tarjeta = request.POST.get("numero_tarjeta","").strip()
         except (ValueError, TypeError):
             messages.error(request, "Por favor, introduce un número válido de tickets.")
             return redirect("carrito", event_id=event_id)
@@ -245,6 +253,29 @@ class CarritoView(LoginRequiredMixin, View):
         if total_cantidad_comprada <= 0:
             messages.error(request, "Debes seleccionar al menos un ticket para comprar.")
             return redirect("carrito", event_id=event_id)
+
+        # Validar tarjeta con el form
+        if not form.is_valid():
+            precio_vip = event.price * 1.25
+            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+            return render(request, "app/carrito.html", {
+                "event": event,
+                "tickets_restantes": tickets_restantes,
+                "tickets_vip": precio_vip,
+                "form": form,
+            })
+
+        numero_tarjeta = form.cleaned_data["numero_tarjeta"]
+        if not validar_tarjeta_luhn(numero_tarjeta):
+            form.add_error("numero_tarjeta", "El número de tarjeta ingresado no es válido.")
+            precio_vip = event.price * 1.25
+            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+            return render(request, "app/carrito.html", {
+                "event": event,
+                "tickets_restantes": tickets_restantes,
+                "tickets_vip": precio_vip,
+                "form": form,
+            })
 
         precio_vip = event.price * 1.25
 
@@ -277,6 +308,11 @@ class CarritoView(LoginRequiredMixin, View):
                     total=cantidad_vip * precio_vip,
                     ticket_code=f"VIP-{uuid.uuid4()}" # Código único con prefijo VIP para diferenciar de los generales
                 )
+
+            # Sumar puntos al usuario
+            total_puntos = total_cantidad_comprada * event_a_actualizar.cantidad_puntos
+            request.user.puntaje += total_puntos
+            request.user.save()
 
             Notification.objects.create(
                 user=request.user,

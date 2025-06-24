@@ -232,8 +232,8 @@ class Command(BaseCommand):
             venue=teatro_colon,
             id_img="1FXlSy1jON88Wd2Pa3-uRbFVo9JzdaMXD",
             total_rating=0,
-            suma_puntaje=False,
-            cantidad_puntos=0,
+            suma_puntaje=True,
+            cantidad_puntos=5000,
             cancelado=False
         )
         evento3.categorias.add(teatro)
@@ -261,7 +261,7 @@ class Command(BaseCommand):
             id_img="1U3dTrrNGjZpFnAe9oAeYSJSFSohGolo3",
             total_rating=0,        
             suma_puntaje=True,   
-            cantidad_puntos=0,     
+            cantidad_puntos=1200,     
             cancelado=False        
         )
         evento5.categorias.add(musica)
