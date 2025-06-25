@@ -31,6 +31,7 @@ class Category(models.Model):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
 
 
+
 class Venue(models.Model):
     name = models.CharField(max_length=200)
     address = models.TextField()
