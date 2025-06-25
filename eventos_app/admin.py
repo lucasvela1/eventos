@@ -122,7 +122,7 @@ class CommentAdmin(admin.ModelAdmin):
     
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
-            return ['create_at', 'user', 'event']
+            return []
         elif hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
             return ['created_at', 'user', 'event', 'title', 'text']
         return ['created_at', 'user', 'event', 'title', 'text']
