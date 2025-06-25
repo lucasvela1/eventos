@@ -708,7 +708,7 @@ class Command(BaseCommand):
             date=date(2025, 8, 20),
             price=4000,
             venue=movistar_arena,
-            id_img="12V-S8M5ccLVlPJOx4i5ugTFEqIQAvgIj",
+            id_img="1-N4UiGcoyA-Mn3K6Ha-IOsdnYUoBoKgR",
             total_rating=0,
             suma_puntaje=False,
             cantidad_puntos=0,
