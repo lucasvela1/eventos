@@ -129,9 +129,9 @@
           </div>
           {% if user == comment.user %}
           <div class="text-end">
-            <!-- Editar -->
+            <!-- Editar Comentario-->
             <button class="btn btn-sm btn-outline-primary" onclick="toggleEditForm('{{ comment.id }}')"><i class="bi bi-pencil"></i></button>
-            <!-- Eliminar -->
+            <!-- Eliminar Comentario-->
             <form method="post" style="display:inline;">
               {% csrf_token %}
               <input type="hidden" name="delete_comment_id" value="{{ comment.id }}">

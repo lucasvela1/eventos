@@ -111,11 +111,11 @@ class EventDetailView(DetailView):
         context['form'] = CommentForm()
 
         if user.is_authenticated:
-            tiene_ticket = Ticket.objects.filter(user=user, event=event).exists()
-            context['tiene_ticket'] = Ticket.objects.filter(user=user, event=event).exists()
-            ha_calificado = Rating.objects.filter(user=user, event=event).exists()
+            tiene_ticket = Ticket.objects.filter(user=user, event=event).exists() #Si existe la relación entre el usuario y el evento
+            context['tiene_ticket'] = tiene_ticket
+            ha_calificado = Rating.objects.filter(user=user, event=event).exists() #Revisamos si el user tiene un rating asociado
             user_can_rate = tiene_ticket and event_has_passed and not ha_calificado
-            context['user_can_rate'] = user_can_rate
+            context['user_can_rate'] = user_can_rate #Si el usuario tiene ticket y el evento finalizó, no calificó aún, entonces puede calificar
         else:
             context['tiene_ticket'] = False
             context['user_can_rate'] = False
@@ -222,19 +222,19 @@ class ToggleFavoritoView(LoginRequiredMixin, View):
         return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
     
 class CarritoView(LoginRequiredMixin, View):
-    login_url = "/accounts/login/"
+    login_url = "/accounts/login/" #Si el usuario no está autenticado, lo redirige a la página de login
 
     def get(self, request, event_id):
         event = Event.objects.get(id=event_id)
-        precio_vip = event.price * 1.25
+        precio_vip = event.price * 1.25 #Representamos el precio vip como un valor fijo 25% más caro que el normal
         tickets_restantes = event.venue.capacity - event.capacidad_ocupada
-        form = PagoForm()
+        form = PagoForm() #Crea la instancia vacía del formulario de pago
         return render(request, "app/carrito.html", {
             "event": event,
             "tickets_restantes": tickets_restantes,
             "tickets_vip": precio_vip,
-            "form": form,
-        })
+            "form": form, 
+        }) #Toda la info que devuelve al template
 
     def post(self, request, event_id):
         event = Event.objects.get(id=event_id)
@@ -247,13 +247,13 @@ class CarritoView(LoginRequiredMixin, View):
         except (ValueError, TypeError):
             messages.error(request, "Por favor, introduce un número válido de tickets.")
             return redirect("carrito", event_id=event_id)
-
+        
         total_cantidad_comprada = cantidad_general + cantidad_vip
 
         if total_cantidad_comprada <= 0:
             messages.error(request, "Debes seleccionar al menos un ticket para comprar.")
             return redirect("carrito", event_id=event_id)
-
+        #Lo de arriba valida y obtiene la cantidad de tickets, si es mayor a cero y si son numeros validos
         # Validar tarjeta con el form
         if not form.is_valid():
             precio_vip = event.price * 1.25
