@@ -2,7 +2,9 @@
 {% block content %}
   <h2>Carrito de Compras</h2>
 
-  <div>
+  <div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-4 mb-4">
+  <!-- Izquierda: título y detalles del evento -->
+  <div style="flex: 1;">
     <h3>{{ event.title }}</h3>
     <p><strong>Fecha:</strong> {{ event.date }}</p>
     <p><strong>Lugar:</strong> {{ event.venue }}</p>
@@ -11,24 +13,63 @@
     <p><strong>Descripción:</strong> {{ event.description }}</p>
     <p><strong>Tickets restantes:</strong> {{ tickets_restantes}}</p>
   </div>
-
-  <form method="post">
+  <div style="flex: 1; max-width: 450px;">
+    <form method="post">
         {% csrf_token %}
 
-        <div class="mb-3">
+        <div class="row mb-3align-items-center">
+          <div class="col d-flex flex-column">
             <label for="cantidad_general" class="form-label">Cantidad de tickets GENERAL:</label>
             <input type="number" name="cantidad_general" id="cantidad_general" value="0" min="0" class="form-control" onchange="actualizarTotal()">
-        </div>
-
-        <div class="mb-3">
+          </div>
+          <div class="col d-flex flex-column">
             <label for="cantidad_vip" class="form-label">Cantidad de tickets VIP:</label>
             <input type="number" name="cantidad_vip" id="cantidad_vip" value="0" min="0" class="form-control" onchange="actualizarTotal()">
+          </div>
         </div>
 
         <hr>
-        <h4>Total a pagar: <span id="total-a-pagar">$0.00</span></h4>
-    <button type="submit" class="btn btn-success mt-2">Comprar</button>
-  </form>
+
+      <h3>Datos de la tarjeta</h3>
+
+      <div class="mb-3">
+        {{ form.nombre_titular.label_tag }}
+        {{ form.nombre_titular }}
+        {% if form.nombre_titular.errors %}
+          <div class="text-danger">{{ form.nombre_titular.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        {{ form.numero_tarjeta.label_tag }}
+        {{ form.numero_tarjeta }}
+        {% if form.numero_tarjeta.errors %}
+          <div class="text-danger">{{ form.numero_tarjeta.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        {{ form.fecha_vencimiento.label_tag }}
+        {{ form.fecha_vencimiento }}
+        {% if form.fecha_vencimiento.errors %}
+          <div class="text-danger">{{ form.fecha_vencimiento.errors }}</div>
+        {% endif %}
+      </div>
+
+      <div class="mb-3">
+        {{ form.cvv.label_tag }}
+        {{ form.cvv }}
+        {% if form.cvv.errors %}
+          <div class="text-danger">{{ form.cvv.errors }}</div>
+        {% endif %}
+      </div>
+
+      <hr>
+      <h4>Total a pagar: <span id="total-a-pagar">$0.00</span></h4>
+      <button type="submit" class="btn btn-success mt-2">Comprar</button>
+    </form>
+  </div>
+  
 
   <script>
     function actualizarTotal() {
@@ -51,7 +92,4 @@
     document.addEventListener('DOMContentLoaded', actualizarTotal);
 </script>
 {% endblock %}
-
-<!-- Para hacer que el precio se actualice habría que hacer un script de javascript que tome el valor
-     unitario y lo multiplique por el total.-->
 
