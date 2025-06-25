@@ -558,6 +558,3 @@ class ReembolsoView(LoginRequiredMixin, View):
         return redirect("my_account")
 
 
-class AceptarReembolsoView(PermissionRequiredMixin, View):
-    permission_required = 'app_name.can_accept_refund'
-

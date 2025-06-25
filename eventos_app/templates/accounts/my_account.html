@@ -171,52 +171,7 @@
         </table>
     </div>
 
-    <!-- Mis Notificaciones -->
-    <h2 class="mb-3">Mis Notificaciones</h2>
-    <div class="mb-5">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Título</th>
-                        <th>Mensaje</th>
-                        <th>Prioridad</th>
-                        <th>Fecha</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if total_unread > 0 %}
-                    {% if total_unread > 5 %}
-                    <tr class="table-light">
-                        <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
-                    </tr>
-                    <!--
-                            <tr>
-                                <td colspan="4" class="text-center">Hay {{ total_unread }} notificaciones no leídas.</td>
-                            </tr>
-                            -->
-                    {% endif %}
-                    {% for notif in unread_notifications %}
-                    <tr>
-                        <td>{{ notif.title }}</td>
-                        <td>{{ notif.message }}</td>
-                        <td>{{ notif.priority }}</td>
-                        <td>{{ notif.created_at|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                    {% else %}
-                    <tr class="table-light">
-                        <td colspan="4" class="text-center">No tenés notificaciones nuevas.</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="text-end mt-3">
-            <a href="{% url 'notifications' %}" class="btn btn-warning rounded-pill fw-bold px-4 py-2">Ver Todas</a>
-        </div>
-    </div>
+    
 
     <h2 class="mb-3">Mis Solicitudes de Reembolso</h2>
     <div class="mb-5">

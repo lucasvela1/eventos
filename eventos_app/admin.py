@@ -66,8 +66,9 @@ class EventAdmin(admin.ModelAdmin):
         if request.user.is_superuser:
             return []
         if request.user.rol == 'VENDEDOR':
-            return ['created_at', 'updated_at', 'total_rating', 'cantidad_puntos', 'suma_puntaje']
+            return ['created_at', 'updated_at', 'total_rating']
         return super().get_readonly_fields(request, obj)
+    
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         if request.user.is_superuser:
@@ -110,6 +111,7 @@ class CommentAdmin(admin.ModelAdmin):
             form.base_fields['event'].widget.can_view_related = False
         return form  # Esto evita que se puedan agregar o cambiar usuarios desde el formulario de comentarios    
 
+
     def has_delete_permission(self, request, obj=None):
         return True
 
@@ -120,12 +122,11 @@ class CommentAdmin(admin.ModelAdmin):
     
     def get_readonly_fields(self, request, obj=None):
         if request.user.is_superuser:
-            return []
-        if request.user.rol == 'VENDEDOR':
-            return ['created_at', 'user', 'event']
-        return super().get_readonly_fields(request, obj)
-
-
+            return ['create_at', 'user', 'event']
+        elif hasattr(request.user, 'rol') and request.user.rol == 'VENDEDOR':
+            return ['created_at', 'user', 'event', 'title', 'text']
+        return ['created_at', 'user', 'event', 'title', 'text']
+    
 # Administración del modelo CustomUser
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
