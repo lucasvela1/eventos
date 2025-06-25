@@ -40,10 +40,23 @@ class Command(BaseCommand):
         arte = Category.objects.create(name="Arte", description="Exposiciones de arte", id_img = "1xPjhxTF8AaVj6ZO6ugkZ4FYPBDLZ8HkT")
         literatura = Category.objects.create(name="Literatura", description="Eventos literarios", id_img = "16coPtu6AfaegS2KR2UgVt36a0vhENx-F")
         
+
         
         #lugares
-        luna_park = Venue.objects.create(name="Luna Park", address="Av. Madero 420", city="Buenos Aires", capacity=10000, contact="info@lunapark.com")
-        teatro_colon = Venue.objects.create(name="Teatro Colón", address="Cerrito 628", city="Buenos Aires", capacity=2500, contact="contacto@colon.org.ar")
+        luna_park = Venue.objects.create(
+            name="Luna Park", 
+            address="Av. Madero 420", 
+            city="Buenos Aires", 
+            capacity=10000, 
+            contact="info@lunapark.com")
+        
+        teatro_colon = Venue.objects.create(
+            name="Teatro Colón", 
+            address="Cerrito 628", 
+            city="Buenos Aires", 
+            capacity=2500, 
+            contact="contacto@colon.org.ar")
+        
         movistar_arena = Venue.objects.create(
             name="Movistar Arena", 
             address="Humboldt 450", 
@@ -147,8 +160,102 @@ class Command(BaseCommand):
             contact="eventos@mdq.gov.ar"
         )
 
+        museo_bellas_artes = Venue.objects.create(
+            name="Museo Nacional de Bellas Artes",
+            address="Av. del Libertador 1473",
+            city="Buenos Aires",
+            capacity=1200,
+            contact="info@mnba.gob.ar"
+        )
 
+        parque_centenario = Venue.objects.create(
+            name="Parque Centenario",
+            address="Av. Díaz Vélez al 4800",
+            city="Buenos Aires",
+            capacity=3000,
+            contact="eventos@parquecentenario.gob.ar"
+        )
 
+        cine_gaumont = Venue.objects.create(
+            name="Cine Gaumont",
+            address="Av. Rivadavia 1635",
+            city="Buenos Aires",
+            capacity=600,
+            contact="contacto@cinegaumont.com"
+        )
+
+        cinemark_palermo = Venue.objects.create(
+            name="Cinemark Palermo",
+            address="Beruti 3399",
+            city="Buenos Aires",
+            capacity=800,
+            contact="info@cinemark.com.ar"
+        )
+
+        espacio_inca = Venue.objects.create(
+            name="Espacio INCAA Km 0",
+            address="Av. Rivadavia 1635",
+            city="Buenos Aires",
+            capacity=500,
+            contact="info@espacioincaa.gob.ar"
+        )
+
+        facultad_filosofia = Venue.objects.create(
+            name="Facultad de Filosofía y Letras - UBA",
+            address="Puán 480",
+            city="Buenos Aires",
+            capacity=1000,
+            contact="eventos@filo.uba.ar"
+        )
+
+        balcarce_tenis = Venue.objects.create(
+            name="Club de Tenis Balcarce",
+            address="Av. del Deporte s/n",
+            city="Balcarce",
+            capacity=1500,
+            contact="info@clubbalcarce.com"
+        )
+
+        predio_la_rural = Venue.objects.create(
+            name="La Rural - Predio Ferial de Buenos Aires",
+            address="Av. Sarmiento 2704",
+            city="Buenos Aires",
+            capacity=10000,
+            contact="info@larural.com.ar"
+        )
+
+        facultad_ingenieria = Venue.objects.create(
+            name="Facultad de Ingeniería - UBA",
+            address="Av. Paseo Colón 850",
+            city="Buenos Aires",
+            capacity=1500,
+            contact="eventos@fi.uba.ar"
+        )
+
+        hotel_sheraton = Venue.objects.create(
+            name="Sheraton Buenos Aires Hotel & Convention Center",
+            address="San Martín 1225",
+            city="Buenos Aires",
+            capacity=2500,
+            contact="info@sheratonbuenosaires.com"
+        )
+
+        biblioteca_nacional = Venue.objects.create(
+            name="Biblioteca Nacional Mariano Moreno",
+            address="Agüero 2502",
+            city="Buenos Aires",
+            capacity=1200,
+            contact="info@bn.gov.ar"
+        )
+
+        cafe_literario = Venue.objects.create(
+            name="Café Literario El Gato Negro",
+            address="Av. Corrientes 1669",
+            city="Buenos Aires",
+            capacity=150,
+            contact="contacto@gatonegro.com.ar"
+        )
+        
 
 
         # Crear Usuarios
@@ -272,7 +379,7 @@ class Command(BaseCommand):
             date=date(2025, 6, 5),
             price=2000,
             venue=centro_cultural_recoleta,
-            id_img="1W-x-SLeRbBxqEutP5cX9uAiSBf7I1Rbc", 
+            id_img="1-heBQdr_JseyZHpuEmCRYa4AJlJ0jNUW", 
             total_rating=3,
             suma_puntaje=False,
             cantidad_puntos=0,
@@ -286,7 +393,7 @@ class Command(BaseCommand):
             date=date(2025, 4, 20),
             price=3500,
             venue=estadio_polideportivo,
-            id_img="1HAco7rRERivRSY8XL4s91_HWLdWou-HT",  
+            id_img="1E-vVofuJyroZcFQ6gVhPuY7Wdaf4LrlS",  
             total_rating=5,
             suma_puntaje=False,
             cantidad_puntos=0,
@@ -300,13 +407,359 @@ class Command(BaseCommand):
             date=date(2025, 5, 18),
             price=1500,
             venue=teatro_radio_city,
-            id_img="19hohVUqx6A0o5EkS-nPPK6hfrJklZF86",  
+            id_img="17MhZGjv2U_alV6ebG83WLxLTS2aQYyjk",  
             total_rating=0,
             suma_puntaje=True,
             cantidad_puntos=0,
             cancelado=False
         )
         evento8.categorias.add(pelicula)
+
+        # --- ARTE ---
+        evento9 = Event.objects.create(
+            title="Exposición de Arte Moderno",
+            description="Obras de artistas contemporáneos locales e internacionales.",
+            date=date(2025, 7, 10),
+            price=2500,
+            venue=centro_cultural_recoleta,
+            id_img="1PDtrzf6iatUQW3d448tUutF1hgecjVJ1",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento9.categorias.add(arte)
+
+        evento10 = Event.objects.create(
+            title="Galería Nocturna",
+            description="Una experiencia artística inmersiva con luces y sonidos.",
+            date=date(2025, 8, 18),
+            price=3000,
+            venue=konex,
+            id_img="1fAXy2VgGTGWjLOwYKiKP8yN_S-jgVQyt",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento10.categorias.add(arte)
+
+        evento11 = Event.objects.create(
+            title="Arte y Naturaleza",
+            description="Intervenciones artísticas en espacios verdes urbanos.",
+            date=date(2025, 9, 5),
+            price=2000,
+            venue=teatro_gran_rix,
+            id_img="1fAXy2VgGTGWjLOwYKiKP8yN_S-jgVQyt",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento11.categorias.add(arte)
+
+        # --- MÚSICA ---
+        evento12 = Event.objects.create(
+            title="Festival Rock Nacional",
+            description="Bandas emblemáticas del rock argentino en vivo.",
+            date=date(2025, 9, 20),
+            price=6000,
+            venue=estadio_velez,
+            id_img="1MgALGBTJtVsB-BfatC3NHEH0K_xnFNe9",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento12.categorias.add(musica)
+
+        evento13 = Event.objects.create(
+            title="Jazz en el Parque",
+            description="Tardes de jazz al aire libre con artistas internacionales.",
+            date=date(2025, 11, 5),
+            price=3500,
+            venue=niceto_club,
+            id_img="1b1RG7WCyKHCF-8MzCyK8KBUE_XyIe73v",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento13.categorias.add(musica)
+
+        evento14 = Event.objects.create(
+            title="Orquesta Filarmónica en Concierto",
+            description="Concierto de música clásica en el Teatro Colón.",
+            date=date(2025, 12, 1),
+            price=4500,
+            venue=teatro_colon,
+            id_img="1bihHzC1USW8qMQo-hzO-nI4C6dJi_k9i",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento14.categorias.add(musica)
+
+        # --- CONFERENCIA ---
+        evento15 = Event.objects.create(
+            title="Charla sobre Inteligencia Artificial",
+            description="Conferencia sobre el impacto de la IA en la sociedad.",
+            date=date(2025, 9, 1),
+            price=4000,
+            venue=movistar_arena,
+            id_img="159OOUJSZ6zBmNTvy0PDSH8WLaabk0qh6",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento15.categorias.add(conferencia)
+
+        evento16 = Event.objects.create(
+            title="Economía Circular y Sustentabilidad",
+            description="Expertos analizan el futuro del desarrollo sostenible.",
+            date=date(2025, 10, 10),
+            price=2500,
+            venue=quality_espacio,
+            id_img="1a1Q_LU8rybJQvaO9OPsMYanQnCAYVr4u",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento16.categorias.add(conferencia)
+
+        evento17 = Event.objects.create(
+            title="Congreso Internacional de Educación",
+            description="Educadores de todo el mundo debaten metodologías innovadoras.",
+            date=date(2025, 12, 15),
+            price=5000,
+            venue=teatro_real,
+            id_img="1a1Q_LU8rybJQvaO9OPsMYanQnCAYVr4u",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento17.categorias.add(conferencia)
+
+        # --- PELÍCULA ---
+        evento18 = Event.objects.create(
+            title="Ciclo de Cine Italiano",
+            description="Proyecciones de clásicos del cine italiano con debate posterior.",
+            date=date(2025, 6, 25),
+            price=1000,
+            venue=teatro_el_circulo,
+            id_img="1HAco7rRERivRSY8XL4s91_HWLdWou-HT",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento18.categorias.add(pelicula)
+
+        evento19 = Event.objects.create(
+            title="Estreno: El Viaje Infinito",
+            description="Una nueva película de ciencia ficción argentina.",
+            date=date(2025, 7, 5),
+            price=1800,
+            venue=arena_maipu,
+            id_img="16XRVARjlzjCll9YrzROjLyE5K-YlOHEM",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento19.categorias.add(pelicula)
+
+        evento20 = Event.objects.create(
+            title="La sirenita",
+            description="Selección de cortos premiados a nivel internacional.",
+            date=date(2025, 8, 15),
+            price=2000,
+            venue=teatro_radio_city,
+            id_img="1a1Q_LU8rybJQvaO9OPsMYanQnCAYVr4u",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento20.categorias.add(pelicula)
+
+        # --- TEATRO ---
+        evento21 = Event.objects.create(
+            title="Obra: La Casa de Bernarda Alba",
+            description="Clásico de Lorca con una puesta moderna.",
+            date=date(2025, 9, 12),
+            price=3500,
+            venue=teatro_independencia,
+            id_img="1SpFaTFtyKQ2-aZHKtckIXsbegqbtsHrL",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento21.categorias.add(teatro)
+
+        evento22 = Event.objects.create(
+            title="Teatro Improvisado",
+            description="Una noche sin guión donde el público decide todo.",
+            date=date(2025, 10, 8),
+            price=3000,
+            venue=teatro_gran_rix,
+            id_img="1zx3dOhJuOMVkMjuqlHxDvpoG5MndiEYe",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento22.categorias.add(teatro)
+
+        evento23 = Event.objects.create(
+            title="Comedia Musical: Tango y Pasión",
+            description="Bailarines y actores en una historia de amor y tango.",
+            date=date(2025, 11, 20),
+            price=5500,
+            venue=teatro_radio_city,
+            id_img="1SpFaTFtyKQ2-aZHKtckIXsbegqbtsHrL",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento23.categorias.add(teatro)
+
+        # --- DEPORTE ---
+        evento24 = Event.objects.create(
+            title="Partido de Fútbol - Superclásico",
+            description="El clásico del fútbol argentino en el Monumental.",
+            date=date(2025, 9, 30),
+            price=8000,
+            venue=estadio_velez,
+            id_img="1E-vVofuJyroZcFQ6gVhPuY7Wdaf4LrlS",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento24.categorias.add(deporte)
+
+        evento25 = Event.objects.create(
+            title="Carrera 10K Ciudad de Buenos Aires",
+            description="Competencia urbana abierta al público.",
+            date=date(2025, 10, 22),
+            price=1000,
+            venue=estadio_polideportivo,
+            id_img="1QFeZufLRRzmLcQqJNnGgBVIkmK5saIId",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento25.categorias.add(deporte)
+
+        evento26 = Event.objects.create(
+            title="Torneo de Tenis Abierto",
+            description="Los mejores tenistas del país compiten en el Lawn Tennis.",
+            date=date(2025, 11, 2),
+            price=3500,
+            venue=metropolitano_rosario,
+            id_img="1EuzU-7VcrM6zE4imimRfOQC9-lgn5ljB",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento26.categorias.add(deporte)
+
+        # --- TECNOLOGÍA ---
+        evento27 = Event.objects.create(
+            title="Expo Tecnología 2025",
+            description="Últimos avances en robótica, IA y realidad aumentada.",
+            date=date(2025, 7, 1),
+            price=4500,
+            venue=quality_espacio,
+            id_img="1zEXloj460EPhOQhnpWRGQYojn18beRwG",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento27.categorias.add(tecnologia)
+
+        evento28 = Event.objects.create(
+            title="Hackatón de Innovación",
+            description="Equipos compiten para desarrollar la mejor solución tecnológica.",
+            date=date(2025, 9, 10),
+            price=0,
+            venue=teatro_real,
+            id_img="1KNNZXrxRsQAf0XJ1l73StB8DtVGZxQlz",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento28.categorias.add(tecnologia)
+
+        evento29 = Event.objects.create(
+            title="Conferencia Blockchain",
+            description="Especialistas explican cómo transformar procesos con blockchain.",
+            date=date(2025, 8, 20),
+            price=4000,
+            venue=movistar_arena,
+            id_img="12V-S8M5ccLVlPJOx4i5ugTFEqIQAvgIj",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento29.categorias.add(tecnologia)
+
+        # --- LITERATURA ---
+        evento30 = Event.objects.create(
+            title="Feria Internacional del Libro",
+            description="Encuentro de lectores, autores y editoriales.",
+            date=date(2025, 4, 23),
+            price=1500,
+            venue=centro_cultural_recoleta,
+            id_img="1b1RG7WCyKHCF-8MzCyK8KBUE_XyIe73v",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento30.categorias.add(literatura)
+
+        evento31 = Event.objects.create(
+            title="Encuentro de Escritores Emergentes",
+            description="Lecturas y debates con autores independientes.",
+            date=date(2025, 5, 12),
+            price=1000,
+            venue=konex,
+            id_img="1CBUPVU_1viKUtBOSz6h_B3XYswkQj5ZV",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento31.categorias.add(literatura)
+
+        evento32 = Event.objects.create(
+            title="Noche de Poesía y Café",
+            description="Lectura de poesía contemporánea en un ambiente íntimo.",
+            date=date(2025, 6, 30),
+            price=800,
+            venue=niceto_club,
+            id_img="1b1RG7WCyKHCF-8MzCyK8KBUE_XyIe73v",
+            total_rating=0,
+            suma_puntaje=False,
+            cantidad_puntos=0,
+            cancelado=False
+        )
+        evento32.categorias.add(literatura)
+
+                
 
         # Crear tickets comprados por clientes
         ticket1 = Ticket.objects.create(
@@ -316,6 +769,7 @@ class Command(BaseCommand):
             total=15000,
             ticket_code=str(uuid.uuid4())
         )
+        
         ticket2 = Ticket.objects.create(
             user=cliente1,
             event=evento4,
