@@ -3,7 +3,7 @@
 {% block title %}Favoritos{% endblock %}
 
 {% block content %}
-<div class="container">
+<div class="container" style="margin-top: 20px;">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1><span class="nav-link">Hola, {{ request.user.username }}</span></h1>
     </div>
@@ -50,10 +50,6 @@
                         
                         <!--{% endif %}-->
 
-                        <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning"
-                            title="Calificar">
-                            <i class="bi bi-star"></i>
-                        </a>
 
                         <a href="{% url 'reembolso' ticket.ticket_code %}" class="btn btn-sm btn-outline-danger"
                             title="Pedir reembolso">

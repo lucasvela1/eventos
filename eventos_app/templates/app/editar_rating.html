@@ -3,7 +3,7 @@
 {% block title %}Editar Calificación{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4" style="margin-top: 20px;">
     <h2>Editar Calificación para: {{ event.title }}</h2>
     <form method="post">
         {% csrf_token %}
@@ -28,7 +28,7 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Guardar cambios</button>
-        <a href="{% url 'event_detail' pk=event.pk %}" class="btn btn-secondary">Cancelar</a>
+        <a href="{% url 'my_account' %}" class="btn btn-secondary">Cancelar</a>
     </form>
 </div>
 

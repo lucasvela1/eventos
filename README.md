@@ -6,7 +6,7 @@ python -m venv env
 
 ## Activar entorno virtual
 - Linux/Mac: source env/bin/activate
-- Windows: source env/Scripts/activate   o   .\venv\Scripts\Activate
+- Windows: source env/Scripts/activate   o   .\venv\Scripts\Activate  o   env\Scripts\activate.bat
 - Windows (alternativa): ./env/Scripts.activate
 
 ## Instalar dependencias
