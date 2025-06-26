@@ -173,6 +173,7 @@ class VenueAdmin(admin.ModelAdmin):
     #list_editable = ['address']
     search_fields =['name']
     list_filter = ['name']
+    list_per_page= 10;
 
 class NotificationAdmin(admin.ModelAdmin):
     list_display = ['title', 'user', 'created_at', 'read']
