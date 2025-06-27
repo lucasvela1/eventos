@@ -28,6 +28,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['es_home'] = True
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
         category_id = self.request.GET.get('category_id')
