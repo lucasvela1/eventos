@@ -1,23 +1,24 @@
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.db.models import Avg, Case, IntegerField, Value, When
 from django.shortcuts import get_object_or_404, redirect, render
 from django.urls import reverse_lazy
 from django.views import View
 from django.views.generic import DetailView, ListView, TemplateView
-from django.views.generic.edit import FormView, UpdateView
+from django.views.generic.edit import FormView, UpdateView, DeleteView
 from django.utils.timezone import now
-from django.db.models import Q, Avg
+from django.utils import timezone
+from django.db.models import Q
 import uuid
 from django.db.models import Prefetch
 
+
 from django.db import models
 from datetime import timedelta
-from .forms import RatingForm, UsuarioRegisterForm, CommentForm
+from .forms import RatingForm, UsuarioRegisterForm, CommentForm, PagoForm
 from django.db import transaction
-from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment
-from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating
+from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type, Pago
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating, validar_tarjeta_luhn
 
 
 
@@ -28,25 +29,42 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+<<<<<<< HEAD
         context['es_home'] = True
+=======
+        user = self.request.user
+>>>>>>> main
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
+        events_proximos_queryset = Event.objects.filter(date__gte=now().date(), cancelado=False)
         category_id = self.request.GET.get('category_id')
         if category_id:
             try:
                 category = get_object_or_404(Category, id=category_id)
+                events_proximos_queryset = events_proximos_queryset.filter(categorias=category).distinct()
                 # La logica del filtrado por categoria para el carrousel de eventos proximos en el home
-                context['events_proximos'] = Event.objects.filter(
-                    date__gte=now().date(),
-                    cancelado=False,
-                    categoria=category
-                ).order_by("date") #Los ordenamos por su fecha
-                context['selected_category'] = category #Se envia la categoría seleccionada al template
+                context['selected_category'] = category
             except:
                 #Si surge un error al obtener la categoría, se obtienen los eventos próximos sin filtrar
                 context['events_proximos'] = obtener_eventos_proximos()
         else:
-           context['events_proximos'] = obtener_eventos_proximos()
+            pass
+        if user.is_authenticated:
+            favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
+            
+            events_proximos_queryset = events_proximos_queryset.annotate(
+                is_favorito=Case(
+                    When(pk__in=list(favoritos_ids), then=Value(1)),
+                    default=Value(0),
+                    output_field=IntegerField()
+                )
+            )
+            # Ordenamos por favoritos primero, y luego por fecha
+            context['events_proximos'] = events_proximos_queryset.order_by('-is_favorito', 'date')
+        else:
+            # Para usuarios no autenticados, solo ordenamos por fecha
+            context['events_proximos'] = events_proximos_queryset.order_by('date')
+
         return context
 
 class EventListView(ListView):
@@ -56,7 +74,21 @@ class EventListView(ListView):
 
     def get_queryset(self): #Pasarle una lista distinta al context
         today = now().date()
-        return Event.objects.filter(date__gte=today, cancelado=False).order_by("date")
+        user = self.request.user
+        queryset = Event.objects.filter(date__gte=today, cancelado=False).order_by("date")
+        if user.is_authenticated: #para obtener los eventos favoritos del usuario autenticado
+            favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
+            queryset = queryset.annotate(
+                is_favorito=Case(
+                    When(pk__in=list(favoritos_ids), then=Value(1)),
+                    default=Value(0), #Si el evento no es favorito, asigna 0
+                    output_field=IntegerField()
+                )
+            )            
+            return queryset.order_by('-is_favorito', 'date') #Se ordena por favoritos y luego por fecha
+        else:
+            # Si no está autenticado, solo ordenamos por fecha
+            return queryset.order_by('date')
 
     def get_context_data(self, **kwargs):  #Llamo al context data del padre, me traigo todos los objetos de event
         context = super().get_context_data(**kwargs)
@@ -77,31 +109,64 @@ class EventDetailView(DetailView):
         context = super().get_context_data(**kwargs)
         event = self.get_object()
         user = self.request.user
-
+        event_has_passed = event.date < timezone.now().date()
+        context['event_has_passed'] = event_has_passed
         context['comments'] = Comment.objects.filter(event = event).order_by('-created_at')
         context['form'] = CommentForm()
+
         if user.is_authenticated:
-            context['tiene_ticket'] = Ticket.objects.filter(user=user, event=event).exists()
+            tiene_ticket = Ticket.objects.filter(user=user, event=event).exists() #Si existe la relación entre el usuario y el evento
+            context['tiene_ticket'] = tiene_ticket
+            ha_calificado = Rating.objects.filter(user=user, event=event).exists() #Revisamos si el user tiene un rating asociado
+            user_can_rate = tiene_ticket and event_has_passed and not ha_calificado
+            context['user_can_rate'] = user_can_rate #Si el usuario tiene ticket y el evento finalizó, no calificó aún, entonces puede calificar
         else:
             context['tiene_ticket'] = False
+            context['user_can_rate'] = False
         return context
     
     def post(self, request, *args, **kwargs):
         self.object = self.get_object()
-        form = CommentForm(request.POST)
+        user = request.user
+        event = self.object
 
-        if request.user.is_authenticated and form.is_valid():
-            comment = form.save(commit=False)
-            comment.user = request.user
-            comment.event = self.object
-            comment.title = self.object.title
-            comment.save()
-
-            return redirect('event_detail', pk=self.object.pk)
+        if 'delete_comment_id' in request.POST:
+            comment_id = request.POST.get('delete_comment_id')
+            comment = get_object_or_404(Comment, pk=comment_id, user=user)
+            comment.delete()
+            return redirect('event_detail', pk=event.pk)
         
-        context = self.get_context_data()
-        context['form'] = form
-        return self.render_to_response(context)
+        elif 'edit_comment_id' in request.POST:
+            comment_id = request.POST.get('edit_comment_id')
+            new_text = request.POST.get('text','').strip()
+            comment = get_object_or_404(Comment, pk=comment_id, user=user)
+            if new_text:
+                comment.text = new_text
+                comment.save()
+            return redirect('event_detail', pk=event.pk)
+        else:
+            form = CommentForm(request.POST)
+            if user.is_authenticated and form.is_valid():
+                comment = form.save(commit=False)
+                comment.user = user
+                comment.event = event
+                comment.title = event.title
+                comment.save()
+                return redirect('event_detail', pk=event.pk)
+
+            context = self.get_context_data()
+            context['form'] = form
+            return self.render_to_response(context)
+
+class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Comment
+    template_name = 'app/delete_comment.html'
+
+    def get_success_url(self):
+        return reverse_lazy('event_detail', kwargs={'pk': self.get_object().event.pk})
+
+    def test_func(self):
+        return self.request.user == self.get_object().user
 
 
 class NotificationListView(LoginRequiredMixin, ListView):
@@ -114,16 +179,20 @@ class NotificationListView(LoginRequiredMixin, ListView):
             When(priority='HIGH', then=Value(1)),
             When(priority='MEDIUM', then=Value(2)),
             When(priority='LOW', then=Value(3)),
-            default=Value(4), # Para cualquier otro valor o si es None
+            default=Value(4),
             output_field=IntegerField(),
         )
-        return Notification.objects.filter(user=self.request.user).order_by(priority_order, "-created_at") 
-         #filtrar notificaciones por usuario
-         # Ordena las notificaciones por prioridad y luego por fecha de creación, de más reciente a más antiguo
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        return context
+        
+        queryset = Notification.objects.filter(user=self.request.user).order_by(priority_order, "-created_at")
+        
+        queryset.filter(read=False).update(read=True)
+        return queryset
+    
+class EliminarNotificacionesSeleccionadasView(LoginRequiredMixin, View):
+    def post(self, request):
+        ids_a_eliminar = request.POST.getlist("notificaciones")
+        Notification.objects.filter(user=request.user, id__in=ids_a_eliminar).delete()
+        return redirect("notifications")
     
 class FavoritosListView(LoginRequiredMixin, ListView):
     model = Favorito
@@ -157,50 +226,107 @@ class ToggleFavoritoView(LoginRequiredMixin, View):
         return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
     
 class CarritoView(LoginRequiredMixin, View):
-    login_url = "/accounts/login/"
+    login_url = "/accounts/login/" #Si el usuario no está autenticado, lo redirige a la página de login
 
     def get(self, request, event_id):
-      event = Event.objects.get(id=event_id)
-      tickets_restantes = event.venue.capacity - event.capacidad_ocupada
-      vip_price = event.price * 1.25
-      return render(request, "app/carrito.html", {
-        "event": event,
-        "tickets_restantes": tickets_restantes,
-        "tickets_vip": vip_price
-    })
+        event = Event.objects.get(id=event_id)
+        precio_vip = event.price * 1.25 #Representamos el precio vip como un valor fijo 25% más caro que el normal
+        tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+        form = PagoForm() #Crea la instancia vacía del formulario de pago
+        return render(request, "app/carrito.html", {
+            "event": event,
+            "tickets_restantes": tickets_restantes,
+            "tickets_vip": precio_vip,
+            "form": form, 
+        }) #Toda la info que devuelve al template
 
     def post(self, request, event_id):
-       event = Event.objects.get(id=event_id)
-       cantidad_general = int(request.POST.get("cantidad_general", 0))
-       cantidad_vip = int(request.POST.get("cantidad_vip", 0))
-       cantidad = cantidad_general + cantidad_vip
-       if cantidad < 1:
-         return redirect("carrito", event_id=event_id)
-       #Por más que en el html no aparezca para poner menos a 0, o 0. Se puede manipular y enviar de alguna forma
-       #un valor que no corresponde, por eso con esto validamos en nuestra parte "backend"
-       
-       with transaction.atomic():
-           capacidad_libre = event.venue.capacity - event.capacidad_ocupada
-           if cantidad > capacidad_libre:
-                return redirect("carrito", event_id=event_id)
-           
-       event.capacidad_ocupada+=cantidad
-       event.save()
-       Ticket.objects.create(
-            user=request.user,
-            event=event,
-            quantity=cantidad,
-            total=cantidad * event.price,
-            ticket_code=str(uuid.uuid4())
-        ) 
+        event = Event.objects.get(id=event_id)
+        form = PagoForm(request.POST)
 
-       Notification.objects.create(
-           user=request.user,
-           title="Ticket comprado",
-           message=f"Se ha comprado exitosamente {cantidad} ticket/s para {event.title}",
-           priority="MEDIUM"
-       )
-       return redirect("my_account")
+        try:
+            cantidad_general = int(request.POST.get("cantidad_general", 0))
+            cantidad_vip = int(request.POST.get("cantidad_vip", 0))
+            numero_tarjeta = request.POST.get("numero_tarjeta","").strip()
+        except (ValueError, TypeError):
+            messages.error(request, "Por favor, introduce un número válido de tickets.")
+            return redirect("carrito", event_id=event_id)
+        
+        total_cantidad_comprada = cantidad_general + cantidad_vip
+
+        if total_cantidad_comprada <= 0:
+            messages.error(request, "Debes seleccionar al menos un ticket para comprar.")
+            return redirect("carrito", event_id=event_id)
+        #Lo de arriba valida y obtiene la cantidad de tickets, si es mayor a cero y si son numeros validos
+        # Validar tarjeta con el form
+        if not form.is_valid():
+            precio_vip = event.price * 1.25
+            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+            return render(request, "app/carrito.html", {
+                "event": event,
+                "tickets_restantes": tickets_restantes,
+                "tickets_vip": precio_vip,
+                "form": form,
+            })
+
+        numero_tarjeta = form.cleaned_data["numero_tarjeta"]
+        if not validar_tarjeta_luhn(numero_tarjeta):
+            form.add_error("numero_tarjeta", "El número de tarjeta ingresado no es válido.")
+            precio_vip = event.price * 1.25
+            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
+            return render(request, "app/carrito.html", {
+                "event": event,
+                "tickets_restantes": tickets_restantes,
+                "tickets_vip": precio_vip,
+                "form": form,
+            })
+
+        precio_vip = event.price * 1.25
+
+        with transaction.atomic():
+            event_a_actualizar = Event.objects.select_for_update().get(id=event_id)
+            
+            capacidad_libre = event_a_actualizar.venue.capacity - event_a_actualizar.capacidad_ocupada
+            if total_cantidad_comprada > capacidad_libre:
+                messages.error(request, f"No hay suficientes tickets. Solo quedan {capacidad_libre} disponibles.")
+                return redirect("carrito", event_id=event_id)
+            event_a_actualizar.capacidad_ocupada += total_cantidad_comprada
+            event_a_actualizar.save()
+            #Por como esta hecho, crea dos tickets, uno general y otro vip con sus cantidades, si se compran ambos tipos
+            if cantidad_general > 0:
+                Ticket.objects.create(
+                    user=request.user,
+                    event=event_a_actualizar,
+                    quantity=cantidad_general,
+                    type=Type.general,  
+                    total=cantidad_general * event_a_actualizar.price,
+                    ticket_code=f"GEN-{uuid.uuid4()}" # Código único con prefijo GEN para diferenciar de los vips
+                )
+
+            if cantidad_vip > 0:
+                Ticket.objects.create(
+                    user=request.user,
+                    event=event_a_actualizar,
+                    quantity=cantidad_vip,
+                    type=Type.vip,  
+                    total=cantidad_vip * precio_vip,
+                    ticket_code=f"VIP-{uuid.uuid4()}" # Código único con prefijo VIP para diferenciar de los generales
+                )
+
+            # Sumar puntos al usuario
+            total_puntos = total_cantidad_comprada * event_a_actualizar.cantidad_puntos
+            request.user.puntaje += total_puntos
+            request.user.save()
+
+            Notification.objects.create(
+                user=request.user,
+                title="Ticket comprado",
+                message=f"Compraste {total_cantidad_comprada} ticket/s para {event_a_actualizar.title}.",
+                priority="MEDIUM"
+            )
+
+        return redirect("my_account")
+
 
 class RegisterView(FormView):
     template_name = "accounts/register.html"
@@ -437,7 +563,4 @@ class ReembolsoView(LoginRequiredMixin, View):
 
         return redirect("my_account")
 
-
-class AceptarReembolsoView(PermissionRequiredMixin, View):
-    permission_required = 'app_name.can_accept_refund'
 

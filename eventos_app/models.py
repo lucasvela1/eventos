@@ -31,6 +31,7 @@ class Category(models.Model):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
 
 
+
 class Venue(models.Model):
     name = models.CharField(max_length=200)
     address = models.TextField()
@@ -65,7 +66,7 @@ class Event(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     total_rating = models.PositiveIntegerField(default=0)
-    categoria = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True)
+    categorias = models.ManyToManyField(Category, blank=True, related_name='events')
     venue = models.ForeignKey(Venue, on_delete=models.SET_NULL, null=True, blank=False)
     suma_puntaje=models.BooleanField(default=False)
     cantidad_puntos=models.PositiveIntegerField(default=0)
@@ -143,7 +144,7 @@ class Notification(models.Model):
     
 class RefundRequest(models.Model):
     approved = models.BooleanField()
-    approval_date = models.DateField(auto_now_add=True)
+    approval_date = models.DateField(null=True, blank=True) #Anteriormente tomaba la fecha de creacion como fecha de aprobacion
     ticket_code = models.TextField(unique=True)
     reason = models.TextField()
     created_at = models.DateField(auto_now_add=True)
@@ -214,3 +215,16 @@ class Favorito(models.Model):
 
     class Meta():
         unique_together = ("user", "event")
+
+class Pago(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
+    nombre_titular = models.CharField("Nombre del titular", max_length=100)
+    numero_tarjeta = models.CharField("Número de tarjeta", max_length=16)
+    fecha_vencimiento = models.CharField("Fecha de expiración (MM/AA)", max_length=5)
+    cvv = models.CharField("Código de seguridad (CVV)", max_length=4)
+    monto = models.DecimalField("Monto total", max_digits=10, decimal_places=2)
+    fecha_creacion = models.DateTimeField("Fecha del pago", auto_now_add=True)
+
+    def __str__(self):
+        return f"Pago de {self.user.username} por ${self.monto}"

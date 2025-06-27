@@ -4,8 +4,9 @@
 
 {% block content %}
 <div class="container">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+    <div class="d-flex flex-column align-items-start mb-4">
         <h1><span class="nav-link">Hola, {{ request.user.username }}</span></h1>
+        <h4 class="mt-1">Puntaje: {{ request.user.puntaje }}</h4>
     </div>
 
     <!-- Mis Tickets -->
@@ -17,6 +18,7 @@
                     <th>#</th>
                     <th>Evento</th>
                     <th>Fecha</th>
+                    <th>Tipo</th>
                     <th>Cantidad</th>
                     <th>Precio total</th>
                     <th>Estado</th>
@@ -29,6 +31,7 @@
                     <td>{{ forloop.counter }}</td>
                     <td>{{ ticket.event.title }}</td>
                     <td>{{ ticket.event.date|date:"d/m/Y" }}</td>
+                    <td>{{ ticket.type}}</td>
                     <td>{{ ticket.quantity }}</td>
                     <td>${{ ticket.total }}</td>
                     <td>
@@ -142,52 +145,7 @@
         </table>
     </div>
 
-    <!-- Mis Notificaciones -->
-    <h2 class="mb-3">Mis Notificaciones</h2>
-    <div class="mb-5">
-        <div class="table-responsive">
-            <table class="table table-striped">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Título</th>
-                        <th>Mensaje</th>
-                        <th>Prioridad</th>
-                        <th>Fecha</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% if total_unread > 0 %}
-                    {% if total_unread > 5 %}
-                    <tr class="table-light">
-                        <td colspan="4" class="text-center">Mostrando las últimas 5 notificaciones</td>
-                    </tr>
-                    <!--
-                            <tr>
-                                <td colspan="4" class="text-center">Hay {{ total_unread }} notificaciones no leídas.</td>
-                            </tr>
-                            -->
-                    {% endif %}
-                    {% for notif in unread_notifications %}
-                    <tr>
-                        <td>{{ notif.title }}</td>
-                        <td>{{ notif.message }}</td>
-                        <td>{{ notif.priority }}</td>
-                        <td>{{ notif.created_at|date:"d/m/Y H:i" }}</td>
-                    </tr>
-                    {% endfor %}
-                    {% else %}
-                    <tr class="table-light">
-                        <td colspan="4" class="text-center">No tenés notificaciones nuevas.</td>
-                    </tr>
-                    {% endif %}
-                </tbody>
-            </table>
-        </div>
-
-        <div class="text-end mt-3">
-            <a href="{% url 'notifications' %}" class="btn btn-warning rounded-pill fw-bold px-4 py-2">Ver Todas</a>
-        </div>
-    </div>
+    
 
     <h2 class="mb-3">Mis Solicitudes de Reembolso</h2>
     <div class="mb-5">
@@ -199,7 +157,7 @@
                         <th>Razón</th>
                         <th>Estado</th>
                         <th>Fecha de Solicitud</th>
-                        <th>Fecha de Aprobación</th>
+                        <th>Fecha de Revision</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -217,15 +175,17 @@
                         <td>{{ request.ticket_code }}</td>
                         <td>{{ request.reason|truncatewords:10 }}</td>
                         <td>
-                            {% if request.approved %}
-                            <span class="badge bg-success">Aprobado</span>
+                            {% if request.approved and request.approval_date %}
+                                <span class="badge bg-success">Aprobado</span>
+                            {% elif not request.approved and request.approval_date %}
+                                <span class="badge bg-danger">Rechazado</span>
                             {% else %}
-                            <span class="badge bg-warning text-dark">Pendiente</span>
+                                <span class="badge bg-warning text-dark">Pendiente</span>
                             {% endif %}
                         </td>
                         <td>{{ request.created_at|date:"d/m/Y" }}</td>
                         <td>
-                            {% if request.approved %}
+                            {% if request.approval_date %}
                             {{ request.approval_date|date:"d/m/Y" }}
                             {% else %}
                             <span class="text-muted">-</span>

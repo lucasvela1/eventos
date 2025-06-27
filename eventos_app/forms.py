@@ -1,9 +1,9 @@
 from django import forms
 from .models import Rating
 from django.contrib.auth.forms import UserCreationForm
-from .models import CustomUser, Comment
+from .models import CustomUser, Comment, Pago
 from django.contrib.auth.forms import AuthenticationForm
-
+from .utils import validar_tarjeta_luhn
 
 class RatingForm(forms.ModelForm):
     class Meta:
@@ -91,3 +91,25 @@ class CommentForm(forms.ModelForm):
         labels = {
             'text': 'Comentario',
         }
+
+class PagoForm(forms.ModelForm):
+    class Meta:
+        model = Pago
+        fields = ['nombre_titular', 'numero_tarjeta', 'fecha_vencimiento', 'cvv']
+        labels = {
+            'nombre_titular': 'Nombre del Titular',
+            'numero_tarjeta': 'Número de Tarjeta',
+            'fecha_vencimiento': 'Fecha de Vencimiento (MM/AA)',
+            'cvv': 'CVV',
+        }
+        widgets = {
+            'nombre_titular': forms.TextInput(attrs={'class': 'form-control'}),
+            'numero_tarjeta': forms.TextInput(attrs={'class': 'form-control', 'maxlength': 19}),
+            'fecha_vencimiento': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'MM/AA'}),
+            'cvv': forms.PasswordInput(attrs={'class': 'form-control', 'maxlength': 4}),
+        }
+        def clean_numero_tarjeta(self):
+            numero = self.cleaned_data['numero_tarjeta'].replace(" ", "")
+            if not validar_tarjeta_luhn(numero):
+                raise forms.ValidationError("El número de tarjeta no es válido.")
+            return numero

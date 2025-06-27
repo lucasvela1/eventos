@@ -5,7 +5,7 @@
 {% include "app/search_form.html" %}
 
 <!-- CARRUSEL DE EVENTOS DESTACADOS -->
-<div class="container mt-2">
+<div class="container mt-2" style="margin-top: 20px;">
   <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
     <!-- Indicadores -->
     <div class="carousel-indicators">
@@ -59,22 +59,22 @@
     <div class="glide__track" data-glide-el="track">
       <ul class="glide__slides">
         {% for categoria in categorys %}
-        <li class="glide__slide">
-          {% if selected_category and selected_category.id == categoria.id %}
-            <a href="{% url 'home' %}#carrusel-categorias-section" style="text-decoration: none;"> <!-- Si es la misma, quita el filtro -->
-          {% else %}
-            <a href="{% url 'home' %}?category_id={{ categoria.id }}#carrusel-categorias-section" style="text-decoration: none;">  <!-- Si es diferente, aplica el filtro -->
-          {% endif %}
-            <div class="card mx-2" style="width: 18rem;">
-              <img src="{{ categoria.imagen_url_directa }}" class="card-img-top" alt="{{ categoria.name }}"
-                style="height: 200px; object-fit: cover;">
-              
-              <div class="card-body">
-                <h5 class="card-title text-center">{{ categoria.name }}</h5>
-              </div>
-            </div>
-          </a>
-        </li>
+
+          <li class="glide__slide">
+            {% if selected_category and selected_category.id == categoria.id %}
+              <a href="{% url 'home' %}#carrusel-categorias-section" style="text-decoration: none;">
+               {% else %}
+              <a href="{% url 'home' %}?category_id={{ categoria.id }}#carrusel-categorias-section" style="text-decoration: none;">
+               {% endif %}
+                <div class="card h-100" style="width: 100%; max-width: 300px; margin: 0 auto;">
+                  <img src="{{ categoria.imagen_url_directa }}" class="card-img-top" alt="{{ categoria.name }}"
+                      style="height: 200px; object-fit: cover;">
+                  <div class="card-body">
+                    <h5 class="card-title text-center">{{ categoria.name }}</h5>
+                  </div>
+                </div>
+              </a>
+          </li>
         {% endfor %}
       </ul>
     </div>
@@ -91,19 +91,27 @@
   <div id="carrusel-proximos" class="glide">
     <div class="glide__track" data-glide-el="track">
       <ul class="glide__slides">
-        {% for event in events_proximos %}
-        <li class="glide__slide">
-          <a href="{% url 'event_detail' event.id %}" style="text-decoration: none;">
-            <div class="card bg-light text-dark mx-2" style="width: 18rem; height: 315px;">
-              <img src="{{ event.imagen_url_directa }}" class="card-img-top" alt="{{ event.title }}"
-                style="height: 200px; object-fit: cover;">
-              <div class="card-body">
-                <h5 class="card-title">{{ event.title }}</h5>
-                <p class="card-text">{{ event.date|date:"d/m/Y" }}</p>
-              </div>
-            </div>
-          </a>
-        </li>
+      
+
+            {% for event in events_proximos %}
+              <li class="glide__slide">
+                <a href="{% url 'event_detail' event.id %}" style="text-decoration: none;">
+                  <div class="card bg-light text-dark h-100" style="width: 100%; max-width: 300px; margin: 0 auto;">
+                    <img src="{{ event.imagen_url_directa }}" class="card-img-top" alt="{{ event.title }}"
+                        style="height: 200px; object-fit: cover;">
+                    <div class="card-body">
+       
+
+
+                      <h5 class="card-title">{{ event.title }}</h5>
+                      <p class="card-text">{{ event.date|date:"d/m/Y" }}</p>
+                    </div>
+                  </div>
+                </a>
+              </li>
+           
+
+
         {% endfor %}
         <!-- Card de "Ver Más" -->
         <li class="glide__slide">
@@ -123,5 +131,6 @@
     </div>
   </div>
 </div>
+
 
 {% endblock %}
