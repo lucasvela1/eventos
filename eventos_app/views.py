@@ -18,7 +18,7 @@ from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm, CommentForm, PagoForm
 from django.db import transaction
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type, Pago
-from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating, validar_tarjeta_luhn
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating
 
 
 
@@ -29,11 +29,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-<<<<<<< HEAD
-        context['es_home'] = True
-=======
         user = self.request.user
->>>>>>> main
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
         events_proximos_queryset = Event.objects.filter(date__gte=now().date(), cancelado=False)
@@ -270,7 +266,7 @@ class CarritoView(LoginRequiredMixin, View):
             })
 
         numero_tarjeta = form.cleaned_data["numero_tarjeta"]
-        if not validar_tarjeta_luhn(numero_tarjeta):
+        if not Pago.validar_tarjeta_luhn(numero_tarjeta):
             form.add_error("numero_tarjeta", "El número de tarjeta ingresado no es válido.")
             precio_vip = event.price * 1.25
             tickets_restantes = event.venue.capacity - event.capacidad_ocupada

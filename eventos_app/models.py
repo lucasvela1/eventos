@@ -228,3 +228,23 @@ class Pago(models.Model):
 
     def __str__(self):
         return f"Pago de {self.user.username} por ${self.monto}"
+    
+    # Utilizaremos el algoritmo de Luhn para verificar la tarjeta
+    def validar_tarjeta_luhn(numero_tarjeta: str) -> bool:
+        numero_tarjeta = numero_tarjeta.replace(' ', '').replace('-', '')
+        if not numero_tarjeta.isdigit():
+            return False
+        
+        suma = 0
+        alt = False
+
+        for digito in reversed(numero_tarjeta):
+            d = int(digito)
+            if alt:
+                d *= 2
+                if d > 9:
+                    d -= 9
+            suma += d
+            alt = not alt
+
+        return suma % 10 == 0
