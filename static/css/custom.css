@@ -108,3 +108,20 @@ html, body {
   color: #222;
   margin-bottom: 0.2rem;
 }
+
+.glide__slide .card {
+  min-width: 220px;
+  flex: 1 1 auto;
+  static
+}
+
+.glide__slide {
+  display: flex;
+  justify-content: center;
+}
+
+.card {
+  width: 100%;
+  max-width: 18rem;
+}
+
