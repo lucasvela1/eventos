@@ -18,7 +18,7 @@ from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm, CommentForm, PagoForm
 from django.db import transaction
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type, Pago
-from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating, validar_tarjeta_luhn
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos, validar_tarjeta_luhn
 
 
 
@@ -410,7 +410,7 @@ class CrearRatingView(LoginRequiredMixin, FormView):
         rating.event = self.event
         rating.save()
         #messages.success(self.request, "Calificación creada correctamente.")
-        actualizar_total_rating(self.event)
+        self.event.actualizar_total_rating()
         return redirect(reverse_lazy('my_account'))
 
     def get_context_data(self, **kwargs):
@@ -441,7 +441,7 @@ class EditarRatingView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.save()
-        actualizar_total_rating(self.rating.event)
+        self.rating.event.actualizar_total_rating()
         messages.success(self.request, "Calificación actualizada correctamente.")
         return redirect(reverse_lazy('my_account'))
 

@@ -100,6 +100,12 @@ class Event(models.Model):
     @property
     def finalizado(self):
         return self.date < now().date()- timedelta(days=1)
+    
+    def actualizar_total_rating(self) -> float:
+        promedio = self.rating_set.aggregate(promedio=Avg('rating'))['promedio']
+        self.total_rating = round(promedio) if promedio is not None else 0
+        self.save(update_fields=['total_rating'])
+        return promedio
 
 class Priority(models.TextChoices):
     high = 'HIGH'
