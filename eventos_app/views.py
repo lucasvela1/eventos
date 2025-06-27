@@ -29,11 +29,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-<<<<<<< HEAD
-        context['es_home'] = True
-=======
         user = self.request.user
->>>>>>> main
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
         events_proximos_queryset = Event.objects.filter(date__gte=now().date(), cancelado=False)
