@@ -17,7 +17,9 @@
                 <th>Rating</th>
                 <th>Fecha</th>
                 <th>Estado</th> 
-                <th>Acciones</th>
+                {% if user.is_authenticated %}
+                <th>Calificar</th>
+                {% endif %}
             </tr>
         </thead>
        <tbody>
@@ -51,16 +53,17 @@
             <td>
                 {% if user.is_authenticated %}
                     {% if event.id in eventos_con_ticket %}
-                        {% if event.id in eventos_ya_calificados %}
-                            <span class="text-muted">Ya calificado</span>
-                        {% else %}
-                            <a href="{% url 'crear_rating' event.id %}" class="btn btn-sm btn-outline-primary">Calificar</a>
-                        {% endif %}
+                            {% if event.id in eventos_ya_calificados and event.user_rating %}
+                                {% with rating=event.user_rating.0 %}
+                                    <a href="{% url 'editar_rating' rating.id %}" class="btn btn-sm btn-outline-primary">Editar</a>
+                                {% endwith %}
+                            {% else %}
+                                <a href="{% url 'crear_rating' event.id %}" class="btn btn-sm btn-outline-primary">Calificar</a>
+                            {% endif %}
                     {% else %}
                         <span class="text-muted">Sin ticket</span>
                     {% endif %}
-                {% else %}
-                    <a href="{% url 'login' %}?next={% url 'crear_rating' event.id %}" class="btn btn-sm btn-secondary">Iniciar sesión</a>
+                
                 {% endif %}
             </td>
         </tr>

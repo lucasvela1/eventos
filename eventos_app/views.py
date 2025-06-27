@@ -29,7 +29,11 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+<<<<<<< HEAD
+        context['es_home'] = True
+=======
         user = self.request.user
+>>>>>>> main
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
         events_proximos_queryset = Event.objects.filter(date__gte=now().date(), cancelado=False)
@@ -484,28 +488,33 @@ class MiCuentaView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         user = self.request.user
+        today = now().date()
+        context['today'] = today
+
         context['user'] = user
-        context['favoritos'] = Favorito.objects.filter(user=user)
-        context['refund_requests'] = RefundRequest.objects.filter(user=user)
         unread_notifications = Notification.objects.filter(user=user, read=False).order_by('-created_at')[:5]
         context['unread_notifications'] = unread_notifications
         context['total_unread'] = Notification.objects.filter(user=user, read=False).count()
+        context['favoritos'] = Favorito.objects.filter(user=user)
+        context['refund_requests'] = RefundRequest.objects.filter(user=user)
         context['tickets'] = Ticket.objects.filter(user=user)
-        today = now().date()
+        
         # Eventos para los que el usuario compró ticket
         eventos_con_ticket = Ticket.objects.filter(user=user).values_list('event', flat=True)
+        context['eventos_con_ticket'] = eventos_con_ticket
 
         # Filtrar solo los eventos no finalizados y no cancelados
         tickets_eventos_activos = Ticket.objects.filter(user=user,event__date__gte=today,event__cancelado=False)
+        context['tickets_eventos_activos'] = tickets_eventos_activos
 
         # Eventos ya calificados por el usuario
         user_ratings = Rating.objects.filter(user=user)
         eventos_ya_calificados = Event.objects.filter(rating__user=user).prefetch_related(
             Prefetch('rating_set', queryset=user_ratings, to_attr='user_rating')
         ).distinct()
+        context['eventos_ya_calificados'] = eventos_ya_calificados
 
-        # Eventos para calificar: con ticket comprado, que ya finalizaron o fueron cancelados,
-        # y que el usuario no haya calificado aún
+        # Eventos para calificar.
         eventos_a_calificar = Event.objects.filter(
             id__in=eventos_con_ticket
         ).exclude(
@@ -513,11 +522,8 @@ class MiCuentaView(TemplateView):
         ).filter(
             models.Q(cancelado=True) | models.Q(date__lt=today)  # Eventos cancelados o pasados
         )
-        context['eventos_con_ticket'] = eventos_con_ticket
         context['eventos_a_calificar'] = eventos_a_calificar
-        context['eventos_ya_calificados'] = eventos_ya_calificados
-        context['tickets_eventos_activos'] = tickets_eventos_activos
-
+        
         return context
     
 
