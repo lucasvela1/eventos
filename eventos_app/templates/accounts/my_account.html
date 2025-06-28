@@ -64,14 +64,11 @@
                                 <i class="bi bi-cash"></i>
                             </a>
                         {% endif %}
-
-                        {% for event in eventos_a_calificar %}
-                            {% if ticket.event in eventos_a_calificar %}
-                                <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
-                                    <i class="bi bi-star"></i>
-                                </a>
-                            {% endif %}
-                        {% endfor %}
+                        {% if ticket.event in eventos_a_calificar %}
+                            <a href="{% url 'crear_rating' ticket.event.id %}" class="btn btn-sm btn-outline-warning" title="Calificar">
+                                <i class="bi bi-star"></i>
+                            </a>
+                        {% endif %}
                     </td>
                 </tr>
                     </td>

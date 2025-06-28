@@ -359,8 +359,7 @@ class RatingView(ListView):
         return (
             Event.objects
             .filter(Q(date__lt=yesterday) | Q(cancelado=True))  # Eventos finalizados o cancelados
-            .annotate(rating_promedio=Avg("rating__rating"))  # Calcula el promedio de ratings
-            .order_by("-rating_promedio")
+            .order_by("-total_rating")
         )
 
     def get_context_data(self, **kwargs):
@@ -466,7 +465,9 @@ class EliminarRatingView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         rating = get_object_or_404(Rating, pk=pk, user=request.user)
+        evento = rating.event
         rating.delete()
+        evento.actualizar_total_rating()
         return redirect(reverse_lazy('my_account'))
 
 class BuscarEventosView(ListView):
