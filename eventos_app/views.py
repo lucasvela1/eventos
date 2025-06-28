@@ -29,6 +29,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['home']=True
         user = self.request.user
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
@@ -368,10 +369,17 @@ class RatingView(ListView):
         if user.is_authenticated:
             # Eventos con ticket comprado
             tickets = Ticket.objects.filter(user=user).values_list('event_id', flat=True)
-            # Eventos ya calificados
-            ratings = Rating.objects.filter(user=user).values_list('event_id', flat=True)
             context['eventos_con_ticket'] = set(tickets)
-            context['eventos_ya_calificados'] = set(ratings)
+            # Eventos ya calificados
+            ratings_qs = Rating.objects.filter(user=user)
+            ratings_dict = {r.event_id: r for r in ratings_qs}
+            eventos = context['events']
+            for evento in eventos:
+                if evento.id in ratings_dict:
+                    evento.user_rating = [ratings_dict[evento.id]]
+                else:
+                    evento.user_rating = []
+            context['eventos_ya_calificados'] = set(ratings_dict.keys())
         else:
             context['eventos_con_ticket'] = set()
             context['eventos_ya_calificados'] = set()
