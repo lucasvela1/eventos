@@ -46,13 +46,13 @@
             {% endif %}
           </div>
 
-          <div class="mb-3">
-            {{ form.numero_tarjeta.label_tag }}
-            {{ form.numero_tarjeta }}
-            {% if form.numero_tarjeta.errors %}
-              <div class="text-danger">{{ form.numero_tarjeta.errors }}</div>
-            {% endif %}
-          </div>
+      <div class="mb-3">
+        {{ form.numero_tarjeta.label_tag }}
+        {{ form.numero_tarjeta }}
+        {% if form.numero_tarjeta.errors %}
+          <div class="text-danger">{{ form.numero_tarjeta.errors }}</div>
+        {% endif %}
+      </div>
 
           <div class="mb-3">
             {{ form.fecha_vencimiento.label_tag }}

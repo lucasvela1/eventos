@@ -18,10 +18,7 @@ from datetime import timedelta
 from .forms import RatingForm, UsuarioRegisterForm, CommentForm, PagoForm
 from django.db import transaction
 from .models import Event, Favorito, Notification, Rating, RefundRequest, Ticket, Category, Comment, Type, Pago
-from .utils import obtener_eventos_destacados, obtener_eventos_proximos, validar_tarjeta_luhn
-
-
-
+from .utils import obtener_eventos_destacados, obtener_eventos_proximos, actualizar_total_rating
 
 class HomeView(TemplateView):
     template_name = "home.html"
@@ -69,33 +66,13 @@ class EventListView(ListView):
     template_name = "app/events.html" #Incluyo el template que controla la vista
     context_object_name = "events"
 
-    def get_queryset(self): #Pasarle una lista distinta al context
-        today = now().date()
-        user = self.request.user
-        queryset = Event.objects.filter(date__gte=today, cancelado=False).order_by("date")
-        if user.is_authenticated: #para obtener los eventos favoritos del usuario autenticado
-            favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
-            queryset = queryset.annotate(
-                is_favorito=Case(
-                    When(pk__in=list(favoritos_ids), then=Value(1)),
-                    default=Value(0), #Si el evento no es favorito, asigna 0
-                    output_field=IntegerField()
-                )
-            )            
-            return queryset.order_by('-is_favorito', 'date') #Se ordena por favoritos y luego por fecha
-        else:
-            # Si no está autenticado, solo ordenamos por fecha
-            return queryset.order_by('date')
+    def get_queryset(self):
+        return Event.objects.activos_para_usuario(self.request.user)
 
-    def get_context_data(self, **kwargs):  #Llamo al context data del padre, me traigo todos los objetos de event
+    def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        user = self.request.user
-        if user.is_authenticated:
-            favoritos_ids = Favorito.objects.filter(user=user).values_list('event_id', flat=True)
-            context['favoritos_ids'] = list(favoritos_ids)
-        else:
-            context['favoritos_ids'] = []
-        return context  
+        context['favoritos_ids'] = Event.objects.favoritos_ids_para_usuario(self.request.user)
+        return context
     
 class EventDetailView(DetailView):
     model = Event
@@ -267,7 +244,7 @@ class CarritoView(LoginRequiredMixin, View):
             })
 
         numero_tarjeta = form.cleaned_data["numero_tarjeta"]
-        if not validar_tarjeta_luhn(numero_tarjeta):
+        if not Pago.validar_tarjeta_luhn(numero_tarjeta):
             form.add_error("numero_tarjeta", "El número de tarjeta ingresado no es válido.")
             precio_vip = event.price * 1.25
             tickets_restantes = event.venue.capacity - event.capacidad_ocupada

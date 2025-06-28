@@ -8,7 +8,7 @@ from django.utils import timezone
 from django.db.models import Exists, OuterRef
 
 # Administración del modelo Event
-admin.site.site_header = "Panel de Administración - Grupo 4"
+admin.site.site_header = "Panel de Administración"
 admin.site.site_title = "Administración de Eventos"
 admin.site.index_title = "Bienvenido al panel de administración"
 
@@ -159,7 +159,6 @@ class CustomUserAdmin(UserAdmin):
             return []
         if hasattr(request.user, 'rol') and request.user.rol == UserRole.VENDEDOR:
             return ['username', 'email', 'rol']
-        return super().get_readonly_fields(request, obj)
         return super().get_readonly_fields(request, obj)
     
     def reiniciar_puntaje(self, request, queryset):
