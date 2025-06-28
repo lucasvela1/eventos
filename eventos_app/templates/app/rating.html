@@ -30,7 +30,7 @@
             <td>
                 {% if event.total_rating > 0 %}
                     <div class="text-warning fs-5">
-                    {% for i in "12345" %}
+                    {% for i in "12345"  %}
                         {% if forloop.counter <= event.total_rating %}
                         <i class="bi bi-star-fill"></i>
                         {% else %}

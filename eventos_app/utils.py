@@ -1,4 +1,4 @@
-from .models import Event,Rating
+from .models import Event
 from django.utils import timezone
 from django.db.models.functions import Coalesce
 from django.utils.timezone import now
@@ -33,11 +33,4 @@ def obtener_eventos_proximos(limit=10):
         date__gte=timezone.now()
         ).order_by('date')[:limit]
 
-# actualiza el total_rating de un evento
-def actualizar_total_rating(evento):
-    promedio = Rating.objects.filter(event=evento).aggregate(promedio=Avg('rating'))['promedio']
-    if promedio is not None:
-        evento.total_rating = round(promedio)
-    else:
-        evento.total_rating = 0
-    evento.save(update_fields=['total_rating'])
+
