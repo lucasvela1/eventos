@@ -198,109 +198,159 @@ class ToggleFavoritoView(LoginRequiredMixin, View):
         if not creado:
             favorito.delete()
         return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
-    
+  
+
 class CarritoView(LoginRequiredMixin, View):
-    login_url = "/accounts/login/" #Si el usuario no está autenticado, lo redirige a la página de login
+    login_url = "/accounts/login/"
+    template_name = "app/carrito.html"
 
     def get(self, request, event_id):
+        """
+        Muestra la página para seleccionar la cantidad de tickets.
+        """
         event = Event.objects.get(id=event_id)
-        precio_vip = event.price * 1.25 #Representamos el precio vip como un valor fijo 25% más caro que el normal
         tickets_restantes = event.venue.capacity - event.capacidad_ocupada
-        form = PagoForm() #Crea la instancia vacía del formulario de pago
-        return render(request, "app/carrito.html", {
+        precio_vip = event.price * 1.25 #
+
+
+        context = {
             "event": event,
             "tickets_restantes": tickets_restantes,
-            "tickets_vip": precio_vip,
-            "form": form, 
-        }) #Toda la info que devuelve al template
+            "precio_vip": precio_vip,   #El contexto que enviamos al template
+        }
+        return render(request, self.template_name, context)
 
     def post(self, request, event_id):
+        
+        #Valida la cantidad de tickets, la guarda en la sesión y redirige al pago.
+        
         event = Event.objects.get(id=event_id)
-        form = PagoForm(request.POST)
-
+        
         try:
             cantidad_general = int(request.POST.get("cantidad_general", 0))
             cantidad_vip = int(request.POST.get("cantidad_vip", 0))
-            numero_tarjeta = request.POST.get("numero_tarjeta","").strip()
         except (ValueError, TypeError):
             messages.error(request, "Por favor, introduce un número válido de tickets.")
-            return redirect("carrito", event_id=event_id)
+            return redirect("carrito", event_id=event_id) #Si la cantidad no es válida, redirige al carrito
         
         total_cantidad_comprada = cantidad_general + cantidad_vip
+        capacidad_libre = event.venue.capacity - event.capacidad_ocupada
 
         if total_cantidad_comprada <= 0:
             messages.error(request, "Debes seleccionar al menos un ticket para comprar.")
             return redirect("carrito", event_id=event_id)
-        #Lo de arriba valida y obtiene la cantidad de tickets, si es mayor a cero y si son numeros validos
-        # Validar tarjeta con el form
+
+        if total_cantidad_comprada > capacidad_libre:
+            messages.error(request, f"No hay suficientes tickets. Solo quedan {capacidad_libre} disponibles.")
+            return redirect("carrito", event_id=event_id)
+
+        # Guardamos la información en la sesión del usuario
+        request.session['cart'] = {
+            'event_id': event_id,
+            'cantidad_general': cantidad_general,
+            'cantidad_vip': cantidad_vip,
+        }
+
+        # Redirigimos a la nueva vista de pago
+        return redirect('pago', event_id=event_id)
+
+class PagoView(LoginRequiredMixin, View):
+    login_url = "/accounts/login/"
+    template_name = "app/pago.html"
+
+    def _prepare_context(self, event, cart_data, form=None):
+       
+        precio_vip = event.price * 1.25
+        total_a_pagar = (cart_data['cantidad_general'] * event.price) + (cart_data['cantidad_vip'] * precio_vip)
+        #Quitamos el Javascript y en esta ocasión cuando quiere hacer el pago le decimos cuanto cuesta todo
+        return {
+            "event": event,
+            "cantidad_general": cart_data['cantidad_general'],
+            "cantidad_vip": cart_data['cantidad_vip'],
+            "precio_vip": precio_vip,
+            "total_a_pagar": total_a_pagar,
+            "form": form or PagoForm(), # Usa el form con errores si existe, si no, uno nuevo
+        }  #Creamos un método para preparar el contexto que se va a enviar al template con todos los atributos necesarios
+
+    def get(self, request, event_id):
+        #Resumen del pedido y formulario de pago
+        cart_data = request.session.get('cart')
+        # Si no hay nada en el carrito o es de otro evento, redirigir al carrito
+        if not cart_data or cart_data.get('event_id') != event_id:
+            messages.warning(request, "Tu carrito está vacío o ha expirado. Por favor, selecciona tus tickets de nuevo.")
+            return redirect("carrito", event_id=event_id)
+
+        event = Event.objects.get(id=event_id)
+        context = self._prepare_context(event, cart_data)
+        
+        return render(request, self.template_name, context)
+
+    def post(self, request, event_id):
+        #Pago y creación de tickets
+        cart_data = request.session.get('cart')
+        if not cart_data or cart_data.get('event_id') != event_id:
+            return redirect("carrito", event_id=event_id)
+
+        event = Event.objects.get(id=event_id)
+        form = PagoForm(request.POST)
+
         if not form.is_valid():
-            precio_vip = event.price * 1.25
-            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
-            return render(request, "app/carrito.html", {
-                "event": event,
-                "tickets_restantes": tickets_restantes,
-                "tickets_vip": precio_vip,
-                "form": form,
-            })
+            # Si el form no es válido, re-renderizamos la página de pago con los errores
+            context = self._prepare_context(event, cart_data, form=form)
+            return render(request, self.template_name, context)
 
         numero_tarjeta = form.cleaned_data["numero_tarjeta"]
         if not Pago.validar_tarjeta_luhn(numero_tarjeta):
             form.add_error("numero_tarjeta", "El número de tarjeta ingresado no es válido.")
-            precio_vip = event.price * 1.25
-            tickets_restantes = event.venue.capacity - event.capacidad_ocupada
-            return render(request, "app/carrito.html", {
-                "event": event,
-                "tickets_restantes": tickets_restantes,
-                "tickets_vip": precio_vip,
-                "form": form,
-            })
-
+            context = self._prepare_context(event, cart_data, form=form)
+            return render(request, self.template_name, context)
+        
+        cantidad_general = cart_data['cantidad_general']
+        cantidad_vip = cart_data['cantidad_vip']
+        total_cantidad_comprada = cantidad_general + cantidad_vip
         precio_vip = event.price * 1.25
-
+        
         with transaction.atomic():
             event_a_actualizar = Event.objects.select_for_update().get(id=event_id)
-            
+            #Le cambios la cantidad al evento, si no hay capacidad suficiente, muestra un mensaje de error
             capacidad_libre = event_a_actualizar.venue.capacity - event_a_actualizar.capacidad_ocupada
             if total_cantidad_comprada > capacidad_libre:
-                messages.error(request, f"No hay suficientes tickets. Solo quedan {capacidad_libre} disponibles.")
+                messages.error(request, f"Lo sentimos, mientras realizabas la compra alguien más compró tickets. Solo quedan {capacidad_libre} disponibles.")
                 return redirect("carrito", event_id=event_id)
+
             event_a_actualizar.capacidad_ocupada += total_cantidad_comprada
             event_a_actualizar.save()
-            #Por como esta hecho, crea dos tickets, uno general y otro vip con sus cantidades, si se compran ambos tipos
+            # Creamos los tickets, si hay compras de general un ticket con todas las cantidades de general, si hay compras de vip un ticket con todas las cantidades de vip
             if cantidad_general > 0:
                 Ticket.objects.create(
-                    user=request.user,
-                    event=event_a_actualizar,
-                    quantity=cantidad_general,
-                    type=Type.general,  
-                    total=cantidad_general * event_a_actualizar.price,
-                    ticket_code=f"GEN-{uuid.uuid4()}" # Código único con prefijo GEN para diferenciar de los vips
+                    user=request.user, event=event_a_actualizar, quantity=cantidad_general,
+                    type=Type.general, total=(cantidad_general * event_a_actualizar.price),
+                    ticket_code=f"GEN-{uuid.uuid4()}"
                 )
 
             if cantidad_vip > 0:
                 Ticket.objects.create(
-                    user=request.user,
-                    event=event_a_actualizar,
-                    quantity=cantidad_vip,
-                    type=Type.vip,  
-                    total=cantidad_vip * precio_vip,
-                    ticket_code=f"VIP-{uuid.uuid4()}" # Código único con prefijo VIP para diferenciar de los generales
+                    user=request.user, event=event_a_actualizar, quantity=cantidad_vip,
+                    type=Type.vip, total=(cantidad_vip * precio_vip),
+                    ticket_code=f"VIP-{uuid.uuid4()}"
                 )
 
-            # Sumar puntos al usuario
             total_puntos = total_cantidad_comprada * event_a_actualizar.cantidad_puntos
             request.user.puntaje += total_puntos
             request.user.save()
 
             Notification.objects.create(
-                user=request.user,
-                title="Ticket comprado",
+                user=request.user, title="Ticket comprado",
                 message=f"Compraste {total_cantidad_comprada} ticket/s para {event_a_actualizar.title}.",
                 priority="MEDIUM"
             )
-
+        
+        # Limpiamos el carrito de la sesión
+        del request.session['cart']
+        
+        messages.success(request, "¡Tu compra ha sido realizada con éxito!")
         return redirect("my_account")
-
+    
 
 class RegisterView(FormView):
     template_name = "accounts/register.html"

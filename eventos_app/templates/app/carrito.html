@@ -1,11 +1,9 @@
 {% extends "base.html" %}
-
-{% block title %}Carrito de Compras{% endblock %}
-
 {% block content %}
-  <div class="container mt-4">
-    <h1 class="mb-4">Carrito de Compras</h1>
-     <div style="flex: 1;">
+<h2>Carrito de Compras</h2>
+
+<div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-4 mb-4">
+    <div style="flex: 1;">
         <h3>{{ event.title }}</h3>
         <p><strong>Fecha:</strong> {{ event.date }}</p>
         <p><strong>Lugar:</strong> {{ event.venue }}</p>
@@ -13,9 +11,9 @@
         <p><strong>Precio VIP (Recargo 25%):</strong> ${{ precio_vip|floatformat:2 }}</p>
         <p><strong>Descripción:</strong> {{ event.description }}</p>
         <p><strong>Tickets restantes:</strong> {{ tickets_restantes }}</p>
-      </div>
+    </div>
 
-      <div style="flex: 1; max-width: 450px;">
+    <div style="flex: 1; max-width: 450px;">
         <form method="post" action="{% url 'carrito' event.id %}">
             {% csrf_token %}
 
@@ -34,8 +32,6 @@
             
             <button type="submit" class="btn btn-primary w-100">Proceder al Pago</button>
         </form>
-      </div>
-  </div>
-</div> <!-- cierra el container -->
-
+    </div>
+</div>
 {% endblock %}
