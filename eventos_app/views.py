@@ -26,6 +26,7 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        context['home']=True
         user = self.request.user
         context['events_destacados'] = obtener_eventos_destacados()
         context['categorys'] = Category.objects.filter(is_active=True)
@@ -376,8 +377,7 @@ class RatingView(ListView):
         return (
             Event.objects
             .filter(Q(date__lt=yesterday) | Q(cancelado=True))  # Eventos finalizados o cancelados
-            .annotate(rating_promedio=Avg("rating__rating"))  # Calcula el promedio de ratings
-            .order_by("-rating_promedio")
+            .order_by("-total_rating")
         )
 
     def get_context_data(self, **kwargs):
@@ -386,10 +386,17 @@ class RatingView(ListView):
         if user.is_authenticated:
             # Eventos con ticket comprado
             tickets = Ticket.objects.filter(user=user).values_list('event_id', flat=True)
-            # Eventos ya calificados
-            ratings = Rating.objects.filter(user=user).values_list('event_id', flat=True)
             context['eventos_con_ticket'] = set(tickets)
-            context['eventos_ya_calificados'] = set(ratings)
+            # Eventos ya calificados
+            ratings_qs = Rating.objects.filter(user=user)
+            ratings_dict = {r.event_id: r for r in ratings_qs}
+            eventos = context['events']
+            for evento in eventos:
+                if evento.id in ratings_dict:
+                    evento.user_rating = [ratings_dict[evento.id]]
+                else:
+                    evento.user_rating = []
+            context['eventos_ya_calificados'] = set(ratings_dict.keys())
         else:
             context['eventos_con_ticket'] = set()
             context['eventos_ya_calificados'] = set()
@@ -428,7 +435,7 @@ class CrearRatingView(LoginRequiredMixin, FormView):
         rating.event = self.event
         rating.save()
         #messages.success(self.request, "Calificación creada correctamente.")
-        actualizar_total_rating(self.event)
+        self.event.actualizar_total_rating()
         return redirect(reverse_lazy('my_account'))
 
     def get_context_data(self, **kwargs):
@@ -459,7 +466,7 @@ class EditarRatingView(LoginRequiredMixin, UpdateView):
 
     def form_valid(self, form):
         form.save()
-        actualizar_total_rating(self.rating.event)
+        self.rating.event.actualizar_total_rating()
         messages.success(self.request, "Calificación actualizada correctamente.")
         return redirect(reverse_lazy('my_account'))
 
@@ -476,7 +483,9 @@ class EliminarRatingView(LoginRequiredMixin, View):
 
     def post(self, request, pk):
         rating = get_object_or_404(Rating, pk=pk, user=request.user)
+        evento = rating.event
         rating.delete()
+        evento.actualizar_total_rating()
         return redirect(reverse_lazy('my_account'))
 
 class BuscarEventosView(ListView):
