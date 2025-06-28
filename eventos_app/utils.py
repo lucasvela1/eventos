@@ -34,3 +34,18 @@ def obtener_eventos_proximos(limit=10):
         ).order_by('date')[:limit]
 
 
+def actualizar_total_rating(event):
+    
+    # Se obtienen todos los ratings asociados al evento y se calcula el promedio
+    avg_dict = event.rating_set.aggregate(promedio=Avg('rating'))
+    
+    # El resultado es un diccionario Extraemos el valor.
+    avg_rating = avg_dict.get('promedio')
+
+    # Si hay ratings, se redondea. Si no hay (es None), se deja en 0.
+    if avg_rating is not None:
+        event.total_rating = round(avg_rating)
+    else:
+        event.total_rating = 0
+    
+    event.save(update_fields=['total_rating'])
