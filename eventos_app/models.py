@@ -4,11 +4,11 @@ from django.utils.timezone import now
 from datetime import timedelta
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
-
 from django.core.exceptions import ValidationError
 from django.db.models import Avg
-
 from django.core.exceptions import ValidationError
+from .managers import NotificationManager, EventManager, RatingManager
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -59,6 +59,7 @@ class Venue(models.Model):
         return self.name
     
 class Event(models.Model):
+    objects = EventManager()
     title = models.CharField(max_length=200)
     description = models.TextField()
     date = models.DateField()
@@ -92,14 +93,14 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-    
-   
+       
     def imagen_url_directa(self):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
     
     @property
     def finalizado(self):
         return self.date < now().date()- timedelta(days=1)
+
 
 class Priority(models.TextChoices):
     high = 'HIGH'
@@ -112,9 +113,15 @@ class UserRole(models.TextChoices):
     VENDEDOR = 'VENDEDOR', 'Vendedor'
     CLIENTE = 'CLIENTE', 'Cliente'
 
+
 class CustomUser(AbstractUser):
     puntaje= models.PositiveIntegerField(default=0)
-    rol = models.CharField(max_length=10, choices=UserRole.choices, default=UserRole.CLIENTE) #Solo se puede elegir entre los roles ya creados
+    rol = models.CharField(
+        max_length=10, 
+        choices=UserRole.choices, 
+        default=UserRole.CLIENTE     #Solo se puede elegir entre los roles ya creados
+        ) 
+    email = models.EmailField(unique=True, blank=False, null=False)                                         
 
     def __str__(self):
         return self.username
@@ -129,9 +136,10 @@ class CustomUser(AbstractUser):
 
         if ((not self.email)|(self.email.strip() == "")):
             raise ValidationError({'email': 'El correo electrónico es requerido.'})
-
+          
 
 class Notification(models.Model):
+    objects = NotificationManager()  # Añadimos el manager personalizado
     title = models.CharField(max_length=200)
     message = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)  #Se pone como DateTimeFiel para también tener la hora
@@ -141,6 +149,7 @@ class Notification(models.Model):
 
     def __str__(self):
         return self.title
+    
     
 class RefundRequest(models.Model):
     approved = models.BooleanField()
@@ -163,6 +172,7 @@ class RefundRequest(models.Model):
 class Type(models.TextChoices):
     general = 'GENERAL'
     vip = 'VIP'
+    
 
 class Ticket(models.Model):
     buy_date = models.DateField(auto_now_add=True)
@@ -176,30 +186,23 @@ class Ticket(models.Model):
     def __str__(self):
         return self.ticket_code
     
+    
 class Rating(models.Model):
+    objects = RatingManager()  # <--- Aquí lo usás
+
     title = models.CharField(max_length=200)
     text = models.TextField()
     rating = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
-    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )
-    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) 
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False)
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False)
 
     def __str__(self):
         return self.title
-    
-    class Meta():
-        unique_together = ("user", "event")
 
-#calcular el puntaje de un evento.
-@receiver([post_save, post_delete], sender=Rating)
-def update_event_rating(sender, instance, **kwargs):
-    event = instance.event
-    avg = event.rating_set.aggregate(avg=Avg('rating'))['avg']
-    if avg:
-        event.total_rating = max(0, min(5, round(avg)))  # redondeado entre 0 y 5
-    else:
-        event.total_rating = 0  # sin calificación
-        event.save()
+    class Meta:
+        unique_together = ("user", "event")
+        
 
 class Comment(models.Model):
     title = models.CharField(max_length=200)

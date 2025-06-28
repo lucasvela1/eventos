@@ -44,6 +44,7 @@
         {{ form.numero_tarjeta.label_tag }}
         {{ form.numero_tarjeta }}
         {% if form.numero_tarjeta.errors %}
+         <!-- quite errores para probar cualquier tarjeta  -->
           <div class="text-danger">{{ form.numero_tarjeta.errors }}</div>
         {% endif %}
       </div>

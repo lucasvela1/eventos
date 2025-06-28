@@ -13,6 +13,8 @@
                 <tr>
                     <th>Título</th>
                     <th>Descripción</th>
+
+                    <th>Categoría</th>
                     <th>Fecha</th>
                     <th>Acciones</th>
                 </tr>
@@ -22,6 +24,14 @@
                     <tr>
                         <td><a href="{%url 'event_detail' event.id%}" style="text-decoration: none;"> {{ event.title }}</a></td>
                         <td>{{ event.description }}</td>
+                        <td style="text-align: center;">
+                              {% for cat in event.categorias.all %}
+                                <span style="margin: 0 2px">{{ cat.name }}</span>
+                              {% if not forloop.last %}, {%endif%}
+                              {%empty%}
+                                <span class="text-muted">Sin categoría</span>
+                            {% endfor %}
+                            </td>
                         <td>{{ event.date|date:"d/m/Y" }}</td>
                         <td>
                             <div class="hstack gap-1">
