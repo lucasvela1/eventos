@@ -18,7 +18,8 @@ from .views import (
     CarritoView, 
     EditarRatingView,
     ReembolsoView, 
-    EliminarRatingView
+    EliminarRatingView,
+    PagoView
 )
 from .views import EliminarNotificacionesSeleccionadasView
 from .forms import LoginForm, UsuarioRegisterForm
@@ -40,6 +41,7 @@ urlpatterns = [
     path("accounts/register/", RegisterView.as_view(), name="register"),
     path("accounts/register/usuario/", MiCuentaView.as_view(), name="my_account" ),
     path('carrito/<int:event_id>/', CarritoView.as_view(), name='carrito'),
+    path('evento/<int:event_id>/pago/', PagoView.as_view(), name='pago'),
     path("reembolso/<str:ticket_code>/", ReembolsoView.as_view(), name="reembolso"),
     path("notifications/eliminar_seleccionadas/", EliminarNotificacionesSeleccionadasView.as_view(), name="eliminar_notificaciones_seleccionadas"),
 
