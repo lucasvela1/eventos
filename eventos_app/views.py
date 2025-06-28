@@ -84,11 +84,11 @@ class EventDetailView(DetailView):
         user = self.request.user
         event_has_passed = event.date < timezone.now().date()
         context['event_has_passed'] = event_has_passed
-        context['comments'] = Comment.objects.filter(event = event).order_by('-created_at')
+        context['comments'] = Comment.objects.for_event(event)
         context['form'] = CommentForm()
 
         if user.is_authenticated:
-            tiene_ticket = Ticket.objects.filter(user=user, event=event).exists() #Si existe la relación entre el usuario y el evento
+            tiene_ticket = Ticket.objects.user_has_ticket_for_event(user, event)
             context['tiene_ticket'] = tiene_ticket
             ha_calificado = Rating.objects.filter(user=user, event=event).exists() #Revisamos si el user tiene un rating asociado
             user_can_rate = tiene_ticket and event_has_passed and not ha_calificado
@@ -148,19 +148,10 @@ class NotificationListView(LoginRequiredMixin, ListView):
     context_object_name = "notifications"
 
     def get_queryset(self):
-        priority_order = Case(
-            When(priority='HIGH', then=Value(1)),
-            When(priority='MEDIUM', then=Value(2)),
-            When(priority='LOW', then=Value(3)),
-            default=Value(4),
-            output_field=IntegerField(),
-        )
-        
-        queryset = Notification.objects.filter(user=self.request.user).order_by(priority_order, "-created_at")
-        
-        queryset.filter(read=False).update(read=True)
-        return queryset
+      Notification.objects.unread_notifications(self.request.user).update(read=True)
+      return Notification.objects.for_user_ordered_by_priority(self.request.user)
     
+
 class EliminarNotificacionesSeleccionadasView(LoginRequiredMixin, View):
     def post(self, request):
         ids_a_eliminar = request.POST.getlist("notificaciones")
@@ -243,7 +234,7 @@ class CarritoView(LoginRequiredMixin, View):
             messages.error(request, f"No hay suficientes tickets. Solo quedan {capacidad_libre} disponibles.")
             return redirect("carrito", event_id=event_id)
 
-        # Guardamos la información en la sesión del usuario
+        # Guardamos la información en la sesión del usuario para que luego se acceda desde el pago view
         request.session['cart'] = {
             'event_id': event_id,
             'cantidad_general': cantidad_general,
@@ -254,7 +245,7 @@ class CarritoView(LoginRequiredMixin, View):
         return redirect('pago', event_id=event_id)
 
 class PagoView(LoginRequiredMixin, View):
-    login_url = "/accounts/login/"
+    login_url = "/accounts/login/" #si el usuario no está logueado, lo redirige a la página de login
     template_name = "app/pago.html"
 
     def _prepare_context(self, event, cart_data, form=None):
@@ -273,7 +264,7 @@ class PagoView(LoginRequiredMixin, View):
 
     def get(self, request, event_id):
         #Resumen del pedido y formulario de pago
-        cart_data = request.session.get('cart')
+        cart_data = request.session.get('cart') #obtenemos el carrito de la sesión desde el request.session
         # Si no hay nada en el carrito o es de otro evento, redirigir al carrito
         if not cart_data or cart_data.get('event_id') != event_id:
             messages.warning(request, "Tu carrito está vacío o ha expirado. Por favor, selecciona tus tickets de nuevo.")
@@ -515,9 +506,8 @@ class MiCuentaView(TemplateView):
         context['today'] = today
 
         context['user'] = user
-        unread_notifications = Notification.objects.filter(user=user, read=False).order_by('-created_at')[:5]
-        context['unread_notifications'] = unread_notifications
-        context['total_unread'] = Notification.objects.filter(user=user, read=False).count()
+        context['unread_notifications'] = Notification.objects.unread_notifications(user, limit=5)
+        context['total_unread'] = Notification.objects.unread_count(user)
         context['favoritos'] = Favorito.objects.filter(user=user)
         context['refund_requests'] = RefundRequest.objects.filter(user=user)
         context['tickets'] = Ticket.objects.filter(user=user)
@@ -531,21 +521,8 @@ class MiCuentaView(TemplateView):
         context['tickets_eventos_activos'] = tickets_eventos_activos
 
         # Eventos ya calificados por el usuario
-        user_ratings = Rating.objects.filter(user=user)
-        eventos_ya_calificados = Event.objects.filter(rating__user=user).prefetch_related(
-            Prefetch('rating_set', queryset=user_ratings, to_attr='user_rating')
-        ).distinct()
-        context['eventos_ya_calificados'] = eventos_ya_calificados
-
-        # Eventos para calificar.
-        eventos_a_calificar = Event.objects.filter(
-            id__in=eventos_con_ticket
-        ).exclude(
-            id__in=eventos_ya_calificados
-        ).filter(
-            models.Q(cancelado=True) | models.Q(date__lt=today)  # Eventos cancelados o pasados
-        )
-        context['eventos_a_calificar'] = eventos_a_calificar
+        context['eventos_ya_calificados'] = Event.objects.rated_by_user(user)
+        context['eventos_a_calificar'] = Event.objects.to_be_rated_by_user(user)
         
         return context
     

@@ -7,7 +7,7 @@ from django.dispatch import receiver
 from django.core.exceptions import ValidationError
 from django.db.models import Avg
 from django.core.exceptions import ValidationError
-from .managers import NotificationManager, EventManager, RatingManager
+from .managers import NotificationManager, EventManager, RatingManager, CommentManager, TicketManager 
 
 
 class Category(models.Model):
@@ -182,6 +182,8 @@ class Ticket(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=False, blank=False)
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=False, blank=False)
     total = models.IntegerField(default=0)
+    objects = TicketManager()
+
     
     def __str__(self):
         return self.ticket_code
@@ -210,6 +212,8 @@ class Comment(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False )  
     event = models.ForeignKey(Event, on_delete=models.CASCADE, null=True, blank=False ) 
+    objects = CommentManager()
+
 
 class Favorito(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, null=True, blank=False, related_name="favoritos_usuario")
