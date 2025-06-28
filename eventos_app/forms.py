@@ -3,7 +3,6 @@ from .models import Rating
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser, Comment, Pago
 from django.contrib.auth.forms import AuthenticationForm
-from .utils import validar_tarjeta_luhn
 
 class RatingForm(forms.ModelForm):
     class Meta:
@@ -110,6 +109,6 @@ class PagoForm(forms.ModelForm):
         }
         def clean_numero_tarjeta(self):
             numero = self.cleaned_data['numero_tarjeta'].replace(" ", "")
-            if not validar_tarjeta_luhn(numero):
+            if not Pago.validar_tarjeta_luhn(numero):
                 raise forms.ValidationError("El número de tarjeta no es válido.")
             return numero

@@ -4,7 +4,6 @@ from django.db.models.functions import Coalesce
 from django.utils.timezone import now
 
 from django.db.models import Case, When, Value, IntegerField, Avg, Count, Sum
-import math
 
 """6 Eventos ordenados por tickets comprados, cantidad de favoritos y nombre. Sin contar cancelados o que paso su fecha"""
 def obtener_eventos_destacados(limit=6):
@@ -42,23 +41,3 @@ def actualizar_total_rating(evento):
     else:
         evento.total_rating = 0
     evento.save(update_fields=['total_rating'])
-
-# Utilizaremos el algoritmo de Luhn para verificar la tarjeta
-def validar_tarjeta_luhn(numero_tarjeta: str) -> bool:
-    numero_tarjeta = numero_tarjeta.replace(' ', '').replace('-', '')
-    if not numero_tarjeta.isdigit():
-        return False
-    
-    suma = 0
-    alt = False
-
-    for digito in reversed(numero_tarjeta):
-        d = int(digito)
-        if alt:
-            d *= 2
-            if d > 9:
-                d -= 9
-        suma += d
-        alt = not alt
-
-    return suma % 10 == 0
