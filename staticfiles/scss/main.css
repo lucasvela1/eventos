@@ -15,13 +15,10 @@ h1 {
   font-weight: 700;
   margin-bottom: 1rem; }
 
-.button1,
-.button2 {
+.button1 {
   border-radius: 2rem;
   font-weight: bold;
-  transition: all 0.2s ease-in-out; }
-
-.button1 {
+  transition: all 0.2s ease-in-out;
   background-color: transparent;
   border: 1px solid #f5d376;
   color: #f5d376; }
@@ -29,13 +26,6 @@ h1 {
     background-color: #f5d376;
     color: black;
     box-shadow: 0 0 8px 2px rgba(245, 211, 118, 0.6); }
-
-.button2 {
-  background-color: #f5d376;
-  color: #000; }
-  .button2:hover {
-    background-color: #fff;
-    color: #f5d376; }
 
 .form-control {
   color: #fff !important;
