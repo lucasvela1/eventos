@@ -246,7 +246,7 @@ footer.footer {
     min-width: 220px;
     flex: 1 1 auto; }
 
-.login-form {
+.login-form, .login-form .register-form {
   margin-top: 3rem; }
   .login-form .card {
     border-radius: 0.75rem;
@@ -273,13 +273,14 @@ footer.footer {
       .login-form .text-login a:hover {
         text-decoration: underline; }
   .login-form form .row {
-    margin-bottom: 1rem; }
+    margin-bottom: 1rem;
+    align-items: center !important; }
     .login-form form .row label {
-      font-family: 'Inter', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #ffffff;
-      text-align: right; }
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      text-align: right;
+      min-height: 38px; }
     .login-form form .row input, .login-form form .row select, .login-form form .row textarea {
       font-family: 'Inter', sans-serif;
       font-size: 1rem;
@@ -287,7 +288,8 @@ footer.footer {
       border-radius: 0.375rem;
       border: 1px solid #ccc;
       width: 100%;
-      transition: border-color 0.2s; }
+      transition: border-color 0.2s;
+      min-height: 38px; }
       .login-form form .row input:focus, .login-form form .row select:focus, .login-form form .row textarea:focus {
         border-color: #e5ee65;
         outline: none; }
