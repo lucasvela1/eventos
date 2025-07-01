@@ -1,14 +1,20 @@
+/*si algun componente usa otro, ese necesario debe estar arriba de los scss que lo utilizan*/
+
 // base
 @import 'base/variables';
 @import 'base/base';
 
 // components
+@import 'components/buttons';
+@import 'components/inputs';
 @import 'components/navbar';
 @import 'components/footer';
-@import 'components/buttons';
+
 @import 'components/cards';
 @import 'components/stars';
+@import 'components/forms';
 
 // pages
+@import 'events';
 @import 'event_details';
 @import 'home';

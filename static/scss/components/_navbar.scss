@@ -1,5 +1,7 @@
+// _navbar.scss
+
 .navbar-dark .navbar-nav .nav-link {
-    color: #fff !important;
+    color: #ffffff !important;
     font-weight: 400 !important;
     font-size: 0.95rem !important;
     letter-spacing: normal !important;
@@ -7,10 +9,12 @@
     padding-right: 1rem !important;
 }
 
+
 .navbar-brand img {
     height: 50px;
     width: auto;
 }
+
 
 .navbar-nav .nav-item {
     margin-left: 0.5rem;
@@ -18,7 +22,7 @@
 }
 
 .navbar-dark .nav-link.active {
-    color: #fff;
+    color: #ffffff;
     font-weight: 800;
     text-decoration: underline;
 }
@@ -27,6 +31,7 @@
     padding-top: 0.6rem !important;
     padding-bottom: 0.2rem !important;
     min-height: 56px;
+    /* altura mínima Bootstrap por defecto */
 }
 
 .navbar .btn-navbar {
@@ -36,4 +41,13 @@
     font-weight: 500;
     height: 36px;
     line-height: 1.2;
+}
+
+.btn-navbar {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.8rem;
+    border-radius: 1.25rem;
+    font-weight: 500;
+    line-height: 1;
+    height: auto;
 }
