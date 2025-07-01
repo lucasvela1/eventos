@@ -5,47 +5,41 @@
 {% include "app/search_form.html" %}
 
 <!-- CARRUSEL DE EVENTOS DESTACADOS -->
-<div class="container mt-2" style="margin-top: 20px;">
+<div class="container mt-2" id="carrusel-eventosDestacados-section">
   <div id="carouselExampleIndicators" class="carousel slide" data-bs-ride="carousel">
     <!-- Indicadores -->
     <div class="carousel-indicators">
       {% for event in events_destacados %}
-        <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"
-          class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}" aria-label="Slide {{ forloop.counter }}"></button>
+      <button type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide-to="{{ forloop.counter0 }}"
+        class="{% if forloop.first %}active{% endif %}" aria-current="{% if forloop.first %}true{% endif %}"
+        aria-label="Slide {{ forloop.counter }}"></button>
       {% endfor %}
     </div>
-
     <!-- Slides -->
     <div class="carousel-inner">
       {% for event in events_destacados %}
-        <div class="carousel-item {% if forloop.first %}active{% endif %}">
-          <div style="width: 100%; height: 500px; overflow: hidden;">
-            <img src="{{ event.imagen_url_directa }}" 
-                 alt="{{ event.title }}"
-                 class="d-block w-100" 
-                 style="width: 100%; height: 100%; object-fit: cover;" 
-                 >          
-          </div>
-          <div class="carousel-caption d-none d-md-block">
-             <a href="{% url 'event_detail' event.id %}" style="text-decoration: none;">
-                <h5 style="font-size: 2rem; color: #fff; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: bold;">
-                  {{ event.title }}
-                </h5>
-              </a>
-            <p style="font-size: 1rem; color: #ddd; text-shadow: 2px 2px 4px rgba(0,0,0,0.7); font-weight: normal;">
-              {{ event.description|truncatechars:80 }}
-            </p>
-          </div>
+      <div class="carousel-item {% if forloop.first %}active{% endif %}">
+        <div class="part-carousel">
+          <img src="{{ event.imagen_url_directa }}" alt="{{ event.title }}" class="d-block w-100">
         </div>
+        <div class="carousel-caption d-none d-md-block">
+          <a href="{% url 'event_detail' event.id %}">
+            <h5>{{ event.title }}</h5>
+          </a>
+          <p>{{ event.description|truncatechars:80 }}</p>
+        </div>
+      </div>
       {% endfor %}
     </div>
 
     <!-- Controles -->
-    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="prev">
+    <button class="carousel-control-prev" type="button" data-bs-target="#carouselExampleIndicators"
+      data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Anterior</span>
     </button>
-    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators" data-bs-slide="next">
+    <button class="carousel-control-next" type="button" data-bs-target="#carouselExampleIndicators"
+      data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Siguiente</span>
     </button>
@@ -53,28 +47,28 @@
 </div>
 
 <!-- Carrusel de Categorías -->
-<div class="container py-4" id="carrusel-categorias-section"> <!-- Para anclar, tipo, si hacemos click en una categoria no vuelve al inicio de pagina arriba, se queda aca-->
+<div class="container py-4" id="carrusel-categorias-section">
+  <!-- Para anclar, tipo, si hacemos click en una categoria no vuelve al inicio de pagina arriba, se queda aca-->
   <h2 class="mb-4">Explorá por Categoría</h2>
   <div id="carrusel-categorias" class="glide">
     <div class="glide__track" data-glide-el="track">
       <ul class="glide__slides">
         {% for categoria in categorys %}
 
-          <li class="glide__slide">
-            {% if selected_category and selected_category.id == categoria.id %}
-              <a href="{% url 'home' %}#carrusel-categorias-section" style="text-decoration: none;">
-               {% else %}
-              <a href="{% url 'home' %}?category_id={{ categoria.id }}#carrusel-categorias-section" style="text-decoration: none;">
-               {% endif %}
-                <div class="card h-100" style="width: 100%; max-width: 300px; margin: 0 auto;">
-                  <img src="{{ categoria.imagen_url_directa }}" class="card-img-top" alt="{{ categoria.name }}"
-                      style="height: 200px; object-fit: cover;">
-                  <div class="card-body">
-                    <h5 class="card-title text-center">{{ categoria.name }}</h5>
-                  </div>
+        <li class="glide__slide">
+          {% if selected_category and selected_category.id == categoria.id %}
+          <a href="{% url 'home' %}#carrusel-categorias-section">
+            {% else %}
+            <a href="{% url 'home' %}?category_id={{ categoria.id }}#carrusel-categorias-section">
+              {% endif %}
+              <div class="card h-100">
+                <img src="{{ categoria.imagen_url_directa }}" class="card-img-top" alt="{{ categoria.name }}">
+                <div class="card-body">
+                  <h5 class="card-title">{{ categoria.name }}</h5>
                 </div>
-              </a>
-          </li>
+              </div>
+            </a>
+        </li>
         {% endfor %}
       </ul>
     </div>
@@ -86,37 +80,28 @@
 </div>
 
 <!-- Carrusel de Próximos Eventos -->
-<div class="container py-4">
+<div class="container py-4" id="carrusel-eventos-section">
   <h2 class="mb-4">Próximos Eventos{% if selected_category %}- {{ selected_category.name }}{% endif %}</h2>
   <div id="carrusel-proximos" class="glide">
     <div class="glide__track" data-glide-el="track">
       <ul class="glide__slides">
-      
-
-            {% for event in events_proximos %}
-              <li class="glide__slide">
-                <a href="{% url 'event_detail' event.id %}" style="text-decoration: none;">
-                  <div class="card bg-light text-dark h-100" style="width: 100%; max-width: 300px; margin: 0 auto;">
-                    <img src="{{ event.imagen_url_directa }}" class="card-img-top" alt="{{ event.title }}"
-                        style="height: 200px; object-fit: cover;">
-                    <div class="card-body">
-       
-
-
-                      <h5 class="card-title">{{ event.title }}</h5>
-                      <p class="card-text">{{ event.date|date:"d/m/Y" }}</p>
-                    </div>
-                  </div>
-                </a>
-              </li>
-           
-
-
+        {% for event in events_proximos %}
+        <li class="glide__slide">
+          <a href="{% url 'event_detail' event.id %}">
+            <div class="card">
+              <img src="{{ event.imagen_url_directa }}" class="card-img-top" alt="{{ event.title }}">
+              <div class="card-body">
+                <h5 class="card-title">{{ event.title }}</h5>
+                <p class="card-text">{{ event.date|date:"d/m/Y" }}</p>
+              </div>
+            </div>
+          </a>
+        </li>
         {% endfor %}
         <!-- Card de "Ver Más" -->
         <li class="glide__slide">
-          <a href="{% url 'events' %}" style="text-decoration: none;">
-            <div class="card text-center bg-light text-dark mx-2" style="width: 18rem; height: 315px; display: flex; align-items: center; justify-content: center;">
+          <a href="{% url 'events' %}">
+            <div class="card card-verMas">
               <div class="card-body">
                 <h4 class="card-title">Ver más eventos</h4>
               </div>

@@ -93,7 +93,7 @@ class Event(models.Model):
 
     def __str__(self):
         return self.title
-       
+
     def imagen_url_directa(self):
         return f'https://drive.google.com/thumbnail?id={self.id_img}'
     
@@ -142,7 +142,7 @@ class CustomUser(AbstractUser):
 
         if ((not self.email)|(self.email.strip() == "")):
             raise ValidationError({'email': 'El correo electrónico es requerido.'})
-          
+
 
 class Notification(models.Model):
     objects = NotificationManager()  # Añadimos el manager personalizado

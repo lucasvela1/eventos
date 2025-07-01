@@ -1,0 +1,39 @@
+.navbar-dark .navbar-nav .nav-link {
+    color: #fff !important;
+    font-weight: 400 !important;
+    font-size: 0.95rem !important;
+    letter-spacing: normal !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+.navbar-brand img {
+    height: 50px;
+    width: auto;
+}
+
+.navbar-nav .nav-item {
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+}
+
+.navbar-dark .nav-link.active {
+    color: #fff;
+    font-weight: 800;
+    text-decoration: underline;
+}
+
+.navbar {
+    padding-top: 0.6rem !important;
+    padding-bottom: 0.2rem !important;
+    min-height: 56px;
+}
+
+.navbar .btn-navbar {
+    padding: 0.375rem 0.75rem;
+    font-size: 0.85rem;
+    border-radius: 1.5rem;
+    font-weight: 500;
+    height: 36px;
+    line-height: 1.2;
+}

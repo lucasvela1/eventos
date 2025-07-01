@@ -128,7 +128,7 @@ class TicketManager(models.Manager):
         return self.filter(user=user, event__date__gte=today, event__cancelado=False)
 
     def user_has_ticket_for_event(self, user, event):
-       # Verifica si un usuario tiene un ticket para un evento específico. 
+        # Verifica si un usuario tiene un ticket para un evento específico. 
         if not user.is_authenticated:
             return False
         return self.filter(user=user, event=event).exists()

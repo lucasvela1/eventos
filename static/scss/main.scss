@@ -1,0 +1,14 @@
+// base
+@import 'base/variables';
+@import 'base/base';
+
+// components
+@import 'components/navbar';
+@import 'components/footer';
+@import 'components/buttons';
+@import 'components/cards';
+@import 'components/stars';
+
+// pages
+@import 'event_details';
+@import 'home';
