@@ -40,13 +40,14 @@
   form {
     .row {
       margin-bottom: 1rem;
+      align-items: center !important;
 
       label {
-        font-family: 'Inter', sans-serif;
-        font-size: 1rem;
-        font-weight: 600;
-        color: #ffffff;
+        display: flex;
+        align-items: center;
+        justify-content: flex-end; 
         text-align: right;
+        min-height: 38px;
       }
 
       input, select, textarea {
@@ -57,6 +58,7 @@
         border: 1px solid #ccc;
         width: 100%;
         transition: border-color 0.2s;
+        min-height: 38px;
 
         &:focus {
           border-color: #e5ee65;
@@ -96,4 +98,8 @@
       }
     }
   }
+
+  .register-form {
+    @extend .login-form;
+    }
 }
