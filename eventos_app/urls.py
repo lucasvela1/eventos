@@ -45,4 +45,4 @@ urlpatterns = [
     path("reembolso/<str:ticket_code>/", ReembolsoView.as_view(), name="reembolso"),
     path("notifications/eliminar_seleccionadas/", EliminarNotificacionesSeleccionadasView.as_view(), name="eliminar_notificaciones_seleccionadas"),
 
-    ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    ] #+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
