@@ -1,8 +1,6 @@
 <!-- templates/app/search_form.html -->
-<form method="GET" action="{% url 'buscar_eventos' %}" class="container mt-4 mb-4">
-  <div class="input-group">
-    <input type="text" name="q" class="form-control" placeholder="Buscar eventos..." value="{{ request.GET.q }}">
-    <button type="submit" class="btn btn-warning px-4 shadow" style="background-color: #f5d376; border-radius: 2rem; font-weight: bold; margin-left:6px;">Buscar</button>
-  </div>
-</form>
 
+<form method="GET" action="{% url 'buscar_eventos' %}" class="d-flex mt-4 mb-4" role="search">
+  <input class="form-control " type="search" name="q" placeholder="Buscar eventos..." aria-label="Buscar" value="{{ request.GET.q }}"/>
+  <button type="submit" class="btn button1">Buscar</button>
+</form>

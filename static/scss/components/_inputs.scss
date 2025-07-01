@@ -1,0 +1,29 @@
+.form-control {
+    color: #fff !important; // fuerza texto blanco puro
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 1.5rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease-in-out;
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    margin-right: 1rem;
+
+    &::placeholder {
+        color: rgba(255, 255, 255, 0.6);
+    }
+
+    &:focus {
+        outline: none;
+        border-color: $color_boton1;
+        box-shadow: 0 0 8px rgba($color_boton1, 0.6);
+        background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    &:disabled,
+    &[readonly] {
+        background-color: rgba(255, 255, 255, 0.02);
+        color: rgba(255, 255, 255, 0.5);
+        cursor: not-allowed;
+    }
+}
