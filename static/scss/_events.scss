@@ -4,3 +4,48 @@
     margin-top: 20px;
     color: white;
 }
+
+//agrego el resto de estilos de rating, my_account
+// 
+.container-rating{
+    h5{
+        color: white;
+    }
+}
+.container-notification{
+    p{
+        color: white;
+    }
+}
+.container-account{
+    h4,
+    h2,
+    h6{
+        color: white;
+    }
+}
+
+.container-reembolso{
+    h2,
+    p,
+    label {
+        color: white;
+    }
+}
+.container-ListaReembolso{
+    h4,
+    p{
+        color:white;
+    }
+}
+.container-favoritos{
+    color: white;
+}
+.container-calificar,
+.container-editarR,
+.container-eliminarR{
+    h2,
+    label {
+        color: white;
+    }
+}

@@ -48,3 +48,31 @@
         color: black;
     }
 }
+
+
+.card-datos {
+    margin-left: 0;  // alineado al borde izquierdo del contenedor
+    max-width: 100%; // que use todo el ancho disponible
+    border-radius: 0.5rem; // opcional, para suavizar bordes
+    padding: 1.2rem;
+
+    p {
+        margin-bottom: 0.6rem;
+        font-size: 1rem;
+    }
+    .card-body{
+        text-align: left !important;
+    }
+
+    &:hover {
+        transform: none !important;
+        box-shadow: none !important;
+        transition: none !important;
+    }
+    // si querés que combine más con otras cards
+    background-color: #ffffff10;
+    border: 1px solid #ffffff50;
+    backdrop-filter: blur(0.1rem);
+    -webkit-backdrop-filter: blur(0.1rem);
+    color: white;
+}

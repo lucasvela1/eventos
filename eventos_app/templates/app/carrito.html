@@ -1,8 +1,8 @@
 {% extends "base.html" %}
 {% block content %}
-<h2>Carrito de Compras</h2>
+<h1>Carrito de Compras</h1>
 
-<div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-4 mb-4">
+<div class="container-carrito flex-md-row">
     <div style="flex: 1;">
         <h3>{{ event.title }}</h3>
         <p><strong>Fecha:</strong> {{ event.date }}</p>
@@ -13,7 +13,7 @@
         <p><strong>Tickets restantes:</strong> {{ tickets_restantes }}</p>
     </div>
 
-    <div style="flex: 1; max-width: 450px;">
+    <div class="form-carrito">
         <form method="post" action="{% url 'carrito' event.id %}">
             {% csrf_token %}
 

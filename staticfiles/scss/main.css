@@ -1,4 +1,5 @@
 @charset "UTF-8";
+/*si algun componente usa otro, ese necesario debe estar arriba de los scss que lo utilizan*/
 html,
 body {
   width: 100%;
@@ -7,6 +8,12 @@ body {
   flex-direction: column;
   font-family: 'Inter', sans-serif;
   background-color: transparent; }
+
+h1 {
+  color: white;
+  margin-top: 1rem;
+  font-weight: 700;
+  margin-bottom: 1rem; }
 
 .button1,
 .button2 {
@@ -112,6 +119,51 @@ footer.footer {
     footer.footer .nav-link:hover {
       color: #f5d376; }
 
+.table, .table-rounded {
+  border-collapse: separate;
+  border-spacing: 0;
+  border-radius: 0.45rem;
+  overflow: hidden;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  color: white; }
+  .table thead, .table-rounded thead {
+    background-color: rgba(0, 0, 0, 0.7); }
+    .table thead th, .table-rounded thead th {
+      text-align: center;
+      font-weight: 600;
+      padding: 0.75rem;
+      vertical-align: middle;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.2); }
+  .table tbody tr, .table-rounded tbody tr {
+    transition: background-color 0.3s ease; }
+    .table tbody tr:hover, .table-rounded tbody tr:hover {
+      background-color: rgba(245, 211, 118, 0.15); }
+    .table tbody tr td, .table-rounded tbody tr td {
+      padding: 0.75rem;
+      vertical-align: middle; }
+      .table tbody tr td a, .table-rounded tbody tr td a {
+        text-decoration: none; }
+        .table tbody tr td a:hover, .table-rounded tbody tr td a:hover {
+          text-decoration: underline;
+          color: #f8e2a6; }
+  .table tbody .text-muted, .table-rounded tbody .text-muted {
+    color: rgba(255, 255, 255, 0.5);
+    font-style: italic; }
+  .table tbody .badge, .table-rounded tbody .badge {
+    font-size: 0.85rem;
+    border-radius: 0.5rem;
+    padding: 0.3rem 0.6rem; }
+  .table .btn-sm, .table-rounded .btn-sm {
+    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem; }
+
+.table-rounded {
+  border-radius: 0.75rem;
+  overflow: hidden; }
+
 .card {
   width: 100%;
   margin: 0 auto;
@@ -148,6 +200,26 @@ footer.footer {
   .card-verMas h4 {
     color: black; }
 
+.card-datos {
+  margin-left: 0;
+  max-width: 100%;
+  border-radius: 0.5rem;
+  padding: 1.2rem;
+  background-color: #ffffff10;
+  border: 1px solid #ffffff50;
+  backdrop-filter: blur(0.1rem);
+  -webkit-backdrop-filter: blur(0.1rem);
+  color: white; }
+  .card-datos p {
+    margin-bottom: 0.6rem;
+    font-size: 1rem; }
+  .card-datos .card-body {
+    text-align: left !important; }
+  .card-datos:hover {
+    transform: none !important;
+    box-shadow: none !important;
+    transition: none !important; }
+
 .background-stars {
   position: fixed;
   top: 0;
@@ -180,136 +252,37 @@ footer.footer {
   margin-top: 20px;
   color: white; }
 
-/*
+.container-rating h5 {
+  color: white; }
 
-.container-events {
-  margin-top: 20px;
-  color: white; // texto general en blanco para contraste
-}
+.container-notification p {
+  color: white; }
 
-h1 {
-  font-weight: 700;
-  font-size: 2rem;
-  margin-bottom: 1rem;
-}
+.container-account h4,
+.container-account h2,
+.container-account h6 {
+  color: white; }
 
-.table {
-  background-color: rgba(255, 255, 255, 0.05); // fondo translúcido estilo glass
-  border-radius: 0.75rem;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  backdrop-filter: blur(5px);
-  -webkit-backdrop-filter: blur(5px);
-  color: white;
+.container-reembolso h2,
+.container-reembolso p,
+.container-reembolso label {
+  color: white; }
 
-  thead.table-dark {
-    background-color: rgba(0, 0, 0, 0.7);
-    border-bottom: 2px solid $color_boton1;
+.container-ListaReembolso h4,
+.container-ListaReembolso p {
+  color: white; }
 
-    th {
-      border: none;
-      font-weight: 600;
-      text-align: center;
-      vertical-align: middle;
-      padding: 0.75rem 1rem;
-    }
-  }
+.container-favoritos {
+  color: white; }
 
-  tbody tr {
-    transition: background-color 0.3s ease;
+.container-calificar h2,
+.container-calificar label,
+.container-editarR h2,
+.container-editarR label,
+.container-eliminarR h2,
+.container-eliminarR label {
+  color: white; }
 
-    &:hover {
-      background-color: rgba(245, 211, 118, 0.2); // color suave al pasar el mouse
-      cursor: pointer;
-    }
-
-    td {
-      vertical-align: middle;
-      padding: 0.75rem 1rem;
-
-      a {
-        color: $color_boton1;
-        text-decoration: none;
-
-        &:hover {
-          text-decoration: underline;
-          color: lighten($color_boton1, 10%);
-        }
-      }
-
-      span {
-        font-size: 0.9rem;
-      }
-
-      &.text-muted {
-        color: rgba(255, 255, 255, 0.5);
-        font-style: italic;
-      }
-
-      &[style*="text-align: center"] {
-        text-align: center;
-      }
-    }
-  }
-}
-
-.hstack {
-  gap: 0.25rem;
-
-  .btn {
-    border-radius: 1.25rem;
-    padding: 0.25rem 0.75rem;
-    font-size: 0.85rem;
-    transition: background-color 0.3s ease, color 0.3s ease;
-
-    i {
-      pointer-events: none; // evitar que el ícono interfiera con el clic
-      font-size: 1.1rem;
-      vertical-align: middle;
-    }
-  }
-
-  .btn-outline-primary {
-    border-color: $color_boton1;
-    color: $color_boton1;
-
-    &:hover {
-      background-color: $color_boton1;
-      color: #000;
-      border-color: $color_boton1;
-      box-shadow: 0 0 8px rgba($color_boton1, 0.6);
-    }
-  }
-
-  .btn-outline-danger {
-    border-color: #dc3545;
-    color: #dc3545;
-
-    &.text-danger, &.active, &:hover {
-      background-color: #dc3545;
-      color: #fff;
-      box-shadow: 0 0 8px rgba(220, 53, 69, 0.6);
-    }
-  }
-
-  .btn-outline-success {
-    border-color: #198754;
-    color: #198754;
-
-    &:hover {
-      background-color: #198754;
-      color: #fff;
-      box-shadow: 0 0 8px rgba(25, 135, 84, 0.6);
-    }
-  }
-}
-
-// Para el mensaje "No hay eventos disponibles"
-.table tbody tr td.text-center {
-  font-style: italic;
-  color: rgba(255, 255, 255, 0.6);
-  padding: 2rem 0;
-}
-*/
 .event-detail h3 {
   font-family: 'Inter', sans-serif;
   font-size: 2rem;
@@ -331,6 +304,127 @@ h1 {
   font-weight: 600;
   color: #222;
   margin-bottom: 0.2rem; }
+
+.container-carrito,
+.container-pago {
+  display: flex;
+  flex-direction: column;
+  align-items: start;
+  justify-content: space-between;
+  gap: 4;
+  margin-bottom: 4px; }
+  .container-carrito h3,
+  .container-carrito p,
+  .container-carrito label,
+  .container-pago h3,
+  .container-pago p,
+  .container-pago label {
+    color: white; }
+  .container-carrito h3,
+  .container-pago h3 {
+    font-size: 1.5rem;
+    font-weight: 600;
+    margin-bottom: 1rem; }
+  .container-carrito p,
+  .container-pago p {
+    margin-bottom: 0.5rem;
+    line-height: 1.4;
+    font-size: 0.95rem; }
+
+.container-carrito .form-carrito {
+  display: flex;
+  flex: 1;
+  max-width: 450px;
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  color: white; }
+  .container-carrito .form-carrito .form-label {
+    font-weight: 500;
+    margin-bottom: 0.3rem; }
+  .container-carrito .form-carrito .form-control {
+    border-radius: 1.25rem;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem; }
+    .container-carrito .form-carrito .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.5); }
+    .container-carrito .form-carrito .form-control:focus {
+      outline: none;
+      border-color: #f5d376;
+      box-shadow: 0 0 8px rgba(245, 211, 118, 0.6); }
+  .container-carrito .form-carrito hr {
+    border-top: 1px solid rgba(255, 255, 255, 0.3);
+    margin: 1.5rem 0; }
+  .container-carrito .form-carrito .btn-primary {
+    background-color: #f5d376;
+    border: none;
+    font-weight: bold;
+    border-radius: 2rem;
+    padding: 0.6rem;
+    transition: all 0.3s ease-in-out; }
+    .container-carrito .form-carrito .btn-primary:hover {
+      background-color: white;
+      color: black;
+      box-shadow: 0 0 10px rgba(245, 211, 118, 0.6); }
+
+.container-pago .resumen {
+  flex: 1; }
+
+.container-pago h4 {
+  margin-top: 1rem;
+  color: #fff; }
+
+.container-pago .form-pago {
+  flex: 1;
+  max-width: 450px; }
+
+.container-pago .form-pago {
+  background-color: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 1rem;
+  padding: 1.5rem;
+  flex: 1;
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  max-width: 450px; }
+  .container-pago .form-pago form {
+    display: flex;
+    flex-direction: column; }
+  .container-pago .form-pago label {
+    font-weight: 500;
+    margin-bottom: 0.3rem; }
+  .container-pago .form-pago .form-control {
+    border-radius: 1.25rem;
+    background-color: rgba(255, 255, 255, 0.07);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease; }
+    .container-pago .form-pago .form-control::placeholder {
+      color: rgba(255, 255, 255, 0.5); }
+    .container-pago .form-pago .form-control:focus {
+      outline: none;
+      border-color: #f5d376;
+      box-shadow: 0 0 8px rgba(245, 211, 118, 0.5); }
+  .container-pago .form-pago .btn-success {
+    background-color: #f5d376;
+    border: none;
+    font-weight: bold;
+    border-radius: 2rem;
+    padding: 0.6rem;
+    transition: all 0.3s ease-in-out; }
+    .container-pago .form-pago .btn-success:hover {
+      background-color: white;
+      color: black;
+      box-shadow: 0 0 10px rgba(245, 211, 118, 0.5); }
+  .container-pago .form-pago .text-danger {
+    font-size: 0.85rem;
+    margin-top: 0.2rem; }
 
 #carrusel-eventosDestacados-section {
   margin-top: 20px; }

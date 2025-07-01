@@ -3,11 +3,11 @@
 {% block title %}Rating de Eventos{% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="container container-rating mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="text-center mb-4">Rating de Eventos</h1>
     </div>
-    <h5 >Aquí podrá ver los eventos finalizados o cancelados con su respectiva calificación.</h5>
+    <h5>Aquí podrá ver los eventos finalizados o cancelados con su respectiva calificación.</h5>
 
     <table class="table table-striped">
         <thead class="table-dark">
@@ -26,7 +26,7 @@
     {% for event in events %}
         <tr>
             <td>{{ forloop.counter }}</td>
-            <td><a href="{%url 'event_detail' event.id%}" style = "text-decoration: none;">{{ event.title }} </a></td>
+            <td><a href="{%url 'event_detail' event.id%}" >{{ event.title }} </a></td>
             <td>
                 {% if event.total_rating > 0 %}
                     <div class="text-warning fs-5">

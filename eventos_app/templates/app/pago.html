@@ -2,8 +2,8 @@
 {% block content %}
 <h2>Finalizar Compra</h2>
 
-<div class="d-flex flex-column flex-md-row align-items-start justify-content-between gap-4 mb-4">
-    <div style="flex: 1;">
+<div class="container-pago flex-md-row">
+    <div class="resumen">
         <h3>Resumen del Pedido</h3>
         <p><strong>Evento:</strong> {{ event.title }}</p>
         <hr>
@@ -17,7 +17,7 @@
         <h4>Total a pagar: <span id="total-a-pagar">${{ total_a_pagar|floatformat:2 }}</span></h4>
     </div>
 
-    <div style="flex: 1; max-width: 450px;">
+    <div class="form-pago" style="flex: 1; max-width: 450px;">
         <form method="post" action="{% url 'pago' event.id %}">
             {% csrf_token %}
             <h3>Datos de la tarjeta</h3>
