@@ -1,15 +1,24 @@
-.login-form {
+.login-form,
+.register-form {
   margin-top: 3rem;
+  position: relative;
 
+  .row {
+    display: flex;
+    justify-content: center;   // Centra horizontalmente
+  }
   .card {
+    display: inline-block;
+    width: auto;
+    max-width: 100%;
     border-radius: 0.75rem;
     box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
     border: none;
-    max-width: 500px;
     margin: 0 auto;
 
     .card-body {
-      padding: 2rem;
+      padding: 1rem;
+      overflow: visible;
     }
 
     .card-title {
@@ -39,16 +48,17 @@
 
   form {
     .row {
-      margin-bottom: 1rem;
+      //margin-bottom: 1rem;
       align-items: center !important;
 
       label {
         display: flex;
-        align-items: center;
+        align-items: center !important;
         justify-content: flex-end; 
         text-align: right;
         min-height: 38px;
       }
+
 
       input, select, textarea {
         font-family: 'Inter', sans-serif;
@@ -99,7 +109,14 @@
     }
   }
 
-  .register-form {
-    @extend .login-form;
-    }
+  .col-md-8 {
+    position: relative;
+  }
+
+  .form-text {
+    position: absolute;
+    font-size: 0.75rem;
+    color: #6c757d; // color por defecto de Bootstrap para texto de ayuda
+    margin-top: 2px;
+  }
 }
