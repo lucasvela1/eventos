@@ -1,0 +1,164 @@
+// _carrito.scss
+
+.container-carrito,
+.container-pago {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    justify-content: space-between;
+    gap: 4;
+    margin-bottom: 4px;
+
+    h3,
+    p,
+    label {
+        color: white;
+    }
+
+    h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    p {
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+        font-size: 0.95rem;
+    }
+}
+
+.container-carrito {
+    .form-carrito {
+        display: flex;
+        flex: 1;
+        max-width: 450px;
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        color: white;
+
+        .form-label {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-control {
+            border-radius: 1.25rem;
+            background-color: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.5);
+            }
+
+            &:focus {
+                outline: none;
+                border-color: $color_boton1;
+                box-shadow: 0 0 8px rgba($color_boton1, 0.6);
+            }
+        }
+
+        hr {
+            border-top: 1px solid rgba(255, 255, 255, 0.3);
+            margin: 1.5rem 0;
+        }
+
+        .btn-primary {
+            background-color: $color_boton1;
+            border: none;
+            font-weight: bold;
+            border-radius: 2rem;
+            padding: 0.6rem;
+            transition: all 0.3s ease-in-out;
+
+            &:hover {
+                background-color: white;
+                color: black;
+                box-shadow: 0 0 10px rgba($color_boton1, 0.6);
+            }
+        }
+    }
+}
+
+
+.container-pago {
+    .resumen {
+        flex: 1;
+    }
+
+    h4 {
+        margin-top: 1rem;
+        color: #fff;
+    }
+
+    .form-pago {
+        flex: 1;
+        max-width: 450px;
+    }
+
+    .form-pago {
+        background-color: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 1rem;
+        padding: 1.5rem;
+        flex: 1;
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        max-width: 450px;
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: 500;
+            margin-bottom: 0.3rem;
+        }
+
+        .form-control {
+            border-radius: 1.25rem;
+            background-color: rgba(255, 255, 255, 0.07);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 0.5rem 1rem;
+            transition: all 0.3s ease;
+
+            &::placeholder {
+                color: rgba(255, 255, 255, 0.5);
+            }
+
+            &:focus {
+                outline: none;
+                border-color: $color_boton1;
+                box-shadow: 0 0 8px rgba($color_boton1, 0.5);
+            }
+        }
+
+        .btn-success {
+            background-color: $color_boton1;
+            border: none;
+            font-weight: bold;
+            border-radius: 2rem;
+            padding: 0.6rem;
+            transition: all 0.3s ease-in-out;
+
+            &:hover {
+                background-color: white;
+                color: black;
+                box-shadow: 0 0 10px rgba($color_boton1, 0.5);
+            }
+        }
+
+        .text-danger {
+            font-size: 0.85rem;
+            margin-top: 0.2rem;
+        }
+    }
+}

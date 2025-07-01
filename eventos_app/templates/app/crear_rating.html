@@ -5,8 +5,8 @@ Calificar evento
 {% endblock %}
 
 {% block content %}
-<div class="container mt-5" style="margin-top: 20px;">
-    <h2 class="mb-4">Calificar evento: {{ event.title }}</h2>
+<div class="container container-calificar mt-5" style="margin-top: 20px;">
+    <h1 class="mb-4">Calificar evento: {{ event.title }}</h1>
 
     <form method="post">
         {% csrf_token %}

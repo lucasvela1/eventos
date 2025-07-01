@@ -1,0 +1,72 @@
+.table {
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: 0.45rem;
+    overflow: hidden;
+    background-color: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+    color: white;
+
+    thead {
+        background-color: rgba(0, 0, 0, 0.7);
+
+        th {
+            text-align: center;
+            font-weight: 600;
+            padding: 0.75rem;
+            vertical-align: middle;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+    }
+
+    tbody {
+        tr {
+            transition: background-color 0.3s ease;
+
+            &:hover {
+                background-color: rgba($color_boton1, 0.15);
+            }
+
+            td {
+                padding: 0.75rem;
+                vertical-align: middle;
+                //text-align: center;
+
+                a {
+                    //color: $color_boton1;
+                    text-decoration: none;
+
+                    &:hover {
+                        text-decoration: underline;
+                        color: lighten($color_boton1, 10%);
+                    }
+                }
+            }
+        }
+
+        .text-muted {
+            color: rgba(255, 255, 255, 0.5);
+            font-style: italic;
+        }
+
+        .badge {
+            font-size: 0.85rem;
+            border-radius: 0.5rem;
+            padding: 0.3rem 0.6rem;
+        }
+    }
+
+    .btn-sm {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.75rem;
+    }
+}
+
+.table-rounded {
+    @extend .table;
+
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
