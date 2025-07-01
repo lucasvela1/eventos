@@ -149,8 +149,8 @@ class NotificationListView(LoginRequiredMixin, ListView):
     context_object_name = "notifications"
 
     def get_queryset(self):
-      Notification.objects.unread_notifications(self.request.user).update(read=True)
-      return Notification.objects.for_user_ordered_by_priority(self.request.user)
+        Notification.objects.unread_notifications(self.request.user).update(read=True)
+        return Notification.objects.for_user_ordered_by_priority(self.request.user)
     
 
 class EliminarNotificacionesSeleccionadasView(LoginRequiredMixin, View):
@@ -189,7 +189,7 @@ class ToggleFavoritoView(LoginRequiredMixin, View):
         if not creado:
             favorito.delete()
         return redirect(request.META.get('HTTP_REFERER', 'favoritos'))
-  
+
 
 class CarritoView(LoginRequiredMixin, View):
     login_url = "/accounts/login/"
@@ -250,7 +250,7 @@ class PagoView(LoginRequiredMixin, View):
     template_name = "app/pago.html"
 
     def _prepare_context(self, event, cart_data, form=None):
-       
+
         precio_vip = event.price * 1.25
         total_a_pagar = (cart_data['cantidad_general'] * event.price) + (cart_data['cantidad_vip'] * precio_vip)
         #Quitamos el Javascript y en esta ocasión cuando quiere hacer el pago le decimos cuanto cuesta todo

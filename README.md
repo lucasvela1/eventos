@@ -18,6 +18,9 @@ pip install django-admin-interface
 ## Instalar el tema de admin desde fixture
 python manage.py loaddata theme_fixture.json
 
+## Para instalar el procesador de Sass
+pip install django-sass-processor
+
 ## Hacer migraciones
 python manage.py migrate
 

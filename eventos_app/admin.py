@@ -19,7 +19,6 @@ class EventAdmin(admin.ModelAdmin):
     list_filter = ['categorias', 'venue', 'cancelado']
     list_per_page = 10
     ordering = ['-date']
-    list_per_page = 10
     actions = ['cancelar_eventos', 'habilitar_eventos','duplicar_eventos'] #Donde metermos las acciones personalizadas del evento
 
     def display_categorias(self, obj):
@@ -55,7 +54,7 @@ class EventAdmin(admin.ModelAdmin):
             )
             if categorias_originales:
                 nuevo_evento.categorias.set(categorias_originales)
-          
+
     def cancelar_eventos(self, request, queryset):
         eventos_actualizados = queryset.update(cancelado=True)
 
@@ -427,7 +426,7 @@ class FavoritoAdmin(admin.ModelAdmin):
             form.base_fields['event'].widget.can_delete_related = False
             form.base_fields['event'].widget.can_view_related = False
         return form
-  
+
 # Registrar los modelos
 admin.site.register(Event, EventAdmin)
 admin.site.register(Comment, CommentAdmin)

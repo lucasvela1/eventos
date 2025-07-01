@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "eventos_app",
     "colorfield",
+    "sass_processor",
 ]
 
 AUTH_USER_MODEL = 'eventos_app.CustomUser' #usamos un user modificado
@@ -137,3 +138,15 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+
+STATICFILES_FINDERS = [
+    "django.contrib.staticfiles.finders.FileSystemFinder",
+    "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    "sass_processor.finders.CssFinder",
+]
+
+SASS_PROCESSOR_ROOT = os.path.join(BASE_DIR, 'static')
+
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+SASS_PROCESSOR_ENABLED = True
