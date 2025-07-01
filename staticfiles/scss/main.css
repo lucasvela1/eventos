@@ -469,4 +469,69 @@ footer.footer {
     min-width: 220px;
     flex: 1 1 auto; }
 
+.login-form {
+  margin-top: 3rem; }
+  .login-form .card {
+    border-radius: 0.75rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+    border: none;
+    max-width: 500px;
+    margin: 0 auto; }
+    .login-form .card .card-body {
+      padding: 2rem; }
+    .login-form .card .card-title {
+      font-family: 'Inter', sans-serif;
+      font-size: 2rem;
+      font-weight: 700;
+      color: #ffffff;
+      text-align: center;
+      margin-bottom: 1.5rem; }
+  .login-form .text-login {
+    font-size: 0.95rem;
+    margin-top: 1rem;
+    color: #eee; }
+    .login-form .text-login a {
+      color: #e5ee65;
+      text-decoration: none; }
+      .login-form .text-login a:hover {
+        text-decoration: underline; }
+  .login-form form .row {
+    margin-bottom: 1rem; }
+    .login-form form .row label {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      font-weight: 600;
+      color: #ffffff;
+      text-align: right; }
+    .login-form form .row input, .login-form form .row select, .login-form form .row textarea {
+      font-family: 'Inter', sans-serif;
+      font-size: 1rem;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      border: 1px solid #ccc;
+      width: 100%;
+      transition: border-color 0.2s; }
+      .login-form form .row input:focus, .login-form form .row select:focus, .login-form form .row textarea:focus {
+        border-color: #e5ee65;
+        outline: none; }
+    .login-form form .row .text-danger {
+      font-size: 0.875rem; }
+  .login-form form .alert {
+    font-size: 0.95rem;
+    padding: 0.5rem 1rem; }
+  .login-form form .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 1.125rem;
+    font-weight: 600;
+    padding: 0.75rem;
+    border-radius: 0.5rem; }
+  .login-form .text-muted {
+    font-size: 0.95rem;
+    margin-top: 1rem; }
+    .login-form .text-muted a {
+      color: #e5ee65;
+      text-decoration: none; }
+      .login-form .text-muted a:hover {
+        text-decoration: underline; }
+
 /*# sourceMappingURL=main.css.map */

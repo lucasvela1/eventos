@@ -1,13 +1,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="container mt-5" style="margin-top: 20px;">
+<div class="container-fluid mt-5 login-form">
 
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
+        <div class="col-12 col-sm-8 col-md-6 col-lg-6">
 
             <div class="card shadow-sm">
-                <div class="card-body p-4">
+                <div class="card-body p-3">
 
                     <h2 class="card-title text-center mb-4">Iniciar Sesión</h2>
 
@@ -48,7 +48,7 @@
             </div>
 
             <div class="text-center mt-3">
-                 <p class="text-muted">¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate aquí</a></p>
+                 <p class="text-login">¿No tienes una cuenta? <a href="{% url 'register' %}">Regístrate aquí</a></p>
             </div>
 
         </div>
